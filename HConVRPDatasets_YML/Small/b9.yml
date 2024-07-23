@@ -1,0 +1,38 @@
+Customer_coordinates:
+- [7.444, 2.887, 1]
+- [8.946, 2.13, 1]
+- [7.182, 4.225, 1]
+- [5.843, 9.515, 1]
+- [9.963, 0.776, 1]
+- [1.668, 5.045, 1]
+- [6.246, 4.734, 1]
+- [2.759, 3.211, 1]
+- [9.485, 5.047, 1]
+- [4.494, 3.05, 1]
+- [6.972, 7.585, 1]
+- [2.839, 6.113, 1]
+Customer_demands:
+- [2, 2, 2]
+- [2, 0, 0]
+- [3, 0, 0]
+- [3, 0, 3]
+- [3, 3, 3]
+- [2, 2, 2]
+- [2, 2, 2]
+- [0, 3, 0]
+- [2, 2, 0]
+- [2, 2, 0]
+- [1, 0, 1]
+- [0, 1, 1]
+Depot_coordinates: [0.0, 0.0]
+Instance_Name: HCon13
+Number_of_available_vehicle_types: 2
+Number_of_nodes: 13
+Planning_Horizon: 3
+Route_Duration: 35
+Total_Number_of_available_vehicles: 2
+Vehicle_Types:
+- {Capacity: 18.0, Fixed_Cost: 130.0, Number_of_available_vehicles: 1, Speed: 1.0,
+  Variable_Cost: 5.0, Vehicle_Type: TYPE1}
+- {Capacity: 15.0, Fixed_Cost: 100.0, Number_of_available_vehicles: 1, Speed: 1.0,
+  Variable_Cost: 3.0, Vehicle_Type: TYPE2}
