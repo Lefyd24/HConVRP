@@ -1,6 +1,7 @@
 from colorama import Fore, Style
 import numpy as np
 import itertools
+import pandas as pd
 
 def colorize(text, color:str):
     if not type(text) == str:
@@ -14,10 +15,12 @@ def euclidean_distance(x1, y1, x2, y2):
     """
     return np.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2)
 
-def create_node_matrix(nodes, type_matrix="distance"):
+def create_node_matrix(nodes, depot, type_matrix="distance"):
     """
     Creates a distance matrix for the given nodes.
     """
+    # add the depot to the nodes as a new Customer object
+    nodes = [depot] + nodes
     n_nodes = len(nodes)
     node_matrix = np.zeros((n_nodes, n_nodes))
 
@@ -34,3 +37,4 @@ def create_node_matrix(nodes, type_matrix="distance"):
             elif type_matrix == "ratio":
                 node_matrix[i, j] = distance / node2.demand
     return node_matrix
+
