@@ -38,3 +38,9 @@ def create_node_matrix(nodes, depot, type_matrix="distance"):
                 node_matrix[i, j] = distance / node2.demand
     return node_matrix
 
+def distance(node1, node2, distance_matrix:np.ndarray):
+        """
+        Returns the distance between two nodes.
+        """
+        return distance_matrix[node1.id, node2.id]
+

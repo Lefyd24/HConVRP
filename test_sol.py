@@ -7,6 +7,8 @@ from helpers import colorize, create_node_matrix
 
 data = yaml.load(open(os.path.join(os.path.dirname(__file__), 'HConVRPDatasets_YML', 'Medium', '15%', 'b5.yml')), Loader=yaml.FullLoader)
 
+depot = Customer(0, tuple(data["Depot_coordinates"]), [0]*data["Planning_Horizon"])
+
 def initialize_customers(data):
     customers = []
     for idx, coordinates in enumerate(data["Customer_coordinates"]):
@@ -29,8 +31,7 @@ def initialize_vehicle_types(data):
         vehicle_types.append(new_v_type)
     return vehicle_types
 
-
-def initialize_vehicles(data, vehicle_types, customers):
+def initialize_vehicles(data, vehicle_types, customers, distance_matrix):
     compatability_matrix = data["Compatibility_Restrictions"]
     compatability_matrix = np.array(compatability_matrix)
 
@@ -51,23 +52,22 @@ def initialize_vehicles(data, vehicle_types, customers):
             else:
                 compatible_customers = customers
 
-            new_vehicle = Vehicle(len(vehicles) + 1, vehicle_type, data["Depot_coordinates"],
-                                  planning_horizon, route_duration,
+            new_vehicle = Vehicle(len(vehicles) + 1, vehicle_type, depot,
+                                  planning_horizon, route_duration, distance_matrix,
                                   compatible_customers, incompatible_customers)
             vehicles.append(new_vehicle)
     return vehicles
-
-compatability_matrix = data["Compatibility_Restrictions"]
-compatability_matrix = np.array(compatability_matrix)
 
 planning_horizon = data["Planning_Horizon"]
 route_duration = data["Route_Duration"]
 
 customers = initialize_customers(data)
 vehicle_types = initialize_vehicle_types(data)
-vehicles = initialize_vehicles(data, vehicle_types, customers)
+distance_matrix = create_node_matrix(customers, depot, type_matrix="distance")
 
-depot = Customer(0, tuple(data["Depot_coordinates"]), None)
+vehicles = initialize_vehicles(data, vehicle_types, customers, distance_matrix)
+
+
 
 print("Number of customers:", colorize(len(customers), 'GREEN'))
 print("Number of vehicle types:", colorize(len(vehicle_types), 'GREEN'))
@@ -76,16 +76,28 @@ print("Planning horizon:", colorize(planning_horizon, 'YELLOW'))
 print("Route duration:", colorize(route_duration, 'YELLOW'))
 print("-"*50)
 
+class Solution:
+    def __init__(self):
+        self.routes = {}  # Key: period, Value: List of routes
+
+    def add_route(self, period, vehicle, route):
+        if period not in self.routes:
+            self.routes[period] = []
+        self.routes[period].append((vehicle, route))
+
 class HConVRP:
-    def __init__(self, depot, customers, vehicles, vehicle_types, planning_horizon, max_route_duration):
+    def __init__(self, depot, customers, vehicles, vehicle_types, planning_horizon, max_route_duration, distance_matrix):
+        self.solution = Solution()
         self.depot = depot
         self.customers = customers
         self.vehicle_types = vehicle_types
         self.vehicles = vehicles
         self.planning_horizon = planning_horizon
         self.max_route_duration = max_route_duration
-        self.distance_matrix = create_node_matrix(customers, depot, type_matrix="distance")
+        self.distance_matrix = distance_matrix
         self.frequent_customers = self._find_frequent_customers()
+        self.non_frequent_customers = [customer for customer in self.customers if customer not in self.frequent_customers]
+        self.template_routes = {}
 
     
     def __str__(self):
@@ -105,8 +117,50 @@ class HConVRP:
                     frequent_customers.append(customer)
                     break
         return frequent_customers
+        
+    def distance(self, node1, node2):
+        """
+        Returns the distance between two nodes.
+        """
+        return self.distance_matrix[node1.id, node2.id]
     
-    def initial_solution(self):
+    def calculate_insertion_cost(self, vehicle, customer, position, period):
+        prev_node = vehicle.routes[period][position - 1]
+        next_node = vehicle.routes[period][position]
+        added_duration = self.distance(prev_node, customer) + self.distance(customer, next_node) - self.distance(prev_node, next_node)
+        
+        new_duration = vehicle.route_duration[period] + added_duration
+        new_load = vehicle.load[period] + customer.demands[period]
+        
+        if new_duration <= self.max_route_duration and new_load <= vehicle.current_capacity[period]:
+            cost = vehicle.variable_cost * added_duration + vehicle.fixed_cost
+            feasible = True
+        else:
+            cost = float('inf')
+            feasible = False
+            
+        return cost, feasible
+            
+
+    def find_feasible_least_cost_vehicle(self, customer, vehicles, period):
+        min_cost = float('inf')
+        best_vehicle = None
+        best_position = -1
+        
+        for vehicle in vehicles:
+            if customer in vehicle.compatible_customers and \
+                vehicle.load[period] + customer.demands[period] <= vehicle.current_capacity[period]:
+                    for i in range(1, len(vehicle.routes[period])):
+                        cost, feasible = self.calculate_insertion_cost(vehicle, customer, i, period)
+                        if feasible and cost < min_cost:
+                            min_cost = cost
+                            best_vehicle = vehicle
+                            best_position = i
+                            
+        return best_vehicle, best_position
+            
+
+    def construct_initial_solution(self):
         """
         The initial solution is constructed via the `Randomized Constructive Heurestic scheme` proposed
         by F. Stavropoulou in the paper:
@@ -123,113 +177,51 @@ class HConVRP:
         
         Move types used in the paper include **ChangeVehicle**, **SwapVehicle** & **ChangeVehicleChain**.
         """
-        # Step 1: Construct the template routes
-        s = None # The current solution
-        template_routes = []
-
-        for i in self.frequent_customers:
-            for k in self.vehicle_types:
-                for m in [vehicles for vehicles in self.vehicles if vehicles.vehicle_type == k]:
-                    u = None # Find the feasible least-cost vehicle
-            template_routes.append(u) # Add customer i to vehicle 
-        
-    def distance(self, node1, node2):
-        """
-        Returns the distance between two nodes.
-        """
-        return self.distance_matrix[node1.id, node2.id]
-    
-    def insert_customer(self, vehicle, customer, period):
-        vehicle.routes[period].append(customer)
-        vehicle.current_capacity -= customer.demands[period]
-        last_customer = vehicle.routes[period][-2]
-        vehicle.route_duration[period] += self.distance(last_customer, customer) + self.distance(customer, self.depot) - self.distance(last_customer, self.depot)
-        vehicle.cost += vehicle.vehicle_type.variable_cost * self.distance(last_customer, customer)
-        vehicle.current_location = customer.coordinates
-
-    def construct_initial_solution(self):
         # Step 1: Construct the template routes with frequent customers
-        for vehicle in self.vehicles:
-            vehicle.routes = {period: [self.depot] for period in range(self.planning_horizon)}
-            vehicle.cost = vehicle.vehicle_type.fixed_cost
-
         random.shuffle(self.frequent_customers)
         for customer in self.frequent_customers:
             for period in range(self.planning_horizon):
-                if customer.demands[period] > 0:
-                    best_vehicle = None
-                    best_position = -1
-                    best_cost = float('inf')
+                #if customer.demands[period] > 0: # Customer requires service on this period
+                best_vehicle, best_position = self.find_feasible_least_cost_vehicle(customer, self.vehicles, period)  
+                if best_vehicle:
+                    best_vehicle.insert_customer(customer=customer, period=period, position=best_position)
+                    print(f"Customer {customer.id} added to vehicle {best_vehicle.id} at position {best_position} on period {period}")
+                    self.template_routes[customer.id] = (best_vehicle, period)
+                    continue
 
-                    for vehicle in self.vehicles:
-                        if customer in vehicle.compatible_customers and vehicle.current_capacity >= customer.demands[period]:
-                            if len(vehicle.routes[period]) == 1:
-                                cost = 2 * self.distance(self.depot, customer)
-                                if vehicle.route_duration[period] + cost <= self.max_route_duration:
-                                    if cost < best_cost:
-                                        best_vehicle = vehicle
-                                        best_position = 1
-                                        best_cost = cost
-                            else:
-                                for i in range(len(vehicle.routes[period]) - 1):
-                                    cost = (self.distance(vehicle.routes[period][i], customer) +
-                                            self.distance(customer, vehicle.routes[period][i + 1]) -
-                                            self.distance(vehicle.routes[period][i], vehicle.routes[period][i + 1]))
-                                    if vehicle.route_duration[period] + cost <= self.max_route_duration:
-                                        if cost < best_cost:
-                                            best_vehicle = vehicle
-                                            best_position = i + 1
-                                            best_cost = cost
-
-                    if best_vehicle and best_position != -1:
-                        best_vehicle.routes[period].insert(best_position, customer)
-                        best_vehicle.current_capacity -= customer.demands[period]
-                        last_customer = best_vehicle.routes[period][best_position - 1]
-                        best_vehicle.route_duration[period] += self.distance(last_customer, customer) + self.distance(customer, self.depot) - self.distance(last_customer, self.depot)
-                        best_vehicle.cost += best_vehicle.vehicle_type.variable_cost * self.distance(last_customer, customer)
-
-        # Step 2: Construct routes for each period with non-frequent customers
+        # Adapt template routes for each period and add non-frequent customers
         for period in range(self.planning_horizon):
-            non_frequent_customers = [c for c in self.customers if c not in self.frequent_customers and c.demands[period] > 0]
-            random.shuffle(non_frequent_customers)
+            # for vehicle in vehicles:
+                # Remove frequent customers not requiring service on that day
+                # if customer.demands[period] > 0 and customer in vehicle.routes[period]:
+                #     print(f"Removing customer {customer.id} from vehicle {vehicle.id} on period {period}")
+                #     vehicle.remove_customer(customer, period)
 
-            for customer in non_frequent_customers:
-                best_vehicle = None
-                best_position = -1
-                best_cost = float('inf')
+            random.shuffle(self.non_frequent_customers)
+            for customer in self.non_frequent_customers:
+                best_vehicle, best_position = self.find_feasible_least_cost_vehicle(customer, vehicles, period)
+                if best_vehicle:
+                    if period not in best_vehicle.routes:
+                        best_vehicle.routes[period] = []
+                    best_vehicle.insert_customer(customer=customer, period=period, position=best_position)
 
-                for vehicle in self.vehicles:
-                    if vehicle.current_capacity >= customer.demands[period] and customer in vehicle.compatible_customers:
-                        for i in range(len(vehicle.routes[period]) - 1):
-                            cost = (self.distance(vehicle.routes[period][i], customer) +
-                                    self.distance(customer, vehicle.routes[period][i + 1]) -
-                                    self.distance(vehicle.routes[period][i], vehicle.routes[period][i + 1]))
-                            if vehicle.route_duration[period] + cost <= self.max_route_duration:
-                                if cost < best_cost:
-                                    best_vehicle = vehicle
-                                    best_position = i + 1
-                                    best_cost = cost
+            # Add daily schedule to the solution
+            for vehicle in vehicles:
+                if vehicle.routes[period]:
+                    self.solution.add_route(period, vehicle, vehicle.routes[period])
 
-                if best_vehicle and best_position != -1:
-                    best_vehicle.routes[period].insert(best_position, customer)
-                    best_vehicle.current_capacity -= customer.demands[period]
-                    last_customer = best_vehicle.routes[period][best_position - 1]
-                    best_vehicle.route_duration[period] += self.distance(last_customer, customer) + self.distance(customer, self.depot) - self.distance(last_customer, self.depot)
-                    best_vehicle.cost += best_vehicle.vehicle_type.variable_cost * self.distance(last_customer, customer)
-
-        # Ensure depot is at the start and end of each route
-        for vehicle in self.vehicles:
-            for period in range(self.planning_horizon):
-                if vehicle.routes[period][-1] != self.depot:
-                    vehicle.routes[period].append(self.depot)
-
-        return self.vehicles
+        return self.solution
     
-problem = HConVRP(depot, customers, vehicles, vehicle_types, planning_horizon, route_duration)
+problem = HConVRP(depot, customers, vehicles, vehicle_types, planning_horizon, route_duration, distance_matrix)
 print(problem)
 print(colorize("Number of frequent customers:", 'GREEN'), len(problem.frequent_customers), colorize("out of", 'GREEN'), len(customers))
 
-initial_vehicles_routes = problem.construct_initial_solution()
-for vehicle in initial_vehicles_routes:
-    print(vehicle)
+solution = problem.construct_initial_solution()
+for period in solution.routes:
+    print(f"Period {period}:")
+    for vehicle, route in solution.routes[period]:
+        print(vehicle)
+        print("Route:", route)
     print("-"*50)
+    
+print("Template routes:", problem.template_routes)
