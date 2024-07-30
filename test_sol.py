@@ -147,6 +147,9 @@ class HConVRP:
         best_vehicle = None
         best_position = -1
         
+        if type(vehicles) == Vehicle:
+            vehicles = [vehicles]
+
         for vehicle in vehicles:
             if customer in vehicle.compatible_customers and \
                 vehicle.load[period] + customer.demands[period] <= vehicle.current_capacity[period]:
@@ -158,7 +161,42 @@ class HConVRP:
                             best_position = i
                             
         return best_vehicle, best_position
-            
+    
+    def find_feasible_least_cost_vehicle_for_frequent(self, customer, vehicles):
+        best_vehicle = None
+        vehicle_costs = {vehicle: {period: 0 for period in range(self.planning_horizon)} for vehicle in vehicles}
+        vehicle_total_costs = {vehicle: 0 for vehicle in vehicles}
+        for vehicle in vehicles:
+            if customer in vehicle.compatible_customers:
+                for period in range(self.planning_horizon):
+                    if customer.demands[period] > 0:
+                        for i in range(1, len(vehicle.routes[period])):
+                            cost, feasible = self.calculate_insertion_cost(vehicle, customer, i, period)
+                            vehicle_costs[vehicle][period] += cost
+
+        for vehicle in vehicles:
+            vehicle_total_costs[vehicle] = sum(vehicle_costs[vehicle].values())
+        # the best vehicle is the one that appears the most in the best_vehicles list
+        # if there is a tie, the vehicle with the lowest cost is selected
+        print("Best vehicles:", vehicle_total_costs)
+        return best_vehicle[0]
+    
+    def generate_template_routes(self):
+        """
+        Generate the template routes for the frequent customers.
+
+        ### Constraints:
+        - Each frequent customer should  be serviced by the same vahicle over all periods in which it requires service.
+        - The vehicle should be the one that minimizes the total cost of serving the customer over all periods.
+        """
+        random.shuffle(self.frequent_customers)
+        for customer in self.frequent_customers:
+            best_vehicle = self.find_feasible_least_cost_vehicle_for_frequent(customer, self.vehicles)
+            for period in range(self.planning_horizon):
+                if customer.demands[period] > 0:
+                    best_position = self.find_feasible_least_cost_vehicle(customer, best_vehicle, period)
+                    best_vehicle.insert_customer(customer=customer, period=period, position=best_position)
+                    self.template_routes[customer.id] = (best_vehicle, period)
 
     def construct_initial_solution(self):
         """
@@ -178,16 +216,7 @@ class HConVRP:
         Move types used in the paper include **ChangeVehicle**, **SwapVehicle** & **ChangeVehicleChain**.
         """
         # Step 1: Construct the template routes with frequent customers
-        random.shuffle(self.frequent_customers)
-        for customer in self.frequent_customers:
-            for period in range(self.planning_horizon):
-                #if customer.demands[period] > 0: # Customer requires service on this period
-                best_vehicle, best_position = self.find_feasible_least_cost_vehicle(customer, self.vehicles, period)  
-                if best_vehicle:
-                    best_vehicle.insert_customer(customer=customer, period=period, position=best_position)
-                    print(f"Customer {customer.id} added to vehicle {best_vehicle.id} at position {best_position} on period {period}")
-                    self.template_routes[customer.id] = (best_vehicle, period)
-                    continue
+        self.generate_template_routes()
 
         # Adapt template routes for each period and add non-frequent customers
         for period in range(self.planning_horizon):
