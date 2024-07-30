@@ -28,6 +28,8 @@ class VehicleType:
     def __str__(self):
         return f"Vehicle type {colorize(self.vehicle_type_name, 'BLUE')} with {self.available_vehicles} vehicles, capacity {self.capacity}, fixed cost {self.fixed_cost}, variable cost {self.variable_cost}, speed {self.speed}"
 
+    def __repr__(self) -> str:
+        return f"VehicleType_{self.vehicle_type_name}"
 
 class Vehicle:
     def __init__(self, id, vehicle_type:VehicleType, current_location, planning_horizon, max_route_duration, 
@@ -43,7 +45,7 @@ class Vehicle:
         self.current_location = current_location
         self.distance_matrix = distance_matrix
         
-        self.current_capacity = {i: self.vehicle_type.capacity for i in range(planning_horizon)} # current_capacity = {period_0: 0, period_1: 0, ...}
+        self.capacity = {i: self.vehicle_type.capacity for i in range(planning_horizon)} # current_capacity = {period_0: 0, period_1: 0, ...}
         self.load = {i: 0 for i in range(planning_horizon)} # load = {period_0: 0, period_1: 0, ...}
         self.cost = {i: self.fixed_cost for i in range(planning_horizon)} # cost = {period_0: 0, period_1: 0, ...}
         self.route_duration = {i: 0 for i in range(planning_horizon)} # route_duration = {period_0: 0, period_1: 0, ...}
@@ -55,7 +57,7 @@ class Vehicle:
     def __str__(self):
         return f"Vehicle {colorize(str(self.id), 'GREEN')} of type {colorize(self.vehicle_type.vehicle_type_name, 'BLUE')}.\n\
 - Current Position {colorize(self.current_location, 'YELLOW')}\n\
-- Current Capacity {colorize(self.current_capacity, 'MAGENTA')} (out of {self.vehicle_type.capacity})\n\
+- Capacity {colorize(self.capacity, 'MAGENTA')} (out of {self.vehicle_type.capacity})\n\
 - Current Cost {colorize(self.cost, 'CYAN')}\n\
 - Routes' Durations: {self.route_duration}\n\
 - Routes: {self.routes}"
@@ -84,7 +86,7 @@ class Vehicle:
         # not compatible customers assertion
         assert customer in self.compatible_customers, f"Customer {customer.id} is not compatible with vehicle {self.id}"
         # load exceeds capacity assertion
-        assert customer.demands[period] + self.load[period] <= self.current_capacity[period], f"Customer {customer.id} demand exceeds vehicle {self.id} capacity"
+        assert customer.demands[period] + self.load[period] <= self.capacity[period], f"Customer {customer.id} demand exceeds vehicle {self.id} capacity"
         # route duration exceeds max route duration assertion
         added_duration = self.distance_matrix[self.routes[period][-2].id, customer.id] + self.distance_matrix[customer.id, self.routes[period][-1].id] - self.distance_matrix[self.routes[period][-2].id, self.routes[period][-1].id]
         assert self.route_duration[period] + added_duration <= self.max_route_duration, f"Customer {customer.id} cannot be added to vehicle {self.id} route due to route duration"
@@ -92,7 +94,6 @@ class Vehicle:
         # add customer to the route
         self.routes[period].insert(-1, customer)
         # update vehicle attributes
-        self.current_capacity[period] -= customer.demands[period]
         self.load[period] += customer.demands[period]
         self.cost[period] += self.variable_cost * added_duration + self.fixed_cost
         self.route_duration[period] += added_duration
@@ -120,15 +121,16 @@ class Vehicle:
         # not compatible customers assertion
         assert customer in self.compatible_customers, f"Customer {customer.id} is not compatible with vehicle {self.id}"
         # load exceeds capacity assertion
-        assert customer.demands[period] + self.load[period] <= self.current_capacity[period], f"Customer {customer.id} demand exceeds vehicle {self.id} capacity"
+        assert customer.demands[period] + self.load[period] <= self.capacity[period], f"Customer {customer.id} demand ({customer.demands[period]}) exceeds vehicle {self.id} capacity ({self.current_capacity[period]}) - Total load: {self.load[period]}"
         # route duration exceeds max route duration assertion
-        added_duration = self.distance_matrix[self.routes[period][position-1].id, customer.id] + self.distance_matrix[customer.id, self.routes[period][position].id] - self.distance_matrix[self.routes[period][position-1].id, self.routes[period][position].id]
+        previous_node = self.routes[period][position-1]
+        next_node = self.routes[period][position]
+        added_duration = self.distance_matrix[previous_node.id, customer.id] + self.distance_matrix[customer.id, next_node.id] - self.distance_matrix[previous_node.id, next_node.id]
         assert self.route_duration[period] + added_duration <= self.max_route_duration, f"Customer {customer.id} cannot be inserted to vehicle {self.id} route at position {position} due to route duration"
         
         # insert customer to the route
         self.routes[period].insert(position, customer)
         # update vehicle attributes
-        self.current_capacity[period] -= customer.demands[period]
         self.load[period] += customer.demands[period]
         self.cost[period] += self.variable_cost * added_duration + self.fixed_cost
         self.route_duration[period] += added_duration
@@ -141,7 +143,7 @@ class Vehicle:
         # remove customer from the route
         self.routes[period].remove(customer)
         # update vehicle attributes
-        self.current_capacity[period] += customer.demands[period]
+        self.capacity[period] += customer.demands[period]
         self.load[period] -= customer.demands[period]
         # if the customer is the last customer in the route
         distance_Prev_Next = self.distance_matrix[self.routes[period][self.routes[period].index(customer)-1].id, self.routes[period][self.routes[period].index(customer)+1].id]

@@ -3,9 +3,13 @@ from models import *
 import yaml
 import os
 import numpy as np
+import datetime as dt
+import time
 from helpers import colorize, create_node_matrix
 
-data = yaml.load(open(os.path.join(os.path.dirname(__file__), 'HConVRPDatasets_YML', 'Medium', '15%', 'b5.yml')), Loader=yaml.FullLoader)
+data_filename = os.path.join(os.path.dirname(__file__), 'HConVRPDatasets_YML', 'Medium', '15%', 'b9.yml')
+
+data = yaml.load(open(data_filename), Loader=yaml.FullLoader)
 
 depot = Customer(0, tuple(data["Depot_coordinates"]), [0]*data["Planning_Horizon"])
 
@@ -77,17 +81,67 @@ print("Route duration:", colorize(route_duration, 'YELLOW'))
 print("-"*50)
 
 class Solution:
-    def __init__(self):
+    def __init__(self, depot):
+        self.nodes = []
+        self.vehicle_types = []
+        self.vehicles = []
         self.routes = {}  # Key: period, Value: List of routes
-
+        self.depot = depot
+        self.planning_horizon = 0
+        self.max_route_duration = 0
+        self.total_cost = {}  # Total cost for each period
+        self.computation_time = 0  # To store the time taken for the solution
+        
     def add_route(self, period, vehicle, route):
         if period not in self.routes:
             self.routes[period] = []
         self.routes[period].append((vehicle, route))
+    
+    def write_solution(self, filename):
+        """
+        File should be of yaml format.
+        """
+        data = {
+            'metadata': {
+                'datetime': dt.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                "solution_for_file": data_filename,
+                'description': 'Solution for Heterogeneous Consistent Vehicle Routing Problem (HConVRP)',
+                'computation_time_seconds': self.computation_time
+            },
+            'solution': {
+                'planning_horizon': self.planning_horizon,
+                'max_route_duration': self.max_route_duration,
+                'depot': self.depot,
+                'nodes': self.nodes,
+                'vehicle_types': self.vehicle_types,
+                'vehicles': [{'id': v.id, 'type': v.vehicle_type} for v in self.vehicles],
+                'routes': {},
+                'total_cost': self.total_cost
+            }
+        }
+        
+        for period, routes in self.routes.items():
+            data['solution']['routes'][period] = []
+            for vehicle, route in routes:
+                route_data = {
+                    'vehicle_id': vehicle.id,
+                    'route': [node.id for node in route]
+                }
+                data['solution']['routes'][period].append(route_data)
+        
+        with open(filename, 'w') as file:
+            yaml.dump(data, file, default_flow_style=False, sort_keys=False)
+            
 
 class HConVRP:
-    def __init__(self, depot, customers, vehicles, vehicle_types, planning_horizon, max_route_duration, distance_matrix):
-        self.solution = Solution()
+    def __init__(self, depot, customers, vehicles, vehicle_types, planning_horizon, max_route_duration, distance_matrix, solution):
+        self.solution = solution
+        self.solution.planning_horizon = planning_horizon
+        self.solution.max_route_duration = max_route_duration
+        self.solution.nodes = customers
+        self.solution.vehicles = vehicles
+        self.solution.vehicle_types = vehicle_types
+        
         self.depot = depot
         self.customers = customers
         self.vehicle_types = vehicle_types
@@ -132,7 +186,7 @@ class HConVRP:
         new_duration = vehicle.route_duration[period] + added_duration
         new_load = vehicle.load[period] + customer.demands[period]
         
-        if new_duration <= self.max_route_duration and new_load <= vehicle.current_capacity[period]:
+        if new_duration <= self.max_route_duration and new_load <= vehicle.capacity[period]:
             cost = vehicle.variable_cost * added_duration + vehicle.fixed_cost
             feasible = True
         else:
@@ -152,7 +206,7 @@ class HConVRP:
 
         for vehicle in vehicles:
             if customer in vehicle.compatible_customers and \
-                vehicle.load[period] + customer.demands[period] <= vehicle.current_capacity[period]:
+                vehicle.load[period] + customer.demands[period] <= vehicle.capacity[period]:
                     for i in range(1, len(vehicle.routes[period])):
                         cost, feasible = self.calculate_insertion_cost(vehicle, customer, i, period)
                         if feasible and cost < min_cost:
@@ -178,8 +232,9 @@ class HConVRP:
             vehicle_total_costs[vehicle] = sum(vehicle_costs[vehicle].values())
         # the best vehicle is the one that appears the most in the best_vehicles list
         # if there is a tie, the vehicle with the lowest cost is selected
-        print("Best vehicles:", vehicle_total_costs)
-        return best_vehicle[0]
+        best_vehicle = min(vehicle_total_costs, key=vehicle_total_costs.get)
+        print(f"Best vehicle for customer {customer.id} is {best_vehicle}")
+        return best_vehicle
     
     def generate_template_routes(self):
         """
@@ -194,7 +249,7 @@ class HConVRP:
             best_vehicle = self.find_feasible_least_cost_vehicle_for_frequent(customer, self.vehicles)
             for period in range(self.planning_horizon):
                 if customer.demands[period] > 0:
-                    best_position = self.find_feasible_least_cost_vehicle(customer, best_vehicle, period)
+                    best_position = self.find_feasible_least_cost_vehicle(customer, best_vehicle, period)[1]
                     best_vehicle.insert_customer(customer=customer, period=period, position=best_position)
                     self.template_routes[customer.id] = (best_vehicle, period)
 
@@ -228,24 +283,35 @@ class HConVRP:
 
             random.shuffle(self.non_frequent_customers)
             for customer in self.non_frequent_customers:
-                best_vehicle, best_position = self.find_feasible_least_cost_vehicle(customer, vehicles, period)
-                if best_vehicle:
-                    if period not in best_vehicle.routes:
-                        best_vehicle.routes[period] = []
-                    best_vehicle.insert_customer(customer=customer, period=period, position=best_position)
+                if customer.demands[period] > 0:
+                    best_vehicle, best_position = self.find_feasible_least_cost_vehicle(customer, vehicles, period)
+                    if best_vehicle:
+                        if period not in best_vehicle.routes:
+                            best_vehicle.routes[period] = []
+                        best_vehicle.insert_customer(customer=customer, period=period, position=best_position)
 
             # Add daily schedule to the solution
             for vehicle in vehicles:
                 if vehicle.routes[period]:
                     self.solution.add_route(period, vehicle, vehicle.routes[period])
+            
+        # calculate total cost of every period
+        for period in range(self.planning_horizon):
+            print(f"Calculating total cost for period {period}")
+            if period not in self.solution.total_cost:
+                self.solution.total_cost[period] = 0
+            for vehicle in vehicles:
+                self.solution.total_cost[period] += float(vehicle.cost[period])
 
         return self.solution
-    
-problem = HConVRP(depot, customers, vehicles, vehicle_types, planning_horizon, route_duration, distance_matrix)
+
+solution = Solution(depot)
+problem = HConVRP(depot, customers, vehicles, vehicle_types, planning_horizon, route_duration, distance_matrix, solution)
 print(problem)
 print(colorize("Number of frequent customers:", 'GREEN'), len(problem.frequent_customers), colorize("out of", 'GREEN'), len(customers))
-
+start = time.time()
 solution = problem.construct_initial_solution()
+end = time.time()
 for period in solution.routes:
     print(f"Period {period}:")
     for vehicle, route in solution.routes[period]:
@@ -254,3 +320,5 @@ for period in solution.routes:
     print("-"*50)
     
 print("Template routes:", problem.template_routes)
+solution.computation_time = end - start
+solution.write_solution("solutions/solution.yml")
