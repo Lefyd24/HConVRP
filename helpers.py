@@ -136,3 +136,4 @@ def create_interactive_graph(graph, edges, solution, filename='solution_with_sli
     # Write the final HTML to a file
     with open(filename, 'w') as f:
         f.write(html_content)
+

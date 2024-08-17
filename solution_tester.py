@@ -18,7 +18,8 @@ class SolutionLoader:
         return Customer(
             id=data['id'],
             coordinates=tuple(data['coordinates']),
-            demands=data['demands']
+            demands=data['demands'],
+            planning_horizon=data['planning_horizon']
         )
 
     def vehicle_type_constructor(loader, node):
@@ -61,7 +62,8 @@ class SolutionLoader:
         depot = Customer(
             id=depot_data.id,
             coordinates=tuple(depot_data.coordinates),
-            demands=depot_data.demands
+            demands=depot_data.demands,
+            planning_horizon=planning_horizon
         )
         
         # Load customers
@@ -71,7 +73,8 @@ class SolutionLoader:
             customer = Customer(
                 id=c_data.id,
                 coordinates=tuple(c_data.coordinates),
-                demands=c_data.demands
+                demands=c_data.demands,
+                planning_horizon=planning_horizon
             )
             customers.append(customer)
         # Map customer IDs to customer objects for easy lookup
@@ -201,7 +204,7 @@ class SolutionChecker:
                 for customer in route:
                     load += customer.demands[period]
                 if load > vehicle.vehicle_type.capacity:
-                    print(colorize(f"Vehicle {vehicle.id} exceeded capacity in period {period}.", "RED"))
+                    print(colorize(f"Vehicle {vehicle.id} exceeded capacity in period {period}. Load: {load}, Capacity: {vehicle.vehicle_type.capacity}.", "RED"))
                     return False
         return True
     
@@ -210,9 +213,9 @@ class SolutionChecker:
             for vehicle, route in routes:
                 duration = 0
                 for i in range(1, len(route)):
-                    duration += self.distance_matrix[route[i-1].id, route[i].id]
+                    duration += self.distance_matrix[route[i-1].id, route[i].id]/vehicle.vehicle_type.speed
                 if duration > self.max_route_duration:
-                    print(colorize(f"Vehicle {vehicle.id} exceeded duration in period {period}.", "RED"))
+                    print(colorize(f"Vehicle {vehicle.id} exceeded duration in period {period}. Duration: {duration}, Max Duration: {self.max_route_duration}.", "RED"))
                     return False
         return True
     
