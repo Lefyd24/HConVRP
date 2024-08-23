@@ -312,6 +312,8 @@ if __name__ == "__main__":
     print(colorize("Vehicle Types:", 'YELLOW'), solution['vehicle_types'])
     print(colorize("No. of Vehicles:", 'YELLOW'), len(solution['vehicles']), colorize("- No. of Customers:", 'YELLOW'), len(solution['customers']))
     print(colorize("Total Cost per Period:", 'YELLOW'), solution['total_cost'])
+    print(colorize("Total solution cost: ", "MAGENTA"), sum([period_cost for period_cost in solution['total_cost'].values()]))
+
 
     checker = SolutionChecker(solution)
     print(checker)

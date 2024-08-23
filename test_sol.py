@@ -5,9 +5,12 @@ import os
 import numpy as np
 import datetime as dt
 import time
+import pandas as pd
 from helpers import colorize, create_node_matrix
+from warnings import filterwarnings
+filterwarnings('ignore')
 
-data_filename = os.path.join(os.path.dirname(__file__), 'HConVRPDatasets_YML', 'Medium', '50%', 'b1.yml')
+data_filename = os.path.join(os.path.dirname(__file__), 'HConVRPDatasets_YML', 'Medium', '50%', 'b2.yml')
 
 data = yaml.load(open(data_filename), Loader=yaml.FullLoader)
 
@@ -138,6 +141,8 @@ class HConVRP:
         self.solution.nodes = customers
         self.solution.vehicles = vehicles
         self.solution.vehicle_types = vehicle_types
+
+        self.solution_df = pd.DataFrame(columns=["Step"] + [f"PeriodCost_{i}" for i in range(planning_horizon)] + ["TotalCost"])
         
         self.depot = depot
         self.customers = customers
@@ -217,6 +222,7 @@ class HConVRP:
         - Each frequent customer should be serviced by the same vehicle over all periods in which it requires service.
         - The vehicle should be the one that minimizes the total cost of serving the customer over all periods.
         """
+        # by random shuffling the frequent customers, every run of the script will generate a different initial solution
         random.shuffle(self.frequent_customers)
         
         for customer in self.frequent_customers:
@@ -264,7 +270,7 @@ class HConVRP:
                     template_customer.is_serviced[period] = False
 
         # 3. Add non-frequent customers to the routes
-        random.shuffle(self.non_frequent_customers)
+        #ßrandom.shuffle(self.non_frequent_customers)
         for customer in self.non_frequent_customers:
             # Determine the period in which the customer requires service
             period = np.argmax(customer.demands)
@@ -359,8 +365,12 @@ class HConVRP:
         for period in range(self.planning_horizon):
             total_cost = sum(vehicle.cost[period] for vehicle in self.vehicles)
             self.solution.total_cost[period] = float(total_cost)
+        
+        self.solution_df = pd.concat([self.solution_df, pd.DataFrame([["Initial"] + list(self.solution.total_cost.values()) + [sum(self.solution.total_cost.values())]], columns=self.solution_df.columns)], ignore_index=True)
 
         return self.solution
+    
+
 
 
             
@@ -369,12 +379,7 @@ hconvrp = HConVRP(depot, customers, vehicles, vehicle_types, planning_horizon, r
 print(hconvrp)
 start = time.time()
 solution = hconvrp.construct_inital_solution()
-# for period in solution.routes:
-#     print(f"Period {period}:")
-#     for vehicle, route in solution.routes[period]:
-#         print(vehicle)
-#         print("Route:", route)
-#     print("-"*50)
+print(hconvrp.solution_df)
 end = time.time()
 solution.computation_time = end - start
 solution.write_solution("solutions/solution.yml")
