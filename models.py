@@ -1,5 +1,6 @@
 import yaml
 import os
+import numpy as np
 from helpers import colorize, distance
 
 class Customer:
@@ -64,21 +65,37 @@ class Vehicle:
     def __repr__(self):
         return f"Vehicle_{self.id} - {self.vehicle_type.vehicle_type_name}"
             
-    def add_customer(self, customer: Customer, period: int) -> bool:
-        self._validate_customer_addition(customer, period)
+    def _validate_customer_addition(self, customer: Customer, period: int):
+        assert customer in self.compatible_customers, f"Customer {customer.id} is not compatible with vehicle {self.id}"
+        assert customer.demands[period] + self.load[period] <= self.vehicle_type.capacity, \
+            f"Customer {customer.id} demand exceeds vehicle {self.id} capacity"
+        new_duration = self._calculate_added_duration(customer, period)
+        assert self.route_duration[period] + new_duration <= self.max_route_duration, \
+            f"Customer {customer.id} cannot be added to vehicle {self.id} route due to route duration"
+
+    def _validate_customer_insertion(self, customer: Customer, period: int, position: int, ignore_load: bool):
+        assert customer in self.compatible_customers, f"Customer {customer.id} is not compatible with vehicle {self.id}"
+        if not ignore_load:
+            assert customer.demands[period] + self.load[period] <= self.vehicle_type.capacity, \
+                f"Customer {customer.id} demand exceeds vehicle {self.id} capacity"
+        new_duration = self._calculate_added_duration(customer, period, position)
+        assert self.route_duration[period] + new_duration <= self.max_route_duration, \
+            f"Customer {customer.id} cannot be inserted to vehicle {self.id} route due to route duration (new duration: {self.route_duration[period] + new_duration} - max duration: {self.max_route_duration})"
+
+    def _calculate_added_duration(self, customer: Customer, period: int, position:int):
+        previous_location = self.routes[period][position - 1]
+        next_location = self.routes[period][position]
         
-        previous_location = self.routes[period][-2]
-        next_location = self.routes[period][-1]
-        
-        added_duration = (self.distance_matrix[previous_location.id, customer.id] +
-                          self.distance_matrix[customer.id, next_location.id] -
-                          self.distance_matrix[previous_location.id, next_location.id])
-        
-        self.routes[period].insert(-1, customer)
-        self._update_vehicle_state(customer, period, added_duration)
-        
-        return True
-    
+        return (self.distance_matrix[previous_location.id, customer.id] +
+                self.distance_matrix[customer.id, next_location.id] -
+                self.distance_matrix[previous_location.id, next_location.id])
+
+    def _update_vehicle_state(self, customer: Customer, period: int, duration_change: float):
+        self.load[period] += customer.demands[period]
+        self.route_duration[period] += duration_change
+        self.cost[period] += self.variable_cost * duration_change
+        self.current_location = customer
+
     def insert_customer(self, customer: Customer, position: int, period: int, ignore_load=False) -> bool:
         self._validate_customer_insertion(customer, period, position, ignore_load)
         
@@ -113,33 +130,43 @@ class Vehicle:
         
         return True
 
-    def _validate_customer_addition(self, customer: Customer, period: int):
-        assert customer in self.compatible_customers, f"Customer {customer.id} is not compatible with vehicle {self.id}"
-        assert customer.demands[period] + self.load[period] <= self.vehicle_type.capacity, \
-            f"Customer {customer.id} demand exceeds vehicle {self.id} capacity"
-        new_duration = self._calculate_added_duration(customer, period)
-        assert self.route_duration[period] + new_duration <= self.max_route_duration, \
-            f"Customer {customer.id} cannot be added to vehicle {self.id} route due to route duration"
+    def find_best_relocation(self, other_vehicle: 'Vehicle', period: int):
+        best_relocation = None
+        no_relocations = 0
+        for first_route_node_index in range(len(self.routes[period])-1):
+            for second_route_node_index in range(len(other_vehicle.routes[period])-1):
+                if (first_route_node_index == 0 or second_route_node_index == 0) or \
+                    (first_route_node_index == len(self.routes[period])-1 or second_route_node_index == len(other_vehicle.routes[period])-1) or \
+                    (self.id == other_vehicle.id and (second_route_node_index == first_route_node_index) or (second_route_node_index == first_route_node_index - 1) or (second_route_node_index == first_route_node_index + 1)):
+                    # 1. If the node is the first or last node of the route, it cannot be relocated (depot)
+                    # 2. If the node is the same node, it cannot be relocated
+                    # 3. If the node is the next or previous node of the other node, it cannot be relocated
+                    continue
+                
+                a1 = self.routes[period][first_route_node_index - 1]
+                a2 = self.routes[period][first_route_node_index]
+                a3 = self.routes[period][first_route_node_index + 1]
 
-    def _validate_customer_insertion(self, customer: Customer, period: int, position: int, ignore_load: bool):
-        assert customer in self.compatible_customers, f"Customer {customer.id} is not compatible with vehicle {self.id}"
-        if not ignore_load:
-            assert customer.demands[period] + self.load[period] <= self.vehicle_type.capacity, \
-                f"Customer {customer.id} demand exceeds vehicle {self.id} capacity"
-        new_duration = self._calculate_added_duration(customer, period, position)
-        assert self.route_duration[period] + new_duration <= self.max_route_duration, \
-            f"Customer {customer.id} cannot be inserted to vehicle {self.id} route due to route duration (new duration: {self.route_duration[period] + new_duration} - max duration: {self.max_route_duration})"
+                b1 = other_vehicle.routes[period][second_route_node_index]
+                b3 = other_vehicle.routes[period][second_route_node_index + 1]
 
-    def _calculate_added_duration(self, customer: Customer, period: int, position:int):
-        previous_location = self.routes[period][position - 1]
-        next_location = self.routes[period][position]
-        
-        return (self.distance_matrix[previous_location.id, customer.id] +
-                self.distance_matrix[customer.id, next_location.id] -
-                self.distance_matrix[previous_location.id, next_location.id])
+                move_cost = None
+                cost_change_first_route = None
+                cost_change_second_route = None
 
-    def _update_vehicle_state(self, customer: Customer, period: int, duration_change: float):
-        self.load[period] += customer.demands[period]
-        self.route_duration[period] += duration_change
-        self.cost[period] += self.variable_cost * duration_change
-        self.current_location = customer
+                # Customer is frequent if it has demand in more than one period
+                customer_is_frequent = np.sum(a2.demands > 0) > 1
+
+                if self.id != other_vehicle.id:
+                    # 1. Capacity constraint
+                    if other_vehicle.load[period] + a2.demands[period] > other_vehicle.vehicle_type.capacity:
+                        continue
+                    # 2. Compatibility constraint
+                    elif a2 not in other_vehicle.compatible_customers:
+                        continue
+                    # 3. Duration constraint
+                    added_duration = (self.distance_matrix[b1.id, a2.id] + self.distance_matrix[a2.id, b3.id] - self.distance_matrix[b1.id, b3.id])/self.vehicle_type.speed
+                    if other_vehicle.route_duration[period] + added_duration > other_vehicle.max_route_duration:
+                        continue
+            
+                    
