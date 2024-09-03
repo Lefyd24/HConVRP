@@ -129,22 +129,24 @@
             document.getElementById('datasetInfo').innerHTML = '';
             // send an ajax request to the server to load the dataset
             $.ajax({
-                url: `/find_dataset/${dataset}`,
-                type: 'GET',
-                data: {
+                url: `/find_dataset`,
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
                     dataset: dataset
-                },
+                }),
                 success: function(response) {
                     // remove the loading spinner and update the card text with the dataset details
                     if (response.status === 'success') {
                         document.getElementById('selectedDataset').innerHTML = `Selected Dataset: <span class='text-aueb-primary font-weight-bold'>${dataset}</span> <span class="badge bg-success">Loaded</span>`;
                         // send another request to now load the dataset into the solver
                         $.ajax({
-                            url: `/load_dataset/${dataset}`,
-                            type: 'GET',
-                            data: {
+                            url: `/load_dataset`,
+                            type: 'POST',
+                            contentType: 'application/json',
+                            data: JSON.stringify({
                                 dataset: dataset
-                            },
+                            }),
                             success: function(response) {
                                 if (response.status === 'success') {
                                     document.getElementById('selectedDataset').innerHTML = `Selected Dataset: <span class='text-aueb-primary font-weight-bold'>${dataset}</span> <span class="badge bg-success">Loaded</span>`;

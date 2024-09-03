@@ -13,6 +13,7 @@ dataset_bp = Blueprint('dataset_bp', __name__)
 def get_directory_structure(rootdir):
     dir_structure = {}
     for dirpath, dirnames, filenames in os.walk(rootdir):
+        print(dirpath, dirnames, filenames)
         folder = os.path.relpath(dirpath, rootdir)
         subdir = dir_structure
         if folder != '.':
@@ -28,13 +29,15 @@ def datasets():
     datasets = get_directory_structure(dataset_path)
     return render_template('datasets.html', datasets=datasets)
 
-@dataset_bp.route('/find_dataset/<path:dataset>', methods=['GET'])
-def find_dataset(dataset):
+@dataset_bp.route('/find_dataset', methods=['POST'])
+def find_dataset():
+    dataset = request.get_json().get('dataset')
     if os.path.isfile(dataset):
         return jsonify({'status': 'success', 'dataset': dataset})
 
-@dataset_bp.route('/load_dataset/<path:dataset>', methods=['GET'])
-def load_dataset(dataset):
+@dataset_bp.route('/load_dataset', methods=['POST'])
+def load_dataset():
+    dataset = request.get_json().get('dataset')
     globals.data = yaml.load(open(dataset), Loader=yaml.FullLoader)
     
     globals.depot = Customer(0, tuple(globals.data["Depot_coordinates"]), [0]*globals.data["Planning_Horizon"], globals.data["Planning_Horizon"])

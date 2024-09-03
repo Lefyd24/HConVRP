@@ -16,6 +16,7 @@ def list_files_recursive(dataset, path='.'):
 @basic_bp.route('/')
 def index():
     dataset_path = current_app.config['DATASET_PATH']
+    print(dataset_path)
     datasets = {}
     list_files_recursive(datasets, dataset_path)
     return render_template('index.html', datasets=datasets)
