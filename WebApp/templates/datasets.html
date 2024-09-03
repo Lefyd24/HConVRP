@@ -1,0 +1,195 @@
+{% extends "base.html" %}
+{% block title %}HConVRP Solver{% endblock %}
+{% block links %}
+<link href="https://cdnjs.cloudflare.com/ajax/libs/jsoneditor/9.5.0/jsoneditor.min.css" rel="stylesheet" />
+{% endblock %}
+{% block content %}
+<style>
+    /* Remove list item bullets and padding */
+    .folder > ul {
+        margin-left: 20px;
+        list-style-type: none; /* Hide list dots */
+        padding-left: 0;
+    }
+
+    .folder-toggle, .file {
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        padding: 5px 0;
+    }
+
+    .folder-toggle i, .file i {
+        margin-right: 8px;
+    }
+
+    .file {
+        list-style-type: none; /* Hide list dots */
+        padding-left: 28px; /* Align files to the folder level */
+    }
+
+    /* Hover effects for folders and files */
+    .folder-toggle:hover .folder-text,
+    .file:hover .file-text {
+        color: #007bff; /* Change text color on hover */
+        text-decoration: underline; /* Add underline to indicate clickability */
+    }
+
+    /* Styles for the card */
+    .card {
+        border: 1px solid #dee2e6;
+        border-radius: 0.25rem;
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    }
+
+    .card-body {
+        background-color: #f8f9fa; /* Light gray background for a professional look */
+    }
+
+    .card-title {
+        color: #343a40; /* Dark color for the card title */
+        font-weight: bold;
+    }
+
+    /* Highlight the selected file */
+    .file.selected {
+        background-color: #e9ecef;
+        border-radius: 4px;
+    }
+</style>
+
+<header class="bg-aueb-primary text-white py-3">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class='row d-flex justify-content-between align-items-center'>
+                    <div class='col-6'>
+                        <h1 class="display-5 p-0">Datasets</h1>
+                    </div>
+                    <div class='col-6 text-end'>
+                        <h6 class="text-white">Explore the datasets</h6>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<div class="container-fluid mt-4" style="height: calc(100vh - 100px);">
+    <div class="row" style="height: 100%;">
+        <!-- Left Column: Folder Structure -->
+        <div class="col-md-4" style="height: 100%; overflow-y: auto;">
+            <div id="dataset-tree" class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Folder Structure</h5>
+                    {% macro render_tree(structure, parent_path="") %}
+                        <ul class="folder">
+                        {% for key, value in structure.items() %}
+                            <li>
+                                {% if value is mapping %}
+                                    <span class="folder-toggle" data-folder="{{ parent_path }}/{{ key }}">
+                                        <i class="fas fa-chevron-right"></i> <!-- Start with right arrow -->
+                                        <i class="fas fa-folder"></i> <span class="folder-text">{{ key }}</span>
+                                    </span>
+                                    {{ render_tree(value, parent_path ~ "/" ~ key) }}
+                                {% else %}
+                                    <span class="file" data-file="{{ parent_path }}/{{ key }}">
+                                        <i class="fas fa-file"></i> <span class="file-text">{{ key }}</span>
+                                    </span>
+                                {% endif %}
+                            </li>
+                        {% endfor %}
+                        </ul>
+                    {% endmacro %}
+                    {{ render_tree(datasets) }}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Right Column: File Display -->
+        <div class="col-md-8" style="height: 100%; overflow-y: auto;">
+            <div id="file-content" class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">File Content</h5>
+                    <!-- The JSON editor will be rendered here -->
+                    <div id="file-display" class="text-muted" style="height: calc(100vh - 200px);"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jsoneditor/9.5.0/jsoneditor.min.js"></script>
+
+<script>
+    $("#solverNav").removeClass("active");
+    $("#contactNav").removeClass("active");
+    $("#datasetNav").addClass("active");
+
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // JSON Editor instance
+        var container = document.getElementById("file-display");
+        var options = {
+            mode: 'view' // Read-only mode
+        };
+        var editor = new JSONEditor(container, options);
+
+        // Initially hide all nested folders (folders should be initially closed)
+        document.querySelectorAll('.folder > ul').forEach(function(ul) {
+            ul.style.display = 'none'; // All folders start closed
+        });
+
+        // Add click event listener to toggle folders with single click
+        document.querySelectorAll('.folder-toggle').forEach(function(folder) {
+            folder.addEventListener('click', function() {
+                var sublist = this.nextElementSibling;
+                var arrowIcon = this.querySelector('.fa-chevron-right') || this.querySelector('.fa-chevron-down');
+                var folderIcon = this.querySelector('.fa-folder') || this.querySelector('.fa-folder-open');
+                if (sublist.style.display === 'none') {
+                    sublist.style.display = 'block';
+                    arrowIcon.classList.replace('fa-chevron-right', 'fa-chevron-down');
+                    folderIcon.classList.replace('fa-folder', 'fa-folder-open');
+                } else {
+                    sublist.style.display = 'none';
+                    arrowIcon.classList.replace('fa-chevron-down', 'fa-chevron-right');
+                    folderIcon.classList.replace('fa-folder-open', 'fa-folder');
+                }
+            });
+        });
+
+        // Add click event listener to display file content and highlight the selected file
+        document.querySelectorAll('.file').forEach(function(file) {
+            file.addEventListener('click', function() {
+                // Remove 'selected' class from all files
+                document.querySelectorAll('.file').forEach(function(f) {
+                    f.classList.remove('selected');
+                });
+
+                // Add 'selected' class to the clicked file
+                this.classList.add('selected');
+
+                var filePath = this.dataset.file.trim(); // Assuming dataset.file contains the relative path
+                console.log("File path being sent:", filePath);
+
+                $.ajax({
+                    url: '/get_dataset_file',
+                    type: 'GET',
+                    data: { file_path: filePath },
+                    success: function(response) {
+                        // Display the JSON content in the editor
+                        editor.set(response);
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error loading file content:', error);
+                    }
+                });
+            });
+        });
+    });
+</script>
+{% endblock %}

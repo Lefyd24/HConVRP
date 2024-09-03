@@ -25,11 +25,12 @@ html, body {
 }
 
 .btn-link-aueb {
-    color: #762023;
+    color: #66171a;
     text-decoration: none;
 }
 .btn-link-aueb:hover {
-    color: #9a615e;
+    color: #aa7876;
+    font-weight: 600;
     text-decoration: none;
 }
 .btn-link-aueb:focus {

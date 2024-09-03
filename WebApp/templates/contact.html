@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}Contact Information{% endblock %}
+
+{% block content %}
+<header class="bg-aueb-primary text-white py-3">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class='row d-flex justify-content-between align-items-center'>
+                    <div class='col-6'>
+                        <h1 class="display-5 p-0">Contact</h1>
+                    </div>
+                    <div class='col-6 text-end'>
+                        <h6 class="text-white">Contact for further info</h6>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+<div class="container mt-5">
+    <div class="row">
+        <!-- Main Content -->
+        <div class="col-lg-8 mx-auto">
+            <div class="card shadow">
+                <div class="card-body">
+                    <h3 class="card-title text-aueb-primary font-weight-bold">Contact Information</h3>
+                    <hr>
+                    <p><strong>Full Name:</strong> Fthenos Eleftherios</p>
+                    <p><strong>Institution:</strong> Athens University of Economics and Business (AUEB)</p>
+                    <p><strong>Department:</strong> <a class='btn btn-link-aueb p-0' href='https://analytics.aueb.gr/'>Master in Business Analytics</a></p>
+                    <p><strong>Supervising Professor:</strong> Dr. Zachariadis Emmanouil</p>
+                    <p><strong>Academic Email:</strong> <a href="mailto:ele.fthenos@aueb.gr">ele.fthenos@aueb.gr</a></p>
+                    <p><strong>Personal Email:</strong> <a href="mailto:fthenosyd@gmail.com">fthenosyd@gmail.com</a></p>
+                    <p><strong>Phone:</strong> +306942793797</p>
+                    <hr>
+                    <h4 class="text-secondary">Professional Bio</h4>
+                    <p>[Provide a brief professional biography here. This could include your academic background, current research interests, professional experience, and any other relevant details that highlight your expertise and role at AUEB.]</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <br>
+    <br><br>
+    <div class="row mt-4">
+        <div class="col-lg-8 mx-auto text-center">
+            <a href="https://www.aueb.gr/" target="_blank">
+                <img src="/static/images/logo_aueb_dark.jpg" alt="AUEB Logo" class="img-fluid rounded-3" style="max-width: 500px;">
+            </a>
+            <p class="mt-2">© 2023 Athens University of Economics and Business</p>
+        </div>
+    </div>
+    
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+    $("#solverNav").removeClass("active");
+    $("#contactNav").addClass("active");
+    $("#datasetNav").removeClass("active");
+</script>
+{% endblock %}
