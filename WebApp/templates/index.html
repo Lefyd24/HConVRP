@@ -1,0 +1,220 @@
+{% extends "base.html" %}
+{% block title %}HConVRP Solver{% endblock %}
+{% block content %}
+<div class="container-fluid">
+    <div class="row d-flex justify-content-center">
+        <div class="col-12 col-xl-8 col-md-12 col-sm-12">
+            <div class="card mt-5 border-aueb">
+                <div class="card-header bg-aueb-secondary text-white h5">
+                    Dataset
+                </div>
+                <div class="card-body">
+                    <form>
+                        <div class="mb-3">
+                            <label for="dataset" class="form-label">Select Dataset</label>
+                            <select class="form-select" id="dataset" name="dataset">
+                                <option selected>Choose...</option>
+                                {% for dataset in datasets %}
+                                <option value="{{ datasets[dataset] }}">{{ dataset }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <button class="btn btn-aueb-primary" id="submitDataset">Submit</button>
+                    </form>
+                </div>
+            </div>
+            <div class="card mt-3 border-aueb">
+                <div class="card-header bg-aueb-secondary text-white h5">
+                    Selected Dataset
+                </div>
+                <div class="card-body">
+                    <p class="card-text" id="selectedDataset">No dataset selected</p>
+                    <div id="datasetInfo"></div>
+                    <a id="solveBtn" class="btn btn-aueb-primary mt-3 disabled">Solve VRP</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-xl-4 col-md-12 col-sm-12">
+            <div class="card mt-5 shadow">
+                <div class="card-body">
+                    <h5 class="card-title">Welcome to the HConVRP Solver</h5>
+                    <p class="card-text text-muted">
+                        This is a project for the Thesis <b>"Investigating Optimization Techniques for the Consistent Vehicle Routing Problem with heterogeneous fleet"</b>
+                        demonstrating the capabilities of the HConVRP Solver developed by Lefteris Fthenos, based on the paper 
+                        <a class='link-primary' href="https://www.sciencedirect.com/science/article/abs/pii/S0305054821003506">
+                        The Consistent Vehicle Routing Problem with heterogeneous fleet</a> by F. Stavropoulou.
+                    </p>
+                </div>
+                <div class="card-header" id="headingOne">
+                    <h5 class="mb-0">
+                        <button class="btn btn-link-aueb text-decoration-none" data-bs-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">
+                            Click for More Information
+                        </button>
+                    </h5>
+                </div>
+                <div id="collapseExample" class="collapse">
+                    <div class="card-body">
+                        <p class="card-text">
+                            The HConVRP Solver is designed to handle complex vehicle routing problems involving a heterogeneous fleet of vehicles. The solver optimizes routes to minimize costs while ensuring consistency across deliveries. Key features include adaptive route adjustments, integration with real-time traffic data, and support for multiple delivery constraints.
+                        </p>
+                        <p class="card-text">
+                            This project aims to provide a robust solution for logistics companies looking to optimize their delivery operations. The solver has been tested against benchmark datasets and has shown significant improvements in efficiency and cost reduction compared to traditional methods.
+                        </p>
+                        <a href="/documentation" class="btn btn-secondary">View Documentation</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row d-flex justify-content-center">
+        <div class="col-12 col-xl-12 col-md-12 col-sm-12">
+            <div class="card mt-3 border-aueb">
+                <div class="card-header bg-aueb-secondary text-white h5">
+                    <div class="row d-flex justify-content-between">
+                        <div class="col-6">Solver Updates</div>
+                        <div class="col-6 text-end">
+                            <!-- Spinner loader-->
+                            <div class="spinner-grow spinner-border-sm text-white" role="status" aria-hidden="true" id='solverLoader' hidden></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <p class="card-text" id="solverInfo">
+                        <p id="introText">Select a dataset and initiate the solver to see info here.</p>
+                        <ul class="list-group mt-2" id="solverUpdates">
+
+                        </ul>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+    document.getElementById('submitDataset').addEventListener('click', function() {
+        // prevent form submission
+        event.preventDefault();
+        var dataset = document.getElementById('dataset').value;
+        if (dataset !== 'Choose...') {
+            // clear any previous dataset info and solver updates
+            document.getElementById('datasetInfo').innerHTML = '';
+            document.getElementById('solverUpdates').innerHTML = '';
+            if (!document.getElementById('introText')) {
+                document.getElementById('solverUpdates').innerHTML = `<p id="introText">Select a dataset and initiate the solver to see info here.</p>`;
+            }
+
+            // add the selected dataset to the card text as well as a loading spinner on its right
+            document.getElementById('selectedDataset').innerHTML = `Selected Dataset: <span class='text-aueb-primary font-weight-bold'>${dataset}</span> <span class="pl-3 spinner-border spinner-border-sm text-aueb-primary" role="status" aria-hidden="true" id='datasetLoader'></span>`;
+            document.getElementById('datasetInfo').innerHTML = '';
+            // send an ajax request to the server to load the dataset
+            $.ajax({
+                url: `/find_dataset/${dataset}`,
+                type: 'GET',
+                data: {
+                    dataset: dataset
+                },
+                success: function(response) {
+                    // remove the loading spinner and update the card text with the dataset details
+                    if (response.status === 'success') {
+                        document.getElementById('selectedDataset').innerHTML = `Selected Dataset: <span class='text-aueb-primary font-weight-bold'>${dataset}</span> <span class="badge bg-success">Loaded</span>`;
+                        // send another request to now load the dataset into the solver
+                        $.ajax({
+                            url: `/load_dataset/${dataset}`,
+                            type: 'GET',
+                            data: {
+                                dataset: dataset
+                            },
+                            success: function(response) {
+                                if (response.status === 'success') {
+                                    document.getElementById('selectedDataset').innerHTML = `Selected Dataset: <span class='text-aueb-primary font-weight-bold'>${dataset}</span> <span class="badge bg-success">Loaded</span>`;
+                                    document.getElementById('datasetInfo').innerHTML = `
+                                        <ul class="list-group mt-3">
+                                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                <span>Number of Customers:</span> <b>${response.customers}</b>
+                                            </li>
+                                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                <span>Number of Vehicles:</span> <b>${response.vehicles}</b>
+                                            </li>
+                                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                <span>Number of Vehicle Types:</span> <b>${response.vehicle_types}</b>
+                                            </li>
+                                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                <span>Planning Horizon:</span> <b>${response.planning_horizon}</b>
+                                            </li>
+                                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                <span>Route Duration:</span> <b>${response.route_duration}</b>
+                                            </li>
+                                        </ul>
+                                    `;
+                                    document.getElementById('solveBtn').classList.remove('disabled');
+                                } else {
+                                    document.getElementById('selectedDataset').innerHTML = `Selected Dataset: <span class='text-aueb-primary font-weight-bold'>${dataset}</span> <span class="badge bg-danger">Failed</span>`;
+                                    document.getElementById('datasetInfo').innerHTML = '';
+                                    document.getElementById('solveBtn').classList.add('disabled');
+                                }
+                            },
+                        });
+                    } else {
+                        document.getElementById('selectedDataset').innerHTML = `Selected Dataset: <span class='text-aueb-primary font-weight-bold'>${dataset}</span> <span class="badge bg-danger">Failed</span>`;
+                        document.getElementById('datasetInfo').innerHTML = '';
+                        document.getElementById('solveBtn').classList.add('disabled');
+                    }
+                },
+            });
+        }
+    });
+
+    var socket = io();
+
+    $('#solveBtn').on('click', function() {
+        $('#solverLoader').attr('hidden', false);
+        $.ajax({
+            url: '/solve',
+            type: 'GET',
+            success: function(response) {
+                console.log(response);
+            },
+        });
+    });
+
+    socket.on('solver_info', function(msg) {
+        // Remove the intro text if it's the first update
+        if (document.getElementById('introText')) {
+            document.getElementById('introText').remove();
+        }
+        function padZero(num) {
+            return num.toString().padStart(2, '0');
+        }
+        // Get current datetime and format it
+        var current_datetime = new Date();
+        var formatted_date = padZero(current_datetime.getDate()) + "-" + padZero(current_datetime.getMonth() + 1) + "-" + current_datetime.getFullYear() + " " + padZero(current_datetime.getHours()) + ":" + padZero(current_datetime.getMinutes()) + ":" + padZero(current_datetime.getSeconds());
+        
+        // Determine the type of update and apply appropriate styles
+        var updateType = msg.status === 'Initiation' ? 'alert-success' : 'alert-secondary';
+        
+        // Create a new list item for the update
+        var newListItem = `
+        <li class="list-group-item border-0">
+            <div class="alert ${updateType} mb-2 p-3">
+                <div class="d-flex justify-content-between align-items-center">
+                    <span class="text-muted small">${formatted_date}</span>
+                    <span class="badge bg-aueb-secondary text-white">Time Elapsed: ${msg.time_elapsed}"</span>
+                    <span class="badge bg-success">Progress: ${msg.progress}%</span>
+                </div>
+                <pre class="m-0 mt-2"><code>${msg.text}</code></pre>
+            </div>
+        </li>
+    `;
+        
+        // Append the new list item to the updates list
+        document.getElementById('solverUpdates').innerHTML += newListItem;
+
+        if (msg.status === 'Completed' || msg.status === 'Failed') {
+            $('#solverLoader').attr('hidden', true);
+        }
+    });
+    
+</script>
+{% endblock %}
