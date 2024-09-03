@@ -16,6 +16,13 @@ html, body {
 .text-aueb-secondary {
     color: #9a615e;
 }
+
+.text-aueb-info {
+    color: #e22028;
+}
+.bg-aueb-info {
+    background-color: #e22028;
+}
 .bg-aueb-secondary {
     background-color: #9a615e;
 }

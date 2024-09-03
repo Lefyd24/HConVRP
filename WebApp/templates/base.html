@@ -10,30 +10,45 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
     {% block links %}{% endblock %}
 </head>
+<style>
+    .navbar-brand:hover {
+        text-shadow: 1px 1px 5px rgba(255, 255, 255, 1);
+    }
+    
+</style>
 <body id="page-top" class="d-flex flex-column min-vh-100">
     <div id="wrapper" class="d-flex flex-column flex-grow-1">
         <!-- Content Wrapper -->
         <nav class="navbar navbar-expand-lg navbar-dark bg-aueb-primary text-white">
             <div class="container-fluid">
-                <a class="navbar-brand" href="/">HConVRP Solver</a>
+                <a class="navbar-brand" href="/" style="font-size: 1.3rem; font-weight: 700; color: #ffffff; text-shadow: 1px 1px 3px rgba(255, 255, 255, 0.4);">
+                    HConVRP Solver
+                </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="collapse navbar-collapse" id="navbarNav">
-                    <ul class="navbar-nav">
+                    <ul class="navbar-nav me-auto">
                         <li class="nav-item">
                             <a class="nav-link" aria-current="page" href="/" id='solverNav'>Solver</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="/datasets" id='datasetNav'>Datasets</a>
+                            <a class="nav-link" href="/datasets" id='datasetNav' data-bs-toggle="tooltip" data-bs-placement="bottom" title="Explore the datasets of the project">Datasets</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="/contact" id='contactNav'>Contact</a>
+                            <a class="nav-link" href="/contact" id='contactNav' data-bs-toggle="tooltip" data-bs-placement="bottom" title="Get in touch with us">Contact</a>
+                        </li>
+                    </ul>
+                    <ul class="navbar-nav ms-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="https://www.aueb.gr/" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom" title="AUEB Website">
+                                <img src="/static/images/logo_aueb_dark.jpg" alt="AUEB Logo" style="height: 50px;" class="d-inline-block align-top">
+                            </a>
                         </li>
                     </ul>
                 </div>
             </div>
-        </nav>
+        </nav>        
         <div class="main flex-grow-1">
             {% block content %}
             {% endblock %}
