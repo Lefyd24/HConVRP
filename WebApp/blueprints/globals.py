@@ -7,3 +7,4 @@ vehicle_types = None
 distance_matrix = None
 vehicles = None
 data = None
+dataset_path = None

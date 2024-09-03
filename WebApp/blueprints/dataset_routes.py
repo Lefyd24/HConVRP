@@ -48,7 +48,7 @@ def load_dataset():
     globals.vehicle_types = initialize_vehicle_types(globals.data)
     globals.distance_matrix = create_node_matrix(globals.customers, globals.depot, type_matrix="distance")
     globals.vehicles = initialize_vehicles(globals.data, globals.vehicle_types, globals.customers, globals.distance_matrix, globals.depot)
-
+    globals.dataset_path = dataset
     return jsonify({'status': 'success', 'customers': len(globals.customers), 'vehicle_types': len(globals.vehicle_types), 'vehicles': len(globals.vehicles), 'planning_horizon': globals.planning_horizon, 'route_duration': globals.route_duration})
 
 @dataset_bp.route('/get_dataset_file', methods=['POST'])

@@ -95,6 +95,22 @@ class Vehicle:
         self.route_duration[period] += duration_change
         self.cost[period] += self.variable_cost * duration_change
         self.current_location = customer
+    
+    def _recalculate_full_route_cost(self, period: int):
+        """Recalculates the full cost of the route for a given period."""
+        total_duration = 0.0
+        total_cost = self.fixed_cost
+        
+        for i in range(1, len(self.routes[period])):
+            previous_location = self.routes[period][i - 1]
+            current_location = self.routes[period][i]
+            
+            duration = self.distance_matrix[previous_location.id, current_location.id] / self.vehicle_type.speed
+            total_duration += duration
+            total_cost += self.variable_cost * duration
+        
+        self.route_duration[period] = total_duration
+        self.cost[period] = total_cost
 
     def insert_customer(self, customer: Customer, position: int, period: int, ignore_load=False) -> bool:
         self._validate_customer_insertion(customer, period, position, ignore_load)
@@ -104,7 +120,11 @@ class Vehicle:
         self.routes[period].insert(position, customer)
         self._update_vehicle_state(customer, period, added_duration)
         
+        # Recalculate the full route cost after insertion
+        self._recalculate_full_route_cost(period)
+        
         return True
+
 
     def remove_customer(self, customer: Customer, period: int) -> bool:
         assert customer in self.routes[period], f"Customer {customer.id} is not in vehicle {self.id} route"
@@ -114,14 +134,17 @@ class Vehicle:
         next_location = self.routes[period][index + 1]
 
         reduction_duration = (self.distance_matrix[previous_location.id, next_location.id] -
-                              self.distance_matrix[previous_location.id, customer.id] -
-                              self.distance_matrix[customer.id, next_location.id])/self.vehicle_type.speed
+                            self.distance_matrix[previous_location.id, customer.id] -
+                            self.distance_matrix[customer.id, next_location.id])/self.vehicle_type.speed
         
         self.route_duration[period] -= reduction_duration
         self.cost[period] -= self.variable_cost * reduction_duration
         self.load[period] -= customer.demands[period]
         self.routes[period].remove(customer)
         self.current_location = self.routes[period][-1]
+        
+        # Recalculate the full route cost after removal
+        self._recalculate_full_route_cost(period)
         
         return True
 
@@ -130,7 +153,16 @@ class Vehicle:
     def find_best_relocation(self, other_vehicle: 'Vehicle', period: int):
         best_relocation = None
         no_relocations = 0
-
+        """
+        IDEA:
+         For frequent customers, for each period, keep a dictionary with all the "good" 
+         relocations of each one, and at the end if moving this client from one vehicle to another
+         leads to cost reduction, then do it, otherwise, do not do it. Keep in mind that moving a
+         frequent customer from one vehicle to another in a period means that we also need to move
+         them in this same vehicle in all the other periods as well due to driver consistency constraint.
+         
+         For non-frequent customers, just check if the relocation leads to cost reduction.
+        """
         for first_route_node_index in range(len(self.routes[period])-1):
             for second_route_node_index in range(len(other_vehicle.routes[period])-1):
                 if (first_route_node_index == 0 or second_route_node_index == 0) or \

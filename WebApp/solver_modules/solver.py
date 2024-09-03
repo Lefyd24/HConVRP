@@ -128,7 +128,7 @@ class HConVRP:
         self.solution.vehicles = vehicles
         self.solution.vehicle_types = vehicle_types
 
-        self.solution_df = pd.DataFrame(columns=["Step"] + [f"PeriodCost_{i}" for i in range(planning_horizon)] + ["TotalCost"])
+        self.solution_df = pd.DataFrame(columns=["Step"] + [f"Period {i}" for i in range(planning_horizon)] + ["Total Cost"])
         
         self.depot = depot
         self.customers = customers
@@ -238,14 +238,16 @@ class HConVRP:
 
         return self.template_routes
     
-    def construct_inital_solution(self):
+    def construct_inital_solution(self, start_time, socketio: object):
         """
         Generate the initial solution by removing frequent customers that do not require service in 
         a period and inserting non-frequent customers that require service in that period.
         """
         # 1. Generate initial template routes
         template_routes = self.generate_template_routes()
-
+        socketio.emit('solver_info', {'status': 'Info', 'progress': 5, 
+                                      'text': f"Template routes for frequent customers initiated. Frequent customers {len(self.frequent_customers)} - Non-frequent customers {len(self.non_frequent_customers)}", 
+                                      'time_elapsed': round(time.time()-start_time, 2)})
         # 2. Remove frequent customers that do not require service in a period
         for period in range(self.planning_horizon):
             for template_customer in list(template_routes.keys()):
@@ -300,10 +302,12 @@ class HConVRP:
                     best_vehicle.insert_customer(customer, best_position, period)
                     customer.is_serviced[period] = True
                 except AssertionError as e:
+                    socketio.emit('solver_info', {'status': 'Failed', 'progress': 10, 
+                                        'text': f"Assertion Error during insertion: {e}", 
+                                        'time_elapsed': round(time.time()-start_time, 2)})
                     print(colorize(f"Attempting to insert customer {customer.id} into vehicle {best_vehicle.id} at position {best_position} for period {period}", 'RED'))
                     print(colorize(f"Assertion Error during insertion: {e}", 'RED'))
             else:
-                print(f"Customer {customer.id} could not be serviced in period {period}")
                 for vehicle in self.vehicles:
                     # Compatibility constraint
                     if customer not in vehicle.compatible_customers:
@@ -336,9 +340,15 @@ class HConVRP:
                         best_vehicle.insert_customer(customer, best_position, period)
                         customer.is_serviced[period] = True
                     except AssertionError as e:
+                        socketio.emit('solver_info', {'status': 'Failed', 'progress': 10,
+                                            'text': f"Assertion Error during insertion: {e}", 
+                                            'time_elapsed': round(time.time()-start_time, 2)})
                         print(colorize(f"Attempting to insert customer {customer.id} into vehicle {best_vehicle.id} at position {best_position} for period {period}", 'RED'))
                         print(colorize(f"Assertion Error during insertion: {e}", 'RED'))
                 else:
+                    socketio.emit('solver_info', {'status': 'Failed', 'progress': 10,
+                                            'text': f"Customer {customer.id} could not be serviced in period {period}", 
+                                            'time_elapsed': round(time.time()-start_time, 2)})
                     print(f"Customer {customer.id} could not be serviced in period {period}")
 
 
@@ -348,15 +358,19 @@ class HConVRP:
                 self.solution.add_route(period, vehicle, vehicle.routes[period])
 
         # 5. Calculate the total cost of the solution
+
         for period in range(self.planning_horizon):
-            total_cost = sum(vehicle.cost[period] for vehicle in self.vehicles)
+            total_cost = 0
+            for obj in self.solution.routes[period]:
+                vehicle, _ = obj
+                total_cost += vehicle.cost[period]
             self.solution.total_cost[period] = float(total_cost)
-        
+
         self.solution_df = pd.concat([self.solution_df, pd.DataFrame([["Initial"] + list(self.solution.total_cost.values()) + [sum(self.solution.total_cost.values())]], columns=self.solution_df.columns)], ignore_index=True)
 
         return self.solution
     
-    def optimize_solution(self):
+    def optimize_solution(self, start_time, socketio):
         """
         Optimize the solution by relocating customers between vehicles.
         """
@@ -370,20 +384,20 @@ class HConVRP:
                     num_relocations = vehicle.find_best_relocation(other_vehicle, period)
                     total_relocations += num_relocations
             
-            print(f"Total relocations: {total_relocations} in period {period} for vehicle {vehicle.id}")
-
-            
         # 4. Add the finalized routes to the solution
         # First clear the routes
-        #self.solution.routes = {}
-        #for period in range(self.planning_horizon):
-        #    for vehicle in self.vehicles:
-        #        self.solution.add_route(period, vehicle, vehicle.routes[period])
+        self.solution.routes = {}
+        for period in range(self.planning_horizon):
+           for vehicle in self.vehicles:
+               self.solution.add_route(period, vehicle, vehicle.routes[period])
 
         # 5. Calculate the total cost of the solution
         for period in range(self.planning_horizon):
-            total_cost = sum(vehicle.cost[period] for vehicle in self.vehicles)
+            total_cost = 0
+            for obj in self.solution.routes[period]:
+                vehicle, _ = obj
+                total_cost += vehicle.cost[period]
             self.solution.total_cost[period] = float(total_cost)
-        
+
         self.solution_df = pd.concat([self.solution_df, pd.DataFrame([["Optimized"] + list(self.solution.total_cost.values()) + [sum(self.solution.total_cost.values())]], columns=self.solution_df.columns)], ignore_index=True)
     

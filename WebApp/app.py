@@ -10,6 +10,7 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = 'hconvrpsolver'
 app.config['TEMPLATES_AUTO_RELOAD'] = True
 app.config['DATASET_PATH'] = os.path.join(app.root_path, 'datasets/')
+app.config['SOLUTION_PATH'] = os.path.join(app.root_path, 'solutions/')
 
 # Initialize SocketIO with the app
 socketio.init_app(app)

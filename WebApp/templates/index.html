@@ -200,42 +200,97 @@
         });
     });
 
-    socket.on('solver_info', function(msg) {
-        // Remove the intro text if it's the first update
-        if (document.getElementById('introText')) {
-            document.getElementById('introText').remove();
-        }
-        function padZero(num) {
-            return num.toString().padStart(2, '0');
-        }
-        // Get current datetime and format it
-        var current_datetime = new Date();
-        var formatted_date = padZero(current_datetime.getDate()) + "-" + padZero(current_datetime.getMonth() + 1) + "-" + current_datetime.getFullYear() + " " + padZero(current_datetime.getHours()) + ":" + padZero(current_datetime.getMinutes()) + ":" + padZero(current_datetime.getSeconds());
-        
-        // Determine the type of update and apply appropriate styles
-        var updateType = msg.status === 'Initiation' ? 'alert-success' : 'alert-secondary';
-        
-        // Create a new list item for the update
-        var newListItem = `
-        <li class="list-group-item border-0">
-            <div class="alert ${updateType} mb-2 p-3">
-                <div class="d-flex justify-content-between align-items-center">
-                    <span class="text-muted small">${formatted_date}</span>
-                    <span class="badge bg-aueb-secondary text-white">Time Elapsed: ${msg.time_elapsed}"</span>
-                    <span class="badge bg-success">Progress: ${msg.progress}%</span>
-                </div>
-                <pre class="m-0 mt-2"><code>${msg.text}</code></pre>
-            </div>
-        </li>
-    `;
-        
-        // Append the new list item to the updates list
-        document.getElementById('solverUpdates').innerHTML += newListItem;
+    let logIndex = 1;
 
-        if (msg.status === 'Completed' || msg.status === 'Failed') {
-            $('#solverLoader').attr('hidden', true);
-        }
-    });
+socket.on('solver_info', function(msg) {
+    // Remove the intro text if it's the first update
+    if (document.getElementById('introText')) {
+        document.getElementById('introText').remove();
+    }
+
+    function padZero(num) {
+        return num.toString().padStart(2, '0');
+    }
+
+    // Get current datetime and format it
+    var current_datetime = new Date();
+    var formatted_date = padZero(current_datetime.getDate()) + "-" + padZero(current_datetime.getMonth() + 1) + "-" + current_datetime.getFullYear() + " " + padZero(current_datetime.getHours()) + ":" + padZero(current_datetime.getMinutes()) + ":" + padZero(current_datetime.getSeconds());
+
+    // Determine the type of update
+    var updateType = msg.status === 'Initiation' ? 'log-initiation' : 'log-update';
+    if (msg.status === 'Completed') {
+        updateType = 'log-completed';
+    } else if (msg.status === 'Failed') {
+        updateType = 'log-failed';
+    }
+
+    // Create a new list item for the update
+    var newListItem = `
+    <li class="log-item">
+        <div class="log-details">
+            <span class="log-index">${logIndex++}.</span>
+            <span class="log-timestamp">${formatted_date}</span>
+            <div class="log-vertical-divider"></div>
+            <span class="log-badge ${updateType}">${msg.status}</span>
+            <div class="log-vertical-divider"></div>
+            <span class="log-text">${msg.text}</span>
+            <span class="log-time">Time: ${msg.time_elapsed}"</span>
+            <span class="log-progress">Progress: ${msg.progress}%</span>
+        </div>
+    `;
+
+    if ("solution" in msg) {
+        var solution = JSON.parse(msg.solution);
+
+        // Get the keys from the first object in the solution array to create table headers
+        var keys = Object.keys(solution[0]);
+
+        // Add a table under the rest of the info
+        newListItem += `
+        <div class="log-solution">
+            <table class="table table-sm table-bordered table-hover table-striped mt-2">
+                <thead>
+                    <tr class='text-center'>
+        `;
+
+        // Dynamically generate table headers
+        keys.forEach(function(key) {
+            newListItem += `<th>${key}</th>`;
+        });
+
+        newListItem += `
+                    </tr>
+                </thead>
+                <tbody>
+        `;
+
+        // Generate table rows
+        solution.forEach(function(item) {
+            newListItem += `<tr class='text-center'>`;
+            keys.forEach(function(key) {
+                newListItem += `<td>${item[key]}</td>`;
+            });
+            newListItem += `</tr>`;
+        });
+
+        newListItem += `
+                </tbody>
+            </table>
+        </div>
+        `;
+    }
+    newListItem += `</li>`;
+
+    
+
+    // Append the new list item to the updates list
+    document.getElementById('solverUpdates').innerHTML += newListItem;
+
+    if (msg.status === 'Completed' || msg.status === 'Failed') {
+        $('#solverLoader').attr('hidden', true);
+    }
+});
+
     
 </script>
 {% endblock %}
