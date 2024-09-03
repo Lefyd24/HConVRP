@@ -294,6 +294,18 @@ class SolutionChecker:
                     return False
         return True
     
+    def calculate_solution_cost(self):
+        """
+        Calculate the total cost of the solution.
+        """
+        total_cost = 0
+        for period, routes in self.routes.items():
+            for vehicle, route in routes:
+                total_cost += vehicle.vehicle_type.fixed_cost
+                for i in range(1, len(route)):
+                    total_cost += vehicle.vehicle_type.variable_cost*(self.distance_matrix[route[i-1].id, route[i].id]/vehicle.vehicle_type.speed)
+        return total_cost
+    
 
 # Example usage
 if __name__ == "__main__":
@@ -323,3 +335,4 @@ if __name__ == "__main__":
     print(colorize("- Start and Return to Depot Constraint: ", "CYAN"), checker.check_start_and_return_to_depot())
     print(colorize("- Customer Service Constraints: ", "CYAN"), checker.check_customer_service())
     print(colorize("- Frequent Customers Consistency: ", "CYAN"), checker.check_frequent_customers_consistency())
+    print(colorize("- Calculated Solution Cost: ", "CYAN"), checker.calculate_solution_cost())

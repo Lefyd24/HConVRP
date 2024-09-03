@@ -1,3 +1,4 @@
+from copy import deepcopy
 import random
 from models import *
 import yaml
@@ -10,7 +11,7 @@ from helpers import colorize, create_node_matrix
 from warnings import filterwarnings
 filterwarnings('ignore')
 
-data_filename = os.path.join(os.path.dirname(__file__), 'HConVRPDatasets_YML', 'Medium', '50%', 'b2.yml')
+data_filename = os.path.join(os.path.dirname(__file__), 'HConVRPDatasets_YML', 'Small', 'b9.yml') # '15%', 
 
 data = yaml.load(open(data_filename), Loader=yaml.FullLoader)
 
@@ -370,6 +371,37 @@ class HConVRP:
 
         return self.solution
     
+    def optimize_solution(self):
+        """
+        Optimize the solution by relocating customers between vehicles.
+        """
+        #vehicles_copy = deepcopy(self.solution.vehicles)
+
+        total_relocations = 0
+        #for i in range(40):
+        for period in range(self.planning_horizon):
+            for vehicle in self.vehicles:
+                for other_vehicle in self.vehicles:
+                    num_relocations = vehicle.find_best_relocation(other_vehicle, period)
+                    total_relocations += num_relocations
+            
+            print(f"Total relocations: {total_relocations} in period {period} for vehicle {vehicle.id}")
+
+            
+        # 4. Add the finalized routes to the solution
+        # First clear the routes
+        #self.solution.routes = {}
+        #for period in range(self.planning_horizon):
+        #    for vehicle in self.vehicles:
+        #        self.solution.add_route(period, vehicle, vehicle.routes[period])
+
+        # 5. Calculate the total cost of the solution
+        for period in range(self.planning_horizon):
+            total_cost = sum(vehicle.cost[period] for vehicle in self.vehicles)
+            self.solution.total_cost[period] = float(total_cost)
+        
+        self.solution_df = pd.concat([self.solution_df, pd.DataFrame([["Optimized"] + list(self.solution.total_cost.values()) + [sum(self.solution.total_cost.values())]], columns=self.solution_df.columns)], ignore_index=True)
+    
 
 
 
@@ -379,6 +411,7 @@ hconvrp = HConVRP(depot, customers, vehicles, vehicle_types, planning_horizon, r
 print(hconvrp)
 start = time.time()
 solution = hconvrp.construct_inital_solution()
+#hconvrp.optimize_solution()
 print(hconvrp.solution_df)
 end = time.time()
 solution.computation_time = end - start

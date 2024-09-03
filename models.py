@@ -88,7 +88,7 @@ class Vehicle:
         
         return (self.distance_matrix[previous_location.id, customer.id] +
                 self.distance_matrix[customer.id, next_location.id] -
-                self.distance_matrix[previous_location.id, next_location.id])
+                self.distance_matrix[previous_location.id, next_location.id])/self.vehicle_type.speed
 
     def _update_vehicle_state(self, customer: Customer, period: int, duration_change: float):
         self.load[period] += customer.demands[period]
@@ -99,12 +99,7 @@ class Vehicle:
     def insert_customer(self, customer: Customer, position: int, period: int, ignore_load=False) -> bool:
         self._validate_customer_insertion(customer, period, position, ignore_load)
         
-        previous_node = self.routes[period][position - 1]
-        next_node = self.routes[period][position]
-        
-        added_duration = (self.distance_matrix[previous_node.id, customer.id] +
-                          self.distance_matrix[customer.id, next_node.id] -
-                          self.distance_matrix[previous_node.id, next_node.id])
+        added_duration = self._calculate_added_duration(customer, period, position)
         
         self.routes[period].insert(position, customer)
         self._update_vehicle_state(customer, period, added_duration)
@@ -120,7 +115,7 @@ class Vehicle:
 
         reduction_duration = (self.distance_matrix[previous_location.id, next_location.id] -
                               self.distance_matrix[previous_location.id, customer.id] -
-                              self.distance_matrix[customer.id, next_location.id])
+                              self.distance_matrix[customer.id, next_location.id])/self.vehicle_type.speed
         
         self.route_duration[period] -= reduction_duration
         self.cost[period] -= self.variable_cost * reduction_duration
@@ -130,9 +125,12 @@ class Vehicle:
         
         return True
 
+    ######## Optimization methods ########
+
     def find_best_relocation(self, other_vehicle: 'Vehicle', period: int):
         best_relocation = None
         no_relocations = 0
+
         for first_route_node_index in range(len(self.routes[period])-1):
             for second_route_node_index in range(len(other_vehicle.routes[period])-1):
                 if (first_route_node_index == 0 or second_route_node_index == 0) or \
@@ -144,7 +142,7 @@ class Vehicle:
                     continue
                 
                 a1 = self.routes[period][first_route_node_index - 1]
-                a2 = self.routes[period][first_route_node_index]
+                a2 = self.routes[period][first_route_node_index] # Customer to be relocated
                 a3 = self.routes[period][first_route_node_index + 1]
 
                 b1 = other_vehicle.routes[period][second_route_node_index]
@@ -154,8 +152,9 @@ class Vehicle:
                 cost_change_first_route = None
                 cost_change_second_route = None
 
+
                 # Customer is frequent if it has demand in more than one period
-                customer_is_frequent = np.sum(a2.demands > 0) > 1
+                customer_is_frequent = np.count_nonzero(a2.demands) > 1
 
                 if self.id != other_vehicle.id:
                     # 1. Capacity constraint
@@ -168,5 +167,39 @@ class Vehicle:
                     added_duration = (self.distance_matrix[b1.id, a2.id] + self.distance_matrix[a2.id, b3.id] - self.distance_matrix[b1.id, b3.id])/self.vehicle_type.speed
                     if other_vehicle.route_duration[period] + added_duration > other_vehicle.max_route_duration:
                         continue
+                    # 4. Relocation cost
+                    # Added Duration = Distance from b1 to a2 + Distance from a2 to b3 - Distance from b1 to b3
+                    # Removed Duration = Distance from a1 to a2 + Distance from a2 to a3 + Distance from b1 to b3 
+                    added_duration = (self.distance_matrix[b1.id, a2.id] + self.distance_matrix[a2.id, b3.id] - self.distance_matrix[b1.id, b3.id])/self.vehicle_type.speed
+                    removed_duration = (self.distance_matrix[a1.id, a2.id] + self.distance_matrix[a2.id, a3.id] + self.distance_matrix[b1.id, b3.id])/self.vehicle_type.speed
+
+                    cost_added = self.variable_cost * added_duration
+                    cost_removed = self.variable_cost * removed_duration
+
+                    move_cost = cost_added - cost_removed
+    
+                    if move_cost < 0:
+                        if best_relocation is None:
+                            # print(f"Move cost for relocating customer {a2.id} from vehicle {self.id} to vehicle {other_vehicle.id}: {move_cost}")
+                            # print("Added Capacity: ", other_vehicle.load[period] + a2.demands[period])
+                            # print("Other Vehicle Total Capacity: ", other_vehicle.vehicle_type.capacity)
+                            best_relocation = (first_route_node_index, second_route_node_index, move_cost)
+                        elif move_cost < best_relocation[2]:
+                            # print(f"Better move cost for relocating customer {a2.id} from vehicle {self.id} to vehicle {other_vehicle.id}: {move_cost}")
+                            best_relocation = (first_route_node_index, second_route_node_index, move_cost)
+                            # print("Added Capacity: ", other_vehicle.load[period] + a2.demands[period])
+                            # print("Other Vehicle Total Capacity: ", other_vehicle.vehicle_type.capacity)
+                    else:
+                        continue
+        if best_relocation is not None:
+            # Perform the relocation
+            # print(f"Relocating customer {self.routes[period][best_relocation[0]].id} from vehicle {self.id} to vehicle {other_vehicle.id}")
+            first_route_node_index, second_route_node_index, move_cost = best_relocation
+            customer = self.routes[period][first_route_node_index]
+            self.remove_customer(customer, period)
+            other_vehicle.insert_customer(customer, second_route_node_index + 1, period)
+            no_relocations += 1
+
+        return no_relocations
             
                     
