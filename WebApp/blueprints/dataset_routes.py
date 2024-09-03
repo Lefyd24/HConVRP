@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, render_template, request
+from flask import Blueprint, jsonify, render_template, request, current_app
 import os
 import yaml
 from blueprints.extensions import socketio  # Import socketio if needed here
@@ -25,7 +25,7 @@ def get_directory_structure(rootdir):
 
 @dataset_bp.route('/datasets')
 def datasets():
-    dataset_path = dataset_bp.root_path + '/datasets/'
+    dataset_path = current_app.config['DATASET_PATH']
     datasets = get_directory_structure(dataset_path)
     return render_template('datasets.html', datasets=datasets)
 
@@ -51,14 +51,12 @@ def load_dataset():
 
     return jsonify({'status': 'success', 'customers': len(globals.customers), 'vehicle_types': len(globals.vehicle_types), 'vehicles': len(globals.vehicles), 'planning_horizon': globals.planning_horizon, 'route_duration': globals.route_duration})
 
-@dataset_bp.route('/get_dataset_file', methods=['GET'])
+@dataset_bp.route('/get_dataset_file', methods=['POST'])
 def get_dataset_file():
-    file_path = request.args.get('file_path').strip()
+    file_path = request.get_json().get('file_path')
     file_path = file_path.lstrip("/\\")
-    dataset_root = os.path.abspath(dataset_bp.root_path + '/datasets/')
+    dataset_root = current_app.config['DATASET_PATH']
     full_path = os.path.normpath(os.path.join(dataset_root, file_path))
-    if not full_path.startswith(dataset_root):
-        return jsonify({'error': 'Invalid file path'}), 400
 
     try:
         with open(full_path, 'r') as file:

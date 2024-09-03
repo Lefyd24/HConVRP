@@ -88,7 +88,7 @@
                             <li>
                                 {% if value is mapping %}
                                     <span class="folder-toggle" data-folder="{{ parent_path }}/{{ key }}">
-                                        <i class="fas fa-chevron-right"></i> <!-- Start with right arrow -->
+                                        <i class="fas fa-chevron-down"></i> <!-- Start with right arrow -->
                                         <i class="fas fa-folder"></i> <span class="folder-text">{{ key }}</span>
                                     </span>
                                     {{ render_tree(value, parent_path ~ "/" ~ key) }}
@@ -178,14 +178,15 @@
 
                 $.ajax({
                     url: '/get_dataset_file',
-                    type: 'GET',
-                    data: { file_path: filePath },
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ file_path: filePath }),
                     success: function(response) {
                         // Display the JSON content in the editor
                         editor.set(response);
                     },
                     error: function(xhr, status, error) {
-                        console.error('Error loading file content:', error);
+                        console.error('Error loading file content:', xhr);
                     }
                 });
             });
