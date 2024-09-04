@@ -5,6 +5,7 @@
     <link rel="stylesheet" href="/static/bootstrap-5.0.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="/static/css/styles.css">
     <link href="/static/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+    <link href="/static/fontawesome-free/css/fontawesome.min.css" rel="stylesheet" type="text/css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
@@ -36,6 +37,9 @@
                             <a class="nav-link" href="/datasets" id='datasetNav' data-bs-toggle="tooltip" data-bs-placement="bottom" title="Explore the datasets of the project">Datasets</a>
                         </li>
                         <li class="nav-item">
+                            <a class="nav-link" href="/documentation" id='documentationNav' data-bs-toggle="tooltip" data-bs-placement="bottom" title="Learn more about the project">Documentation</a>
+                        </li>
+                        <li class="nav-item">
                             <a class="nav-link" href="/contact" id='contactNav' data-bs-toggle="tooltip" data-bs-placement="bottom" title="Get in touch with us">Contact</a>
                         </li>
                     </ul>
@@ -53,9 +57,6 @@
             {% block content %}
             {% endblock %}
         </div>
-        <a class="scroll-to-top rounded" href="#page-top">
-            <i class="fas fa-angle-up"></i>
-        </a>
         
         <!-- Footer -->
         <footer class="sticky-footer bg-dark mt-auto mb-auto">

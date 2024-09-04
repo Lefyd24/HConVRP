@@ -21,6 +21,10 @@ def index():
     list_files_recursive(datasets, dataset_path)
     return render_template('index.html', datasets=datasets)
 
+@basic_bp.route('/documentation')
+def documentation():
+    return render_template('documentation.html')
+
 @basic_bp.route('/contact')
 def contact():
     return render_template('contact.html')

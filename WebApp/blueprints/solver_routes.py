@@ -25,11 +25,11 @@ def solve():
     socketio.emit('solver_info', {'status': 'Initiation', 'progress': 0, 'text': "HConVRP Solver has initiated successfully.", 'time_elapsed': round(time.time()-start_time, 2)})
     # Initial Solution
     solution = Solver.construct_inital_solution(start_time, socketio)
-    solution_json = Solver.solution_df.to_json(orient='records')
+    solution_json = Solver.solution_df.to_json(orient='records', double_precision=3)
     socketio.emit('solver_info', {'status': 'Info', 'progress': 20, 'text': "Initial Solution constructed", 'time_elapsed': round(time.time()-start_time, 2), 'solution': solution_json})
     socketio.emit('solver_info', {'status': 'Info', 'progress': 20, 'text': "Solution Optimization...", 'time_elapsed': round(time.time()-start_time, 2)})
     Solver.optimize_solution(start_time, socketio)
-    solution_json = Solver.solution_df.to_json(orient='records')
+    solution_json = Solver.solution_df.to_json(orient='records', double_precision=3)
     socketio.emit('solver_info', {'status': 'Info', 'progress': 80, 'text': "Solution Optimized", 'time_elapsed': round(time.time()-start_time, 2), 'solution': solution_json})
     socketio.emit('solver_info', {'status': 'Completed', 'progress': 100, 'text': "Solver has completed!", 'time_elapsed': round(time.time()-start_time, 2)})
     

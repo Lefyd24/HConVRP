@@ -44,7 +44,14 @@
                 </div>
                 <div class="card-body">
                     <p class="card-text" id="selectedDataset">No dataset selected</p>
-                    <div id="datasetInfo"></div>
+                    <div id="datasetInfo">
+                        <div class='row d-flex justify-content-between align-items-center'>
+                            <div class='col-xl-6 col-md-6 col-sm-12' id='datasetGeneralInfo'>
+                            </div>
+                            <div class='col-xl-6 col-md-6 col-sm-12' id='datasetSpecificInfo'>
+                            </div>
+                        </div>
+                    </div>
                     <a id="solveBtn" class="btn btn-aueb-primary mt-3 disabled">Solve VRP</a>
                 </div>
             </div>
@@ -83,22 +90,24 @@
     </div>
     <div class="row d-flex justify-content-center">
         <div class="col-12 col-xl-12 col-md-12 col-sm-12">
-            <div class="card mt-3 shadow-lg">
+            <div class="card mt-3 shadow-lg" id='printCard'>
                 <div class="card-header bg-aueb-primary text-white h5">
-                    <div class="row d-flex justify-content-between">
-                        <div class="col-6">Solver Updates</div>
+                    <div class="row d-flex justify-content-between align-items-center">
+                        <div class="col-6">Solver Update Log</div>
                         <div class="col-6 text-end">
                             <!-- Spinner loader-->
-                            <div class="spinner-grow spinner-border-sm text-white" role="status" aria-hidden="true" id='solverLoader' hidden></div>
+                            <div class="spinner-grow spinner-border-sm text-white" role="status" aria-hidden="true" id="solverLoader" hidden></div>
+                            <!-- Print Button -->
+                            <button class="btn btn-light btn-sm" onclick="printCardContent()" title="Print">
+                                <i class="fas fa-print" style="background-color: transparent;"></i>
+                            </button>
                         </div>
                     </div>
                 </div>
                 <div class="card-body">
                     <p class="card-text" id="solverInfo">
                         <p id="introText">Select a dataset and initiate the solver to see info here.</p>
-                        <ul class="list-group mt-2" id="solverUpdates">
-
-                        </ul>
+                        <ul class="list-group mt-2" id="solverUpdates"></ul>
                     </p>
                 </div>
             </div>
@@ -107,10 +116,21 @@
 </div>
 {% endblock %}
 {% block scripts %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
 <script>
     $("#solverNav").addClass("active");
     $("#contactNav").removeClass("active");
     $("#datasetNav").removeClass("active");
+    $("#documentationNav").removeClass("active");
+
+    function printCardContent() {
+        var printContents = document.getElementById('printCard').innerHTML;
+        var originalContents = document.body.innerHTML;
+
+        document.body.innerHTML = printContents;
+        window.print();
+        document.body.innerHTML = originalContents;
+    }
 
     document.getElementById('submitDataset').addEventListener('click', function() {
         // prevent form submission
@@ -118,15 +138,17 @@
         var dataset = document.getElementById('dataset').value;
         if (dataset !== 'Choose...') {
             // clear any previous dataset info and solver updates
-            document.getElementById('datasetInfo').innerHTML = '';
+            document.getElementById('datasetSpecificInfo').innerHTML = '';
+            document.getElementById('datasetGeneralInfo').innerHTML = '';
             document.getElementById('solverUpdates').innerHTML = '';
             if (!document.getElementById('introText')) {
                 document.getElementById('solverUpdates').innerHTML = `<p id="introText">Select a dataset and initiate the solver to see info here.</p>`;
             }
 
             // add the selected dataset to the card text as well as a loading spinner on its right
-            document.getElementById('selectedDataset').innerHTML = `Selected Dataset: <span class='text-aueb-primary font-weight-bold'>${dataset}</span> <span class="pl-3 spinner-border spinner-border-sm text-aueb-primary" role="status" aria-hidden="true" id='datasetLoader'></span>`;
-            document.getElementById('datasetInfo').innerHTML = '';
+            document.getElementById('selectedDataset').innerHTML = ``;
+            document.getElementById('datasetSpecificInfo').innerHTML = '';
+            document.getElementById('datasetGeneralInfo').innerHTML = '';
             // send an ajax request to the server to load the dataset
             $.ajax({
                 url: `/find_dataset`,
@@ -138,7 +160,7 @@
                 success: function(response) {
                     // remove the loading spinner and update the card text with the dataset details
                     if (response.status === 'success') {
-                        document.getElementById('selectedDataset').innerHTML = `Selected Dataset: <span class='text-aueb-primary font-weight-bold'>${dataset}</span> <span class="badge bg-success">Loaded</span>`;
+                        document.getElementById('selectedDataset').innerHTML = ``;
                         // send another request to now load the dataset into the solver
                         $.ajax({
                             url: `/load_dataset`,
@@ -150,36 +172,95 @@
                             success: function(response) {
                                 if (response.status === 'success') {
                                     document.getElementById('selectedDataset').innerHTML = `Selected Dataset: <span class='text-aueb-primary font-weight-bold'>${dataset}</span> <span class="badge bg-success">Loaded</span>`;
-                                    document.getElementById('datasetInfo').innerHTML = `
+                                    // General Dataset Info
+                                    var generalInfoHtml = `
+                                        <p>Dataset Instance: <span class='text-aueb-primary font-weight-bold'><u>${response.general_info.instance_name}</u></span></p>
+                                        
+                                        <table class="table table-sm table-hover mt-1 p-0">
+                                            <thead>
+                                                <tr>
+                                                    <th>Vehicle Type</th>
+                                    `;
+
+                                    // Loop through the vehicle types to create column headers (vehicle types)
+                                    for (const [key, value] of Object.entries(response.general_info.vehicle_types_info)) {
+                                        generalInfoHtml += `<th class='text-center'>${key}</th>`;
+                                    }
+
+                                    generalInfoHtml += `
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                    `;
+
+                                    // Now, generate the rows for each property, filling in values for each vehicle type
+                                    let properties = ["Capacity", "Fixed Cost", "No. Available Vehicles", "Variable Cost", "Vehicle Speed"];
+                                    properties.forEach(property => {
+                                        generalInfoHtml += `<tr><td>${property}</td>`;
+
+                                        // Add data for each vehicle type for the current property
+                                        for (const [key, value] of Object.entries(response.general_info.vehicle_types_info)) {
+                                            let propValue;
+                                            switch(property) {
+                                                case "Capacity": 
+                                                    propValue = value.Capacity;
+                                                    break;
+                                                case "Fixed Cost": 
+                                                    propValue = value.Fixed_Cost;
+                                                    break;
+                                                case "No. Available Vehicles": 
+                                                    propValue = value.Number_of_available_vehicles;
+                                                    break;
+                                                case "Variable Cost": 
+                                                    propValue = value.Variable_Cost;
+                                                    break;
+                                                case "Vehicle Speed": 
+                                                    propValue = value.Speed;
+                                                    break;
+                                            }
+                                            generalInfoHtml += `<td class='text-center'>${propValue}</td>`;
+                                        }
+
+                                        generalInfoHtml += `</tr>`;
+                                    });
+
+                                    generalInfoHtml += `
+                                            </tbody>
+                                        </table>
+                                    `;
+
+                                    document.getElementById('datasetGeneralInfo').innerHTML = generalInfoHtml;
+                                    // Specific Dataset Info
+                                    document.getElementById('datasetSpecificInfo').innerHTML = `
                                         <ul class="list-group mt-3">
-                                            <li class="list-group-item d-flex justify-content-between align-items-center bg-aueb-info border border-white text-white">
+                                            <li class="list-group-item d-flex justify-content-between align-items-center border border-white text-dark" style='background-color:#a1c1d8;'>
                                                 <span>Number of Customers:</span> <b>${response.customers}</b>
                                             </li>
-                                            <li class="list-group-item d-flex justify-content-between align-items-center bg-aueb-info border border-white text-white">
+                                            <li class="list-group-item d-flex justify-content-between align-items-center border border-white text-dark" style='background-color:#a1c1d8;'>
                                                 <span>Number of Vehicles:</span> <b>${response.vehicles}</b>
                                             </li>
-                                            <li class="list-group-item d-flex justify-content-between align-items-center bg-aueb-info border border-white text-white">
+                                            <li class="list-group-item d-flex justify-content-between align-items-center border border-white text-dark" style='background-color:#a1c1d8;'>
                                                 <span>Number of Vehicle Types:</span> <b>${response.vehicle_types}</b>
                                             </li>
-                                            <li class="list-group-item d-flex justify-content-between align-items-center bg-aueb-info border border-white text-white">
+                                            <li class="list-group-item d-flex justify-content-between align-items-center border border-white text-dark" style='background-color:#a1c1d8;'>
                                                 <span>Planning Horizon:</span> <b>${response.planning_horizon}</b>
                                             </li>
-                                            <li class="list-group-item d-flex justify-content-between align-items-center bg-aueb-info border border-white text-white">
+                                            <li class="list-group-item d-flex justify-content-between align-items-center border border-white text-dark" style='background-color:#a1c1d8;'>
                                                 <span>Route Duration:</span> <b>${response.route_duration}</b>
                                             </li>
                                         </ul>
                                     `;
                                     document.getElementById('solveBtn').classList.remove('disabled');
                                 } else {
-                                    document.getElementById('selectedDataset').innerHTML = `Selected Dataset: <span class='text-aueb-primary font-weight-bold'>${dataset}</span> <span class="badge bg-danger">Failed</span>`;
-                                    document.getElementById('datasetInfo').innerHTML = '';
+                                    //document.getElementById('selectedDataset').innerHTML = `Selected Dataset: <span class='text-aueb-primary font-weight-bold'>${dataset}</span> <span class="badge bg-danger">Failed</span>`;
+                                    document.getElementById('datasetSpecificInfo').innerHTML = '';
                                     document.getElementById('solveBtn').classList.add('disabled');
                                 }
                             },
                         });
                     } else {
-                        document.getElementById('selectedDataset').innerHTML = `Selected Dataset: <span class='text-aueb-primary font-weight-bold'>${dataset}</span> <span class="badge bg-danger">Failed</span>`;
-                        document.getElementById('datasetInfo').innerHTML = '';
+                        //document.getElementById('selectedDataset').innerHTML = `Selected Dataset: <span class='text-aueb-primary font-weight-bold'>${dataset}</span> <span class="badge bg-danger">Failed</span>`;
+                        document.getElementById('datasetSpecificInfo').innerHTML = '';
                         document.getElementById('solveBtn').classList.add('disabled');
                     }
                 },
@@ -245,43 +326,57 @@ socket.on('solver_info', function(msg) {
         // Get the keys from the first object in the solution array to create table headers
         var keys = Object.keys(solution[0]);
 
-        // Add a table under the rest of the info
+        // Create a unique ID for each table for exporting
+        var tableID = `table_${logIndex}`;
+
+        // Add a table under the rest of the info with an export button
         newListItem += `
         <div class="log-solution">
-            <table class="table table-sm table-bordered table-hover table-striped mt-2">
-                <thead>
-                    <tr class='text-center'>
-        `;
+            <div class="d-flex justify-content-between align-items-center">
+                <table id="${tableID}" class="table table-sm table-bordered table-hover table-striped mt-1 exportable-table">
+                    <thead>
+                        <tr class='text-center'>
+            `;
 
-        // Dynamically generate table headers
-        keys.forEach(function(key) {
-            newListItem += `<th>${key}</th>`;
-        });
-
-        newListItem += `
-                    </tr>
-                </thead>
-                <tbody>
-        `;
-
-        // Generate table rows
-        solution.forEach(function(item) {
-            newListItem += `<tr class='text-center'>`;
+            // Dynamically generate table headers
             keys.forEach(function(key) {
-                newListItem += `<td>${item[key]}</td>`;
+                newListItem += `<th>${key}</th>`;
             });
-            newListItem += `</tr>`;
-        });
 
-        newListItem += `
-                </tbody>
-            </table>
+            newListItem += `
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            // Generate table rows
+            solution.forEach(function(item) {
+                newListItem += `<tr class='text-center'>`;
+                keys.forEach(function(key) {
+                    var value = item[key];
+                    // If the value is a number, convert it to a format that Excel can handle (no localization)
+                    if (typeof value === 'number') {
+                        value = value.toFixed(2); // Convert to dot decimal
+                    }
+                    newListItem += `<td>${value}</td>`;
+                });
+                newListItem += `</tr>`;
+            });
+
+            newListItem += `
+                    </tbody>
+                </table>
+                <button class="btn btn-sm btn-success ms-auto align-self-stretch mt-1" 
+                    style="border-top-left-radius: 0; border-bottom-left-radius: 0;" 
+                    onclick="exportTableToExcel('${tableID}', 'Solver_Export_${logIndex}')">
+                    <i class="fas fa-file-excel"></i>
+                </button>
+            </div>
         </div>
         `;
+
     }
     newListItem += `</li>`;
-
-    
 
     // Append the new list item to the updates list
     document.getElementById('solverUpdates').innerHTML += newListItem;
@@ -290,6 +385,21 @@ socket.on('solver_info', function(msg) {
         $('#solverLoader').attr('hidden', true);
     }
 });
+
+// Function to export table to Excel
+function exportTableToExcel(tableID, filename = '') {
+    var wb = XLSX.utils.book_new();
+    var tableElement = document.getElementById(tableID);
+
+    // Convert the table to worksheet
+    var ws = XLSX.utils.table_to_sheet(tableElement);
+
+    // Add the worksheet to the workbook
+    XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
+
+    // Export the Excel file
+    XLSX.writeFile(wb, filename + '.xlsx');
+}
 
     
 </script>

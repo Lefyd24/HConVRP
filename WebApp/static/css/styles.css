@@ -73,10 +73,9 @@ html, body {
 
 /* Log item styling */
 .log-item {
-    border-bottom: 1px solid #e0e0e0;
+    border-bottom: 0mm ridge rgba(141, 78, 74, 0.3);
     padding: 0.5rem 0;
-    font-family: 'Arial', sans-serif;
-    font-size: 0.95rem;
+    font-size: 0.85rem;
     color: #333;
 }
 
