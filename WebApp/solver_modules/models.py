@@ -3,22 +3,23 @@ import os
 import numpy as np
 from solver_modules.helpers import colorize, distance
 
+
 class Customer:
-    def __init__(self, id, coordinates, demands, planning_horizon):
+    def __init__(self, id, coordinates, demands, service_time, planning_horizon):
         self.id = id
         self.coordinates = coordinates
         self.demands = demands
         self.planning_horizon = planning_horizon
+        self.service_time = service_time
         self.is_serviced = {i: False for i in range(self.planning_horizon)}
     
     def __str__(self):
-        return f"Customer {self.id} at {self.coordinates} with demand {self.demands}"
+        return f"Customer {self.id} with demands {self.demands}"
     
     # string representation of the object if it is called from another object
     def __repr__(self):
         return f"Customer_{self.id}"
     
-
 class VehicleType:
     def __init__(self, vehicle_type_name, available_vehicles, capacity, fixed_cost, variable_cost, speed):
         self.vehicle_type_name = vehicle_type_name
@@ -33,7 +34,7 @@ class VehicleType:
 
     def __repr__(self) -> str:
         return f"VehicleType_{self.vehicle_type_name}"
-
+    
 class Vehicle:
     def __init__(self, id, vehicle_type: VehicleType, current_location, planning_horizon, max_route_duration, 
                  distance_matrix, compatible_customers=None, incompatible_customers=None):
@@ -53,185 +54,275 @@ class Vehicle:
         self.cost = {i: self.fixed_cost for i in range(planning_horizon)}
         self.route_duration = {i: 0.0 for i in range(planning_horizon)}
         self.routes = {i: [self.current_location, self.current_location] for i in range(planning_horizon)}
-        self.sliding_demand = {}
+        self.sliding_variable_cost = {i: [] for i in range(planning_horizon)}
 
     def __str__(self):
         return (f"Vehicle {self.id} of type {self.vehicle_type.vehicle_type_name}.\n"
                 f"- Load: {self.load} (Capacity: {self.vehicle_type.capacity})\n"
                 f"- Cost: {self.cost}\n"
                 f"- Route Durations: {self.route_duration}\n"
-                f"- Routes: {self.routes}")
+                f"- Routes: {self.routes}\n"
+                f"- Compatible Customers: {self.compatible_customers}\n"
+                f"- Incompatible Customers: {self.incompatible_customers}")
 
     def __repr__(self):
         return f"Vehicle_{self.id} - {self.vehicle_type.vehicle_type_name}"
-            
-    def _validate_customer_addition(self, customer: Customer, period: int):
-        assert customer in self.compatible_customers, f"Customer {customer.id} is not compatible with vehicle {self.id}"
-        assert customer.demands[period] + self.load[period] <= self.vehicle_type.capacity, \
-            f"Customer {customer.id} demand exceeds vehicle {self.id} capacity"
-        new_duration = self._calculate_added_duration(customer, period)
-        assert self.route_duration[period] + new_duration <= self.max_route_duration, \
-            f"Customer {customer.id} cannot be added to vehicle {self.id} route due to route duration"
-
-    def _validate_customer_insertion(self, customer: Customer, period: int, position: int, ignore_load: bool):
-        assert customer in self.compatible_customers, f"Customer {customer.id} is not compatible with vehicle {self.id}"
-        if not ignore_load:
-            assert customer.demands[period] + self.load[period] <= self.vehicle_type.capacity, \
-                f"Customer {customer.id} demand exceeds vehicle {self.id} capacity"
-        new_duration = self._calculate_added_duration(customer, period, position)
-        assert self.route_duration[period] + new_duration <= self.max_route_duration, \
-            f"Customer {customer.id} cannot be inserted to vehicle {self.id} route due to route duration (new duration: {self.route_duration[period] + new_duration} - max duration: {self.max_route_duration})"
-
-    def _calculate_added_duration(self, customer: Customer, period: int, position:int):
-        previous_location = self.routes[period][position - 1]
-        next_location = self.routes[period][position]
-        
-        return (self.distance_matrix[previous_location.id, customer.id] +
-                self.distance_matrix[customer.id, next_location.id] -
-                self.distance_matrix[previous_location.id, next_location.id])/self.vehicle_type.speed
-
-    def _update_vehicle_state(self, customer: Customer, period: int, duration_change: float):
-        self.load[period] += customer.demands[period]
-        self.route_duration[period] += duration_change
-        self.cost[period] += self.variable_cost * duration_change
-        self.current_location = customer
     
-    def _recalculate_full_route_cost(self, period: int):
-        """Recalculates the full cost of the route for a given period."""
-        total_duration = 0.0
-        total_cost = self.fixed_cost
+    def _added_duration(self, period, customer, position):
+        previous_node = self.routes[period][position - 1]
+        next_node = self.routes[period][position]
+        return (distance(previous_node, customer, self.distance_matrix) + customer.service_time\
+                + distance(customer, next_node, self.distance_matrix)  + next_node.service_time)/self.vehicle_type.speed \
+                - distance(previous_node, next_node, self.distance_matrix + next_node.service_time)/self.vehicle_type.speed
+    
+    def _validate_customer_insertion(self, period, customer:Customer, position):
+        # 1. Compatibility check
+        if customer.id not in [c.id for c in self.compatible_customers]:
+            return False, "Compatibility"
+        # 2. Capacity check
+        if self.load[period] + customer.demands[period] > self.vehicle_type.capacity:
+            return False, "Capacity"
+        # 3. Duration check
+        previous_node = self.routes[period][position - 1]
+        next_node = self.routes[period][position]
+        added_duration = (distance(previous_node, customer, self.distance_matrix)  + customer.service_time \
+                        + distance(customer, next_node, self.distance_matrix) + next_node.service_time)/self.vehicle_type.speed
+        removed_duration = (distance(previous_node, next_node, self.distance_matrix) + next_node.service_time)/self.vehicle_type.speed
         
-        for i in range(1, len(self.routes[period])):
-            previous_location = self.routes[period][i - 1]
-            current_location = self.routes[period][i]
+        if self.route_duration[period] + (added_duration - removed_duration) > self.max_route_duration:
+            return False, "Duration"
+        return True, "Success"
+    
+    def _validate_intra_relocation(self, period, from_position, to_position):
+        # 1. Duration check
+        removed_duration = self.calculate_removal_duration_change(period, from_position)
+        added_duration = self.calculate_insertion_duration_change(period, self.routes[period][from_position], to_position)
+        if self.route_duration[period] + (added_duration - removed_duration) > self.max_route_duration:
+            return False, "Duration"
+        return True, "Success"
+    
+    def _validate_inter_relocation(self, period, other_vehicle:'Vehicle', from_position, to_position, customer_is_frequent, vehicle_positions):
+        if customer_is_frequent:
+            demand_periods = [i for i in range(self.planning_horizon) if self.routes[period][from_position].demands[i] > 0]
+            for p in demand_periods:
+                # 1. Duration check
+                removed_duration = self.calculate_removal_duration_change(p, vehicle_positions[p]['from'])
+                added_duration = other_vehicle.calculate_insertion_duration_change(p, self.routes[p][vehicle_positions[p]['from']], vehicle_positions[p]['to'])
+                if other_vehicle.route_duration[p] + (added_duration - removed_duration) > other_vehicle.max_route_duration:
+                    return False, "Duration"
+                # 2. Capacity check
+                if other_vehicle.load[p] + self.routes[p][vehicle_positions[p]['from']].demands[p] > other_vehicle.vehicle_type.capacity:
+                    return False, "Capacity"
+            return True, "Success"
+        # 1. Duration check
+        added_duration = other_vehicle.calculate_insertion_duration_change(period, self.routes[period][from_position], to_position)
+        if other_vehicle.route_duration[period] + added_duration > other_vehicle.max_route_duration:
+            return False, "Duration"
+        # 2. Capacity check
+        if other_vehicle.load[period] + self.routes[period][from_position].demands[period] > other_vehicle.vehicle_type.capacity:
+            return False, "Capacity"
+        return True, "Success"
+    
+    def calculate_removal_duration_change(self, period, position):
+        """
+        Calculate the duration change of removing a customer from a vehicle's route
+        """
+        previous_node = self.routes[period][position - 1]
+        next_node = self.routes[period][position + 1]
+        return (distance(previous_node, next_node, self.distance_matrix) + next_node.service_time)/self.vehicle_type.speed - (distance(previous_node, self.routes[period][position], self.distance_matrix) + self.routes[period][position].service_time + distance(self.routes[period][position], next_node, self.distance_matrix) + next_node.service_time)/self.vehicle_type.speed
+    
+    def calculate_insertion_duration_change(self, period, customer, position):
+        previous_node = self.routes[period][position - 1]
+        next_node = self.routes[period][position]
+        return (distance(previous_node, customer, self.distance_matrix) + customer.service_time + \
+            distance(customer, next_node, self.distance_matrix) + next_node.service_time)/self.vehicle_type.speed - \
+                (distance(previous_node, next_node, self.distance_matrix) + next_node.service_time)/self.vehicle_type.speed
+    
+    def calculate_insertion_cost(self, period, customer, position):
+        """
+        Calculate the cost of inserting a customer into a vehicle's route
+        at a specified position without actually modifying the route.
+        """
+        # Retrieve the previous and next node based on the position
+        previous_node = self.routes[period][position - 1]
+        next_node = self.routes[period][position]
+        
+        # Calculate the duration added by inserting the customer between previous_node and next_node
+        cost_previous_to_customer = (distance(previous_node, customer, self.distance_matrix) + customer.service_time) * self.variable_cost / self.vehicle_type.speed
+        cost_customer_to_next = (distance(customer, next_node, self.distance_matrix) + next_node.service_time) * self.variable_cost / self.vehicle_type.speed
+        cost_previous_to_next = (distance(previous_node, next_node, self.distance_matrix) + next_node.service_time) * self.variable_cost / self.vehicle_type.speed
+        
+        # Calculate the net change in duration
+        insertion_cost = cost_previous_to_customer + cost_customer_to_next - cost_previous_to_next
+        
+        return insertion_cost
+    
+    def calculate_removal_cost(self, period, position):
+        """
+        Calculate the cost of removing a customer from a vehicle's route
+        at a specified position without actually modifying the route.
+        """
+        # Retrieve the previous and next node based on the position
+        previous_node = self.routes[period][position - 1]
+        customer = self.routes[period][position]
+        next_node = self.routes[period][position + 1]
+        
+        # Calculate the duration added by inserting the customer between previous_node and next_node
+        cost_previous_to_next = (distance(previous_node, next_node, self.distance_matrix) + next_node.service_time) * self.variable_cost / self.vehicle_type.speed
+        cost_previous_to_customer = (distance(previous_node, customer, self.distance_matrix) + customer.service_time) * self.variable_cost / self.vehicle_type.speed
+        cost_customer_to_next = (distance(self.routes[period][position], next_node, self.distance_matrix) + next_node.service_time) * self.variable_cost / self.vehicle_type.speed
+        
+        # Calculate the net change in duration
+        removal_cost = cost_previous_to_next - cost_previous_to_customer - cost_customer_to_next
+        
+        return removal_cost
+    
+    def calculate_intra_relocation_move_cost(self, period, position1, position2):
+        """
+        Calculate the move cost of relocating a customer from one position to another
+        within the same route without actually modifying the route.
+        """
+        removal_cost = self.calculate_removal_cost(period, position1)
+        insertion_cost = self.calculate_insertion_cost(period, self.routes[period][position1], position2)
+        
+        # Calculate the net change in transportation cost
+        move_cost = insertion_cost + removal_cost
+        # Scenario 1: If the move cost is negative, it means that the relocation is beneficial
+        # Scenario 2: If the move cost is positive, it means that the relocation is not beneficial
+        return move_cost
+    
+    def calculate_inter_relocation_move_cost(self, period, other_vehicle:'Vehicle', position1, position2, customer_is_frequent):
+        """
+        Calculate the move cost of relocating a customer from one vehicle to another
+        without actually modifying the routes.
+        """
+        # Retrieve the customer to be relocated
+        customer = self.routes[period][position1]
+        vehicle_positions = {}
+        
+        if customer_is_frequent:
+            # if the customer is frequent, we need to iterate over all the periods
+            # they require service, and find the corresponsing removal and insertion costs
+            # for the positions asked
+            demand_periods = [i for i in range(self.planning_horizon) if customer.demands[i] > 0]
             
-            duration = self.distance_matrix[previous_location.id, current_location.id] / self.vehicle_type.speed
-            total_duration += duration
-            total_cost += self.variable_cost * duration
+            removal_cost = 0
+            insertion_cost = 0
+            for p in demand_periods:
+                current_customer_position = self.routes[p].index(customer)
+                removal_cost += self.calculate_removal_cost(p, current_customer_position)
+                if p == period:
+                    insertion_cost += other_vehicle.calculate_insertion_cost(p, customer, position2)
+                    vehicle_positions[p] = {"from": current_customer_position, "to": position2}
+                else:
+                    # We need to find the best insertion position for the customer in the other vehicle
+                    # and then calculate the insertion cost and removal cost
+                    best_position = {"from": current_customer_position, "to": 1}
+                    best_cost = np.inf
+                    for i in range(1, len(other_vehicle.routes[p])):
+                        if other_vehicle._validate_customer_insertion(p, customer, i):                        
+                            cost = other_vehicle.calculate_insertion_cost(p, customer, i)
+                            if cost < best_cost:
+                                best_cost = cost
+                                best_position["to"] = i
+                    insertion_cost += best_cost
+                    vehicle_positions[p] = best_position
+        else:
+            # Calculate the cost of removing the customer from the current vehicle
+            removal_cost = self.calculate_removal_cost(period, position1)
+            
+            # Calculate the cost of inserting the customer into the other vehicle
+            insertion_cost = other_vehicle.calculate_insertion_cost(period, customer, position2)
+            # Store the position of the customer in the other vehicle
+            vehicle_positions[period] = {"from": position1, "to": position2}
+            # Calculate the net change in transportation cost
+        move_cost = insertion_cost + removal_cost
+            
+        # Scenario 1: If the move cost is negative, it means that the relocation is beneficial
+        # Scenario 2: If the move cost is positive, it means that the relocation is not beneficial
+        return move_cost, vehicle_positions
         
-        self.route_duration[period] = total_duration
-        self.cost[period] = total_cost
-
-    def insert_customer(self, customer: Customer, position: int, period: int, ignore_load=False) -> bool:
-        self._validate_customer_insertion(customer, period, position, ignore_load)
         
-        added_duration = self._calculate_added_duration(customer, period, position)
-        
-        self.routes[period].insert(position, customer)
-        self._update_vehicle_state(customer, period, added_duration)
-        
-        # Recalculate the full route cost after insertion
-        self._recalculate_full_route_cost(period)
-        
-        return True
-
-
-    def remove_customer(self, customer: Customer, period: int) -> bool:
-        assert customer in self.routes[period], f"Customer {customer.id} is not in vehicle {self.id} route"
-
-        index = self.routes[period].index(customer)
-        previous_location = self.routes[period][index - 1]
-        next_location = self.routes[period][index + 1]
-
-        reduction_duration = (self.distance_matrix[previous_location.id, next_location.id] -
-                            self.distance_matrix[previous_location.id, customer.id] -
-                            self.distance_matrix[customer.id, next_location.id])/self.vehicle_type.speed
-        
-        self.route_duration[period] -= reduction_duration
-        self.cost[period] -= self.variable_cost * reduction_duration
-        self.load[period] -= customer.demands[period]
-        self.routes[period].remove(customer)
-        self.current_location = self.routes[period][-1]
-        
-        # Recalculate the full route cost after removal
-        self._recalculate_full_route_cost(period)
-        
-        return True
-
-    ######## Optimization methods ########
-
-    def find_best_relocation(self, other_vehicle: 'Vehicle', period: int):
-        best_relocation = None
-        no_relocations = 0
-        """
-        IDEA:
-         For frequent customers, for each period, keep a dictionary with all the "good" 
-         relocations of each one, and at the end if moving this client from one vehicle to another
-         leads to cost reduction, then do it, otherwise, do not do it. Keep in mind that moving a
-         frequent customer from one vehicle to another in a period means that we also need to move
-         them in this same vehicle in all the other periods as well due to driver consistency constraint.
-         
-         For non-frequent customers, just check if the relocation leads to cost reduction.
-        """
-        for first_route_node_index in range(len(self.routes[period])-1):
-            for second_route_node_index in range(len(other_vehicle.routes[period])-1):
-                if (first_route_node_index == 0 or second_route_node_index == 0) or \
-                    (first_route_node_index == len(self.routes[period])-1 or second_route_node_index == len(other_vehicle.routes[period])-1) or \
-                    (self.id == other_vehicle.id and (second_route_node_index == first_route_node_index) or (second_route_node_index == first_route_node_index - 1) or (second_route_node_index == first_route_node_index + 1)):
-                    # 1. If the node is the first or last node of the route, it cannot be relocated (depot)
-                    # 2. If the node is the same node, it cannot be relocated
-                    # 3. If the node is the next or previous node of the other node, it cannot be relocated
-                    continue
+    def update_vehicle(self):
+        for period in range(self.planning_horizon):
+            # Update the route duration
+            self.route_duration[period] = 0
+            for i in range(1, len(self.routes[period])):
+                previous_node = self.routes[period][i - 1]
+                next_node = self.routes[period][i]
+                self.route_duration[period] += (distance(previous_node, next_node, self.distance_matrix) + next_node.service_time) /self.vehicle_type.speed
+            # Update the sliding costs
+            self.sliding_variable_cost[period] = [0]
+            for i in range(1, len(self.routes[period])):
+                self.sliding_variable_cost[period].append(self.sliding_variable_cost[period][i - 1] + self.variable_cost * ((distance(self.routes[period][i - 1], self.routes[period][i], self.distance_matrix) + self.routes[period][i].service_time)/self.vehicle_type.speed))
+            # Update the cost
+            self.cost[period] = self.fixed_cost + self.variable_cost * self.route_duration[period]
+            # Update the load
+            self.load[period] = 0
+            for customer in self.routes[period][1:]:
+                self.load[period] += customer.demands[period]
                 
-                a1 = self.routes[period][first_route_node_index - 1]
-                a2 = self.routes[period][first_route_node_index] # Customer to be relocated
-                a3 = self.routes[period][first_route_node_index + 1]
-
-                b1 = other_vehicle.routes[period][second_route_node_index]
-                b3 = other_vehicle.routes[period][second_route_node_index + 1]
-
-                move_cost = None
-                cost_change_first_route = None
-                cost_change_second_route = None
-
-
-                # Customer is frequent if it has demand in more than one period
-                customer_is_frequent = np.count_nonzero(a2.demands) > 1
-
-                if self.id != other_vehicle.id:
-                    # 1. Capacity constraint
-                    if other_vehicle.load[period] + a2.demands[period] > other_vehicle.vehicle_type.capacity:
-                        continue
-                    # 2. Compatibility constraint
-                    elif a2 not in other_vehicle.compatible_customers:
-                        continue
-                    # 3. Duration constraint
-                    added_duration = (self.distance_matrix[b1.id, a2.id] + self.distance_matrix[a2.id, b3.id] - self.distance_matrix[b1.id, b3.id])/self.vehicle_type.speed
-                    if other_vehicle.route_duration[period] + added_duration > other_vehicle.max_route_duration:
-                        continue
-                    # 4. Relocation cost
-                    # Added Duration = Distance from b1 to a2 + Distance from a2 to b3 - Distance from b1 to b3
-                    # Removed Duration = Distance from a1 to a2 + Distance from a2 to a3 + Distance from b1 to b3 
-                    added_duration = (self.distance_matrix[b1.id, a2.id] + self.distance_matrix[a2.id, b3.id] - self.distance_matrix[b1.id, b3.id])/self.vehicle_type.speed
-                    removed_duration = (self.distance_matrix[a1.id, a2.id] + self.distance_matrix[a2.id, a3.id] + self.distance_matrix[b1.id, b3.id])/self.vehicle_type.speed
-
-                    cost_added = self.variable_cost * added_duration
-                    cost_removed = self.variable_cost * removed_duration
-
-                    move_cost = cost_added - cost_removed
     
-                    if move_cost < 0:
-                        if best_relocation is None:
-                            # print(f"Move cost for relocating customer {a2.id} from vehicle {self.id} to vehicle {other_vehicle.id}: {move_cost}")
-                            # print("Added Capacity: ", other_vehicle.load[period] + a2.demands[period])
-                            # print("Other Vehicle Total Capacity: ", other_vehicle.vehicle_type.capacity)
-                            best_relocation = (first_route_node_index, second_route_node_index, move_cost)
-                        elif move_cost < best_relocation[2]:
-                            # print(f"Better move cost for relocating customer {a2.id} from vehicle {self.id} to vehicle {other_vehicle.id}: {move_cost}")
-                            best_relocation = (first_route_node_index, second_route_node_index, move_cost)
-                            # print("Added Capacity: ", other_vehicle.load[period] + a2.demands[period])
-                            # print("Other Vehicle Total Capacity: ", other_vehicle.vehicle_type.capacity)
-                    else:
-                        continue
-        if best_relocation is not None:
-            # Perform the relocation
-            # print(f"Relocating customer {self.routes[period][best_relocation[0]].id} from vehicle {self.id} to vehicle {other_vehicle.id}")
-            first_route_node_index, second_route_node_index, move_cost = best_relocation
-            customer = self.routes[period][first_route_node_index]
-            self.remove_customer(customer, period)
-            other_vehicle.insert_customer(customer, second_route_node_index + 1, period)
-            no_relocations += 1
+    def insert_customer(self, period, customer, position):
+        #validate, message = self._validate_customer_insertion(period, customer, position)
+        #if validate:
+        self.routes[period].insert(position, customer)
+        self.update_vehicle()
+        #else:
+        #    raise AssertionError("Customer insertion is not allowed due to the following reason: " + message)
+        
+    def remove_customer(self, period, position):
+        """
+        Removes a customer from the specified period and position in the routes list.
 
-        return no_relocations
-            
-                    
+        Parameters:
+        - period (int): The period from which to remove the customer.
+        - position (int): The position of the customer in the routes list.
+        """
+        self.routes[period].remove(self.routes[period][position])
+        self.update_vehicle()
+        
+    
+
+    def intra_route_relocate(self, period, from_position, to_position):
+        """
+        Relocates a customer within a route for a given period.
+        Parameters:
+        - period (int): The period for which the route is being modified.
+        - from_position (int): The current position of the customer within the route.
+        - to_position (int): The new position where the customer will be relocated.
+        Returns:
+        None
+        """
+        # Retrieve the customer to be relocated
+        customer = self.routes[period][from_position]
+        
+        # Remove the customer from its current position
+        self.remove_customer(period, from_position)
+        
+        # Insert the customer into the new position
+        self.insert_customer(period, customer, to_position)
+        
+    def inter_route_relocate(self, period, other_vehicle:'Vehicle', from_position, to_position):
+        """
+        Relocates a customer from one vehicle to another in the inter-route relocation operation.
+        Parameters:
+        - period (int): The period in which the relocation operation is performed.
+        - other_vehicle (Vehicle): The other vehicle to which the customer will be relocated.
+        - from_position (int): The position of the customer in the current vehicle.
+        - to_position (int): The position at which the customer will be inserted in the other vehicle.
+
+        """
+        # Retrieve the customer to be relocated
+        customer = self.routes[period][from_position]
+        
+        # Remove the customer from the current vehicle
+        self.remove_customer(period, from_position)
+        
+        # Insert the customer into the other vehicle
+        other_vehicle.insert_customer(period, customer, to_position)
+
+        
+        
+        
+        

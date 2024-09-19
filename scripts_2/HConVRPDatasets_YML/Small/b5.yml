@@ -1,0 +1,35 @@
+Compatibility_Restrictions: []
+Customer_coordinates:
+- [9.574, 5.474, 1]
+- [0.637, 3.747, 1]
+- [7.541, 3.132, 1]
+- [4.448, 0.854, 1]
+- [2.152, 9.587, 1]
+- [4.914, 4.111, 1]
+- [0.561, 4.104, 1]
+- [2.152, 1.214, 1]
+- [5.801, 0.251, 1]
+- [2.532, 2.137, 1]
+Customer_demands:
+- [1, 0, 0]
+- [1, 1, 1]
+- [2, 2, 2]
+- [2, 2, 2]
+- [3, 3, 0]
+- [3, 3, 0]
+- [3, 0, 3]
+- [3, 3, 3]
+- [1, 1, 1]
+- [0, 1, 0]
+Depot_coordinates: [0.0, 0.0]
+Instance_Name: HCon11
+Number_of_available_vehicle_types: 2
+Number_of_nodes: 11
+Planning_Horizon: 3
+Route_Duration: 35
+Total_Number_of_available_vehicles: 2
+Vehicle_Types:
+- {Capacity: 18.0, Fixed_Cost: 130.0, Number_of_available_vehicles: 1, Speed: 1.0,
+  Variable_Cost: 5.0, Vehicle_Type: TYPE1}
+- {Capacity: 15.0, Fixed_Cost: 100.0, Number_of_available_vehicles: 1, Speed: 1.0,
+  Variable_Cost: 3.0, Vehicle_Type: TYPE2}

@@ -40,7 +40,7 @@ def load_dataset():
     dataset = request.get_json().get('dataset')
     globals.data = yaml.load(open(dataset), Loader=yaml.FullLoader)
     
-    globals.depot = Customer(0, tuple(globals.data["Depot_coordinates"]), [0]*globals.data["Planning_Horizon"], globals.data["Planning_Horizon"])
+    globals.depot = Customer(0, tuple(globals.data["Depot_coordinates"]), [0]*globals.data["Planning_Horizon"], 0, globals.data["Planning_Horizon"])
     globals.planning_horizon = globals.data["Planning_Horizon"]
     globals.route_duration = globals.data["Route_Duration"]
 

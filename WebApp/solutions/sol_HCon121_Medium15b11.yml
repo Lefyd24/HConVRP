@@ -1,0 +1,2869 @@
+metadata:
+  datetime: '2024-09-05 19:41:53'
+  solution_for_file: null
+  description: Solution for Heterogeneous Consistent Vehicle Routing Problem (HConVRP)
+  computation_time_seconds: 0
+solution:
+  planning_horizon: 5
+  max_route_duration: 300
+  depot: !!python/object:solver_modules.models.Customer
+    id: 0
+    coordinates: !!python/tuple
+    - 0.0
+    - 0.0
+    demands:
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    planning_horizon: 5
+    is_serviced:
+      0: false
+      1: false
+      2: false
+      3: false
+      4: false
+  nodes:
+  - !!python/object:solver_modules.models.Customer
+    id: 1
+    coordinates: !!python/tuple
+    - 15.0
+    - -44.0
+    - 0
+    demands:
+    - 25
+    - 25
+    - 25
+    - 25
+    - 25
+    planning_horizon: 5
+    is_serviced:
+      0: true
+      1: true
+      2: true
+      3: true
+      4: true
+  - !!python/object:solver_modules.models.Customer
+    id: 2
+    coordinates: !!python/tuple
+    - 15.0
+    - -42.0
+    - 0
+    demands:
+    - 7
+    - 7
+    - 7
+    - 7
+    - 7
+    planning_horizon: 5
+    is_serviced:
+      0: true
+      1: true
+      2: true
+      3: true
+      4: true
+  - !!python/object:solver_modules.models.Customer
+    id: 3
+    coordinates: !!python/tuple
+    - 21.0
+    - -40.0
+    - 0
+    demands:
+    - 13
+    - 13
+    - 0
+    - 13
+    - 13
+    planning_horizon: 5
+    is_serviced:
+      0: true
+      1: true
+      2: false
+      3: true
+      4: true
+  - !!python/object:solver_modules.models.Customer
+    id: 4
+    coordinates: !!python/tuple
+    - 22.0
+    - -40.0
+    - 0
+    demands:
+    - 0
+    - 0
+    - 6
+    - 0
+    - 0
+    planning_horizon: 5
+    is_serviced:
+      0: false
+      1: false
+      2: true
+      3: false
+      4: false
+  - !!python/object:solver_modules.models.Customer
+    id: 5
+    coordinates: !!python/tuple
+    - 21.0
+    - -38.0
+    - 0
+    demands:
+    - 14
+    - 14
+    - 14
+    - 14
+    - 14
+    planning_horizon: 5
+    is_serviced:
+      0: true
+      1: true
+      2: true
+      3: true
+      4: true
+  - !!python/object:solver_modules.models.Customer
+    id: 6
+    coordinates: !!python/tuple
+    - 22.0
+    - -36.0
+    - 0
+    demands:
+    - 5
+    - 5
+    - 0
+    - 0
+    - 5
+    planning_horizon: 5
+    is_serviced:
+      0: true
+      1: true
+      2: false
+      3: false
+      4: true
+  - !!python/object:solver_modules.models.Customer
+    id: 7
+    coordinates: !!python/tuple
+    - 24.0
+    - -36.0
+    - 0
+    demands:
+    - 0
+    - 11
+    - 11
+    - 11
+    - 0
+    planning_horizon: 5
+    is_serviced:
+      0: false
+      1: true
+      2: true
+      3: true
+      4: false
+  - !!python/object:solver_modules.models.Customer
+    id: 8
+    coordinates: !!python/tuple
+    - 36.0
+    - -36.0
+    - 0
+    demands:
+    - 0
+    - 19
+    - 19
+    - 0
+    - 19
+    planning_horizon: 5
+    is_serviced:
+      0: false
+      1: true
+      2: true
+      3: false
+      4: true
+  - !!python/object:solver_modules.models.Customer
+    id: 9
+    coordinates: !!python/tuple
+    - 25.0
+    - -38.0
+    - 0
+    demands:
+    - 0
+    - 0
+    - 5
+    - 5
+    - 0
+    planning_horizon: 5
+    is_serviced:
+      0: false
+      1: false
+      2: true
+      3: true
+      4: false
+  - !!python/object:solver_modules.models.Customer
+    id: 10
+    coordinates: !!python/tuple
+    - 24.0
+    - -39.0
+    - 0
+    demands:
+    - 0
+    - 0
+    - 0
+    - 0
+    - 15
+    planning_horizon: 5
+    is_serviced:
+      0: false
+      1: false
+      2: false
+      3: false
+      4: true
+  - !!python/object:solver_modules.models.Customer
+    id: 11
+    coordinates: !!python/tuple
+    - 25.0
+    - -40.0
+    - 0
+    demands:
+    - 15
+    - 0
+    - 0
+    - 15
+    - 15
+    planning_horizon: 5
+    is_serviced:
+      0: true
+      1: false
+      2: false
+      3: true
+      4: true
+  - !!python/object:solver_modules.models.Customer
+    id: 12
+    coordinates: !!python/tuple
+    - 37.0
+    - -39.0
+    - 0
+    demands:
+    - 0
+    - 0
+    - 0
+    - 10
+    - 0
+    planning_horizon: 5
+    is_serviced:
+      0: false
+      1: false
+      2: false
+      3: true
+      4: false
+  - !!python/object:solver_modules.models.Customer
+    id: 13
+    coordinates: !!python/tuple
+    - 30.0
+    - -40.0
+    - 0
+    demands:
+    - 0
+    - 13
+    - 13
+    - 0
+    - 0
+    planning_horizon: 5
+    is_serviced:
+      0: false
+      1: true
+      2: true
+      3: false
+      4: false
+  - !!python/object:solver_modules.models.Customer
+    id: 14
+    coordinates: !!python/tuple
+    - 29.0
+    - -42.0
+    - 0
+    demands:
+    - 0
+    - 12
+    - 12
+    - 12
+    - 0
+    planning_horizon: 5
+    is_serviced:
+      0: false
+      1: true
+      2: true
+      3: true
+      4: false
+  - !!python/object:solver_modules.models.Customer
+    id: 15
+    coordinates: !!python/tuple
+    - 26.0
+    - -42.0
+    - 0
+    demands:
+    - 18
+    - 18
+    - 18
+    - 0
+    - 18
+    planning_horizon: 5
+    is_serviced:
+      0: true
+      1: true
+      2: true
+      3: false
+      4: true
+  - !!python/object:solver_modules.models.Customer
+    id: 16
+    coordinates: !!python/tuple
+    - 63.0
+    - -39.0
+    - 0
+    demands:
+    - 13
+    - 13
+    - 13
+    - 13
+    - 13
+    planning_horizon: 5
+    is_serviced:
+      0: true
+      1: true
+      2: true
+      3: true
+      4: true
+  - !!python/object:solver_modules.models.Customer
+    id: 17
+    coordinates: !!python/tuple
+    - 63.0
+    - -37.0
+    - 0
+    demands:
+    - 0
+    - 18
+    - 18
+    - 18
+    - 18
+    planning_horizon: 5
+    is_serviced:
+      0: false
+      1: true
+      2: true
+      3: true
+      4: true
+  - !!python/object:solver_modules.models.Customer
+    id: 18
+    coordinates: !!python/tuple
+    - 14.0
+    - -9.0
+    - 0
+    demands:
+    - 12
+    - 0
+    - 0
+    - 0
+    - 12
+    planning_horizon: 5
+    is_serviced:
+      0: true
+      1: false
+      2: false
+      3: false
+      4: true
+  - !!python/object:solver_modules.models.Customer
+    id: 19
+    coordinates: !!python/tuple
+    - 66.0
+    - -39.0
+    - 0
+    demands:
+    - 0
+    - 17
+    - 17
+    - 17
+    - 17
+    planning_horizon: 5
+    is_serviced:
+      0: false
+      1: true
+      2: true
+      3: true
+      4: true
+  - !!python/object:solver_modules.models.Customer
+    id: 20
+    coordinates: !!python/tuple
+    - 66.0
+    - -35.0
+    - 0
+    demands:
+    - 4
+    - 0
+    - 4
+    - 4
+    - 0
+    planning_horizon: 5
+    is_serviced:
+      0: true
+      1: false
+      2: true
+      3: true
+      4: false
+  - !!python/object:solver_modules.models.Customer
+    id: 21
+    coordinates: !!python/tuple
+    - 66.0
+    - -32.0
+    - 0
+    demands:
+    - 7
+    - 7
+    - 7
+    - 7
+    - 0
+    planning_horizon: 5
+    is_serviced:
+      0: true
+      1: true
+      2: true
+      3: true
+      4: false
+  - !!python/object:solver_modules.models.Customer
+    id: 22
+    coordinates: !!python/tuple
+    - 68.0
+    - -42.0
+    - 0
+    demands:
+    - 0
+    - 12
+    - 12
+    - 12
+    - 0
+    planning_horizon: 5
+    is_serviced:
+      0: false
+      1: true
+      2: true
+      3: true
+      4: false
+  - !!python/object:solver_modules.models.Customer
+    id: 23
+    coordinates: !!python/tuple
+    - 68.0
+    - -36.0
+    - 0
+    demands:
+    - 13
+    - 0
+    - 13
+    - 13
+    - 13
+    planning_horizon: 5
+    is_serviced:
+      0: true
+      1: false
+      2: true
+      3: true
+      4: true
+  - !!python/object:solver_modules.models.Customer
+    id: 24
+    coordinates: !!python/tuple
+    - 69.0
+    - -42.0
+    - 0
+    demands:
+    - 8
+    - 0
+    - 8
+    - 8
+    - 8
+    planning_horizon: 5
+    is_serviced:
+      0: true
+      1: false
+      2: true
+      3: true
+      4: true
+  - !!python/object:solver_modules.models.Customer
+    id: 25
+    coordinates: !!python/tuple
+    - 69.0
+    - -40.0
+    - 0
+    demands:
+    - 16
+    - 16
+    - 16
+    - 0
+    - 16
+    planning_horizon: 5
+    is_serviced:
+      0: true
+      1: true
+      2: true
+      3: false
+      4: true
+  - !!python/object:solver_modules.models.Customer
+    id: 26
+    coordinates: !!python/tuple
+    - 69.0
+    - -34.0
+    - 0
+    demands:
+    - 15
+    - 15
+    - 0
+    - 15
+    - 0
+    planning_horizon: 5
+    is_serviced:
+      0: true
+      1: true
+      2: false
+      3: true
+      4: false
+  - !!python/object:solver_modules.models.Customer
+    id: 27
+    coordinates: !!python/tuple
+    - 72.0
+    - -42.0
+    - 0
+    demands:
+    - 6
+    - 0
+    - 0
+    - 6
+    - 6
+    planning_horizon: 5
+    is_serviced:
+      0: true
+      1: false
+      2: false
+      3: true
+      4: true
+  - !!python/object:solver_modules.models.Customer
+    id: 28
+    coordinates: !!python/tuple
+    - 72.0
+    - -38.0
+    - 0
+    demands:
+    - 5
+    - 0
+    - 0
+    - 5
+    - 5
+    planning_horizon: 5
+    is_serviced:
+      0: true
+      1: false
+      2: false
+      3: true
+      4: true
+  - !!python/object:solver_modules.models.Customer
+    id: 29
+    coordinates: !!python/tuple
+    - 80.0
+    - -30.0
+    - 0
+    demands:
+    - 9
+    - 9
+    - 9
+    - 0
+    - 0
+    planning_horizon: 5
+    is_serviced:
+      0: true
+      1: true
+      2: true
+      3: false
+      4: false
+  - !!python/object:solver_modules.models.Customer
+    id: 30
+    coordinates: !!python/tuple
+    - 74.0
+    - -42.0
+    - 0
+    demands:
+    - 0
+    - 0
+    - 0
+    - 11
+    - 0
+    planning_horizon: 5
+    is_serviced:
+      0: false
+      1: false
+      2: false
+      3: true
+      4: false
+  - !!python/object:solver_modules.models.Customer
+    id: 31
+    coordinates: !!python/tuple
+    - 74.0
+    - -40.0
+    - 0
+    demands:
+    - 10
+    - 10
+    - 10
+    - 10
+    - 0
+    planning_horizon: 5
+    is_serviced:
+      0: true
+      1: true
+      2: true
+      3: true
+      4: false
+  - !!python/object:solver_modules.models.Customer
+    id: 32
+    coordinates: !!python/tuple
+    - 74.0
+    - -36.0
+    - 0
+    demands:
+    - 3
+    - 3
+    - 0
+    - 3
+    - 3
+    planning_horizon: 5
+    is_serviced:
+      0: true
+      1: true
+      2: false
+      3: true
+      4: true
+  - !!python/object:solver_modules.models.Customer
+    id: 33
+    coordinates: !!python/tuple
+    - 75.0
+    - -44.0
+    - 0
+    demands:
+    - 0
+    - 0
+    - 7
+    - 7
+    - 7
+    planning_horizon: 5
+    is_serviced:
+      0: false
+      1: false
+      2: true
+      3: true
+      4: true
+  - !!python/object:solver_modules.models.Customer
+    id: 34
+    coordinates: !!python/tuple
+    - 77.0
+    - -40.0
+    - 0
+    demands:
+    - 0
+    - 2
+    - 0
+    - 2
+    - 0
+    planning_horizon: 5
+    is_serviced:
+      0: false
+      1: true
+      2: false
+      3: true
+      4: false
+  - !!python/object:solver_modules.models.Customer
+    id: 35
+    coordinates: !!python/tuple
+    - 75.0
+    - -37.0
+    - 0
+    demands:
+    - 4
+    - 4
+    - 4
+    - 0
+    - 0
+    planning_horizon: 5
+    is_serviced:
+      0: true
+      1: true
+      2: true
+      3: false
+      4: false
+  - !!python/object:solver_modules.models.Customer
+    id: 36
+    coordinates: !!python/tuple
+    - 77.0
+    - -38.0
+    - 0
+    demands:
+    - 4
+    - 4
+    - 4
+    - 4
+    - 4
+    planning_horizon: 5
+    is_serviced:
+      0: true
+      1: true
+      2: true
+      3: true
+      4: true
+  - !!python/object:solver_modules.models.Customer
+    id: 37
+    coordinates: !!python/tuple
+    - 76.0
+    - -4.0
+    - 0
+    demands:
+    - 18
+    - 18
+    - 0
+    - 18
+    - 0
+    planning_horizon: 5
+    is_serviced:
+      0: true
+      1: true
+      2: false
+      3: true
+      4: false
+  - !!python/object:solver_modules.models.Customer
+    id: 38
+    coordinates: !!python/tuple
+    - 76.0
+    - -1.0
+    - 0
+    demands:
+    - 14
+    - 14
+    - 0
+    - 14
+    - 14
+    planning_horizon: 5
+    is_serviced:
+      0: true
+      1: true
+      2: false
+      3: true
+      4: true
+  - !!python/object:solver_modules.models.Customer
+    id: 39
+    coordinates: !!python/tuple
+    - 76.0
+    - 1.0
+    - 0
+    demands:
+    - 12
+    - 12
+    - 12
+    - 0
+    - 12
+    planning_horizon: 5
+    is_serviced:
+      0: true
+      1: true
+      2: true
+      3: false
+      4: true
+  - !!python/object:solver_modules.models.Customer
+    id: 40
+    coordinates: !!python/tuple
+    - 75.0
+    - 10.0
+    - 0
+    demands:
+    - 17
+    - 17
+    - 17
+    - 17
+    - 0
+    planning_horizon: 5
+    is_serviced:
+      0: true
+      1: true
+      2: true
+      3: true
+      4: false
+  - !!python/object:solver_modules.models.Customer
+    id: 41
+    coordinates: !!python/tuple
+    - 79.0
+    - -2.0
+    - 0
+    demands:
+    - 0
+    - 0
+    - 0
+    - 20
+    - 0
+    planning_horizon: 5
+    is_serviced:
+      0: false
+      1: false
+      2: false
+      3: true
+      4: false
+  - !!python/object:solver_modules.models.Customer
+    id: 42
+    coordinates: !!python/tuple
+    - 79.0
+    - 1.0
+    - 0
+    demands:
+    - 14
+    - 14
+    - 14
+    - 14
+    - 0
+    planning_horizon: 5
+    is_serviced:
+      0: true
+      1: true
+      2: true
+      3: true
+      4: false
+  - !!python/object:solver_modules.models.Customer
+    id: 43
+    coordinates: !!python/tuple
+    - 79.0
+    - 7.0
+    - 0
+    demands:
+    - 0
+    - 16
+    - 16
+    - 0
+    - 16
+    planning_horizon: 5
+    is_serviced:
+      0: false
+      1: true
+      2: true
+      3: false
+      4: true
+  - !!python/object:solver_modules.models.Customer
+    id: 44
+    coordinates: !!python/tuple
+    - 82.0
+    - -3.0
+    - 0
+    demands:
+    - 10
+    - 10
+    - 10
+    - 0
+    - 10
+    planning_horizon: 5
+    is_serviced:
+      0: true
+      1: true
+      2: true
+      3: false
+      4: true
+  - !!python/object:solver_modules.models.Customer
+    id: 45
+    coordinates: !!python/tuple
+    - 82.0
+    - 7.0
+    - 0
+    demands:
+    - 9
+    - 9
+    - 9
+    - 0
+    - 9
+    planning_horizon: 5
+    is_serviced:
+      0: true
+      1: true
+      2: true
+      3: false
+      4: true
+  - !!python/object:solver_modules.models.Customer
+    id: 46
+    coordinates: !!python/tuple
+    - 84.0
+    - -3.0
+    - 0
+    demands:
+    - 0
+    - 0
+    - 0
+    - 11
+    - 0
+    planning_horizon: 5
+    is_serviced:
+      0: false
+      1: false
+      2: false
+      3: true
+      4: false
+  - !!python/object:solver_modules.models.Customer
+    id: 47
+    coordinates: !!python/tuple
+    - 84.0
+    - -1.0
+    - 0
+    demands:
+    - 7
+    - 7
+    - 7
+    - 7
+    - 7
+    planning_horizon: 5
+    is_serviced:
+      0: true
+      1: true
+      2: true
+      3: true
+      4: true
+  - !!python/object:solver_modules.models.Customer
+    id: 48
+    coordinates: !!python/tuple
+    - 84.0
+    - 3.0
+    - 0
+    demands:
+    - 0
+    - 13
+    - 13
+    - 0
+    - 13
+    planning_horizon: 5
+    is_serviced:
+      0: false
+      1: true
+      2: true
+      3: false
+      4: true
+  - !!python/object:solver_modules.models.Customer
+    id: 49
+    coordinates: !!python/tuple
+    - 86.0
+    - -3.0
+    - 0
+    demands:
+    - 5
+    - 5
+    - 5
+    - 5
+    - 5
+    planning_horizon: 5
+    is_serviced:
+      0: true
+      1: true
+      2: true
+      3: true
+      4: true
+  - !!python/object:solver_modules.models.Customer
+    id: 50
+    coordinates: !!python/tuple
+    - 89.0
+    - 1.0
+    - 0
+    demands:
+    - 4
+    - 0
+    - 0
+    - 4
+    - 4
+    planning_horizon: 5
+    is_serviced:
+      0: true
+      1: false
+      2: false
+      3: true
+      4: true
+  - !!python/object:solver_modules.models.Customer
+    id: 51
+    coordinates: !!python/tuple
+    - 89.0
+    - 5.0
+    - 0
+    demands:
+    - 21
+    - 21
+    - 21
+    - 0
+    - 0
+    planning_horizon: 5
+    is_serviced:
+      0: true
+      1: true
+      2: true
+      3: false
+      4: false
+  - !!python/object:solver_modules.models.Customer
+    id: 52
+    coordinates: !!python/tuple
+    - 73.0
+    - 35.0
+    - 0
+    demands:
+    - 13
+    - 13
+    - 13
+    - 13
+    - 13
+    planning_horizon: 5
+    is_serviced:
+      0: true
+      1: true
+      2: true
+      3: true
+      4: true
+  - !!python/object:solver_modules.models.Customer
+    id: 53
+    coordinates: !!python/tuple
+    - 73.0
+    - 38.0
+    - 0
+    demands:
+    - 11
+    - 0
+    - 11
+    - 0
+    - 11
+    planning_horizon: 5
+    is_serviced:
+      0: true
+      1: false
+      2: true
+      3: false
+      4: true
+  - !!python/object:solver_modules.models.Customer
+    id: 54
+    coordinates: !!python/tuple
+    - 75.0
+    - 36.0
+    - 0
+    demands:
+    - 12
+    - 12
+    - 12
+    - 0
+    - 12
+    planning_horizon: 5
+    is_serviced:
+      0: true
+      1: true
+      2: true
+      3: false
+      4: true
+  - !!python/object:solver_modules.models.Customer
+    id: 55
+    coordinates: !!python/tuple
+    - 75.0
+    - 40.0
+    - 0
+    demands:
+    - 14
+    - 14
+    - 14
+    - 14
+    - 14
+    planning_horizon: 5
+    is_serviced:
+      0: true
+      1: true
+      2: true
+      3: true
+      4: true
+  - !!python/object:solver_modules.models.Customer
+    id: 56
+    coordinates: !!python/tuple
+    - 75.0
+    - 44.0
+    - 0
+    demands:
+    - 10
+    - 0
+    - 0
+    - 0
+    - 0
+    planning_horizon: 5
+    is_serviced:
+      0: true
+      1: false
+      2: false
+      3: false
+      4: false
+  - !!python/object:solver_modules.models.Customer
+    id: 57
+    coordinates: !!python/tuple
+    - 77.0
+    - 35.0
+    - 0
+    demands:
+    - 8
+    - 8
+    - 8
+    - 0
+    - 0
+    planning_horizon: 5
+    is_serviced:
+      0: true
+      1: true
+      2: true
+      3: false
+      4: false
+  - !!python/object:solver_modules.models.Customer
+    id: 58
+    coordinates: !!python/tuple
+    - 77.0
+    - 41.0
+    - 0
+    demands:
+    - 0
+    - 16
+    - 0
+    - 16
+    - 16
+    planning_horizon: 5
+    is_serviced:
+      0: false
+      1: true
+      2: false
+      3: true
+      4: true
+  - !!python/object:solver_modules.models.Customer
+    id: 59
+    coordinates: !!python/tuple
+    - 80.0
+    - 32.0
+    - 0
+    demands:
+    - 0
+    - 0
+    - 0
+    - 19
+    - 0
+    planning_horizon: 5
+    is_serviced:
+      0: false
+      1: false
+      2: false
+      3: true
+      4: false
+  - !!python/object:solver_modules.models.Customer
+    id: 60
+    coordinates: !!python/tuple
+    - 80.0
+    - 43.0
+    - 0
+    demands:
+    - 5
+    - 5
+    - 5
+    - 5
+    - 5
+    planning_horizon: 5
+    is_serviced:
+      0: true
+      1: true
+      2: true
+      3: true
+      4: true
+  - !!python/object:solver_modules.models.Customer
+    id: 61
+    coordinates: !!python/tuple
+    - 83.0
+    - 37.0
+    - 0
+    demands:
+    - 17
+    - 17
+    - 17
+    - 17
+    - 17
+    planning_horizon: 5
+    is_serviced:
+      0: true
+      1: true
+      2: true
+      3: true
+      4: true
+  - !!python/object:solver_modules.models.Customer
+    id: 62
+    coordinates: !!python/tuple
+    - 83.0
+    - 39.0
+    - 0
+    demands:
+    - 7
+    - 0
+    - 0
+    - 7
+    - 7
+    planning_horizon: 5
+    is_serviced:
+      0: true
+      1: false
+      2: false
+      3: true
+      4: true
+  - !!python/object:solver_modules.models.Customer
+    id: 63
+    coordinates: !!python/tuple
+    - 83.0
+    - 44.0
+    - 0
+    demands:
+    - 16
+    - 16
+    - 16
+    - 16
+    - 0
+    planning_horizon: 5
+    is_serviced:
+      0: true
+      1: true
+      2: true
+      3: true
+      4: false
+  - !!python/object:solver_modules.models.Customer
+    id: 64
+    coordinates: !!python/tuple
+    - 84.0
+    - 41.0
+    - 0
+    demands:
+    - 14
+    - 0
+    - 0
+    - 0
+    - 14
+    planning_horizon: 5
+    is_serviced:
+      0: true
+      1: false
+      2: false
+      3: false
+      4: true
+  - !!python/object:solver_modules.models.Customer
+    id: 65
+    coordinates: !!python/tuple
+    - 85.0
+    - 35.0
+    - 0
+    demands:
+    - 0
+    - 17
+    - 0
+    - 0
+    - 17
+    planning_horizon: 5
+    is_serviced:
+      0: false
+      1: true
+      2: false
+      3: false
+      4: true
+  - !!python/object:solver_modules.models.Customer
+    id: 66
+    coordinates: !!python/tuple
+    - 89.0
+    - 44.0
+    - 0
+    demands:
+    - 13
+    - 0
+    - 13
+    - 13
+    - 13
+    planning_horizon: 5
+    is_serviced:
+      0: true
+      1: false
+      2: true
+      3: true
+      4: true
+  - !!python/object:solver_modules.models.Customer
+    id: 67
+    coordinates: !!python/tuple
+    - 27.0
+    - 38.0
+    - 0
+    demands:
+    - 0
+    - 17
+    - 0
+    - 0
+    - 0
+    planning_horizon: 5
+    is_serviced:
+      0: false
+      1: true
+      2: false
+      3: false
+      4: false
+  - !!python/object:solver_modules.models.Customer
+    id: 68
+    coordinates: !!python/tuple
+    - 40.0
+    - 35.0
+    - 0
+    demands:
+    - 13
+    - 13
+    - 0
+    - 13
+    - 13
+    planning_horizon: 5
+    is_serviced:
+      0: true
+      1: true
+      2: false
+      3: true
+      4: true
+  - !!python/object:solver_modules.models.Customer
+    id: 69
+    coordinates: !!python/tuple
+    - 25.0
+    - 40.0
+    - 0
+    demands:
+    - 14
+    - 14
+    - 14
+    - 0
+    - 14
+    planning_horizon: 5
+    is_serviced:
+      0: true
+      1: true
+      2: true
+      3: false
+      4: true
+  - !!python/object:solver_modules.models.Customer
+    id: 70
+    coordinates: !!python/tuple
+    - 25.0
+    - 42.0
+    - 0
+    demands:
+    - 16
+    - 16
+    - 16
+    - 0
+    - 16
+    planning_horizon: 5
+    is_serviced:
+      0: true
+      1: true
+      2: true
+      3: false
+      4: true
+  - !!python/object:solver_modules.models.Customer
+    id: 71
+    coordinates: !!python/tuple
+    - 34.0
+    - 41.0
+    - 0
+    demands:
+    - 7
+    - 0
+    - 0
+    - 7
+    - 0
+    planning_horizon: 5
+    is_serviced:
+      0: true
+      1: false
+      2: false
+      3: true
+      4: false
+  - !!python/object:solver_modules.models.Customer
+    id: 72
+    coordinates: !!python/tuple
+    - 36.0
+    - 44.0
+    - 0
+    demands:
+    - 0
+    - 13
+    - 13
+    - 13
+    - 13
+    planning_horizon: 5
+    is_serviced:
+      0: false
+      1: true
+      2: true
+      3: true
+      4: true
+  - !!python/object:solver_modules.models.Customer
+    id: 73
+    coordinates: !!python/tuple
+    - 36.0
+    - 38.0
+    - 0
+    demands:
+    - 0
+    - 9
+    - 9
+    - 0
+    - 9
+    planning_horizon: 5
+    is_serviced:
+      0: false
+      1: true
+      2: true
+      3: false
+      4: true
+  - !!python/object:solver_modules.models.Customer
+    id: 74
+    coordinates: !!python/tuple
+    - 36.0
+    - 42.0
+    - 0
+    demands:
+    - 0
+    - 0
+    - 11
+    - 0
+    - 0
+    planning_horizon: 5
+    is_serviced:
+      0: false
+      1: false
+      2: true
+      3: false
+      4: false
+  - !!python/object:solver_modules.models.Customer
+    id: 75
+    coordinates: !!python/tuple
+    - 36.0
+    - 44.0
+    - 0
+    demands:
+    - 35
+    - 35
+    - 0
+    - 35
+    - 0
+    planning_horizon: 5
+    is_serviced:
+      0: true
+      1: true
+      2: false
+      3: true
+      4: false
+  - !!python/object:solver_modules.models.Customer
+    id: 76
+    coordinates: !!python/tuple
+    - 38.0
+    - 38.0
+    - 0
+    demands:
+    - 5
+    - 5
+    - 5
+    - 0
+    - 5
+    planning_horizon: 5
+    is_serviced:
+      0: true
+      1: true
+      2: true
+      3: false
+      4: true
+  - !!python/object:solver_modules.models.Customer
+    id: 77
+    coordinates: !!python/tuple
+    - 40.0
+    - 40.0
+    - 0
+    demands:
+    - 0
+    - 0
+    - 28
+    - 0
+    - 0
+    planning_horizon: 5
+    is_serviced:
+      0: false
+      1: false
+      2: true
+      3: false
+      4: false
+  - !!python/object:solver_modules.models.Customer
+    id: 78
+    coordinates: !!python/tuple
+    - 40.0
+    - 43.0
+    - 0
+    demands:
+    - 7
+    - 0
+    - 0
+    - 0
+    - 0
+    planning_horizon: 5
+    is_serviced:
+      0: true
+      1: false
+      2: false
+      3: false
+      4: false
+  - !!python/object:solver_modules.models.Customer
+    id: 79
+    coordinates: !!python/tuple
+    - 44.0
+    - 41.0
+    - 0
+    demands:
+    - 3
+    - 0
+    - 3
+    - 3
+    - 3
+    planning_horizon: 5
+    is_serviced:
+      0: true
+      1: false
+      2: true
+      3: true
+      4: true
+  - !!python/object:solver_modules.models.Customer
+    id: 80
+    coordinates: !!python/tuple
+    - 44.0
+    - 45.0
+    - 0
+    demands:
+    - 10
+    - 0
+    - 10
+    - 10
+    - 10
+    planning_horizon: 5
+    is_serviced:
+      0: true
+      1: false
+      2: true
+      3: true
+      4: true
+  - !!python/object:solver_modules.models.Customer
+    id: 81
+    coordinates: !!python/tuple
+    - 0.0
+    - -10.0
+    - 0
+    demands:
+    - 7
+    - 7
+    - 0
+    - 7
+    - 7
+    planning_horizon: 5
+    is_serviced:
+      0: true
+      1: true
+      2: false
+      3: true
+      4: true
+  - !!python/object:solver_modules.models.Customer
+    id: 82
+    coordinates: !!python/tuple
+    - 0.0
+    - -5.0
+    - 0
+    demands:
+    - 12
+    - 0
+    - 12
+    - 12
+    - 0
+    planning_horizon: 5
+    is_serviced:
+      0: true
+      1: false
+      2: true
+      3: true
+      4: false
+  - !!python/object:solver_modules.models.Customer
+    id: 83
+    coordinates: !!python/tuple
+    - 8.0
+    - -15.0
+    - 0
+    demands:
+    - 11
+    - 11
+    - 11
+    - 11
+    - 11
+    planning_horizon: 5
+    is_serviced:
+      0: true
+      1: true
+      2: true
+      3: true
+      4: true
+  - !!python/object:solver_modules.models.Customer
+    id: 84
+    coordinates: !!python/tuple
+    - 7.0
+    - -10.0
+    - 0
+    demands:
+    - 10
+    - 0
+    - 0
+    - 0
+    - 0
+    planning_horizon: 5
+    is_serviced:
+      0: true
+      1: false
+      2: false
+      3: false
+      4: false
+  - !!python/object:solver_modules.models.Customer
+    id: 85
+    coordinates: !!python/tuple
+    - 6.0
+    - -7.0
+    - 0
+    demands:
+    - 8
+    - 0
+    - 8
+    - 8
+    - 8
+    planning_horizon: 5
+    is_serviced:
+      0: true
+      1: false
+      2: true
+      3: true
+      4: true
+  - !!python/object:solver_modules.models.Customer
+    id: 86
+    coordinates: !!python/tuple
+    - 4.0
+    - -5.0
+    - 0
+    demands:
+    - 0
+    - 11
+    - 11
+    - 11
+    - 0
+    planning_horizon: 5
+    is_serviced:
+      0: false
+      1: true
+      2: true
+      3: true
+      4: false
+  - !!python/object:solver_modules.models.Customer
+    id: 87
+    coordinates: !!python/tuple
+    - 5.0
+    - -3.0
+    - 0
+    demands:
+    - 21
+    - 0
+    - 21
+    - 0
+    - 21
+    planning_horizon: 5
+    is_serviced:
+      0: true
+      1: false
+      2: true
+      3: false
+      4: true
+  - !!python/object:solver_modules.models.Customer
+    id: 88
+    coordinates: !!python/tuple
+    - 1.0
+    - -3.0
+    - 0
+    demands:
+    - 0
+    - 4
+    - 0
+    - 0
+    - 0
+    planning_horizon: 5
+    is_serviced:
+      0: false
+      1: true
+      2: false
+      3: false
+      4: false
+  - !!python/object:solver_modules.models.Customer
+    id: 89
+    coordinates: !!python/tuple
+    - 8.0
+    - -5.0
+    - 0
+    demands:
+    - 0
+    - 0
+    - 15
+    - 15
+    - 15
+    planning_horizon: 5
+    is_serviced:
+      0: false
+      1: false
+      2: true
+      3: true
+      4: true
+  - !!python/object:solver_modules.models.Customer
+    id: 90
+    coordinates: !!python/tuple
+    - 11.0
+    - -6.0
+    - 0
+    demands:
+    - 16
+    - 16
+    - 16
+    - 16
+    - 16
+    planning_horizon: 5
+    is_serviced:
+      0: true
+      1: true
+      2: true
+      3: true
+      4: true
+  - !!python/object:solver_modules.models.Customer
+    id: 91
+    coordinates: !!python/tuple
+    - 10.0
+    - -5.0
+    - 0
+    demands:
+    - 4
+    - 4
+    - 4
+    - 4
+    - 4
+    planning_horizon: 5
+    is_serviced:
+      0: true
+      1: true
+      2: true
+      3: true
+      4: true
+  - !!python/object:solver_modules.models.Customer
+    id: 92
+    coordinates: !!python/tuple
+    - 8.0
+    - -4.0
+    - 0
+    demands:
+    - 16
+    - 16
+    - 16
+    - 16
+    - 16
+    planning_horizon: 5
+    is_serviced:
+      0: true
+      1: true
+      2: true
+      3: true
+      4: true
+  - !!python/object:solver_modules.models.Customer
+    id: 93
+    coordinates: !!python/tuple
+    - 10.0
+    - -1.0
+    - 0
+    demands:
+    - 0
+    - 0
+    - 0
+    - 7
+    - 7
+    planning_horizon: 5
+    is_serviced:
+      0: false
+      1: false
+      2: false
+      3: true
+      4: true
+  - !!python/object:solver_modules.models.Customer
+    id: 94
+    coordinates: !!python/tuple
+    - 12.0
+    - -1.0
+    - 0
+    demands:
+    - 10
+    - 10
+    - 0
+    - 10
+    - 10
+    planning_horizon: 5
+    is_serviced:
+      0: true
+      1: true
+      2: false
+      3: true
+      4: true
+  - !!python/object:solver_modules.models.Customer
+    id: 95
+    coordinates: !!python/tuple
+    - 6.0
+    - 0.0
+    - 0
+    demands:
+    - 0
+    - 0
+    - 9
+    - 0
+    - 0
+    planning_horizon: 5
+    is_serviced:
+      0: false
+      1: false
+      2: true
+      3: false
+      4: false
+  - !!python/object:solver_modules.models.Customer
+    id: 96
+    coordinates: !!python/tuple
+    - 10.0
+    - 0.0
+    - 0
+    demands:
+    - 11
+    - 0
+    - 11
+    - 11
+    - 11
+    planning_horizon: 5
+    is_serviced:
+      0: true
+      1: false
+      2: true
+      3: true
+      4: true
+  - !!python/object:solver_modules.models.Customer
+    id: 97
+    coordinates: !!python/tuple
+    - 15.0
+    - 0.0
+    - 0
+    demands:
+    - 17
+    - 0
+    - 0
+    - 0
+    - 0
+    planning_horizon: 5
+    is_serviced:
+      0: true
+      1: false
+      2: false
+      3: false
+      4: false
+  - !!python/object:solver_modules.models.Customer
+    id: 98
+    coordinates: !!python/tuple
+    - 20.0
+    - 10.0
+    - 0
+    demands:
+    - 12
+    - 12
+    - 12
+    - 12
+    - 12
+    planning_horizon: 5
+    is_serviced:
+      0: true
+      1: true
+      2: true
+      3: true
+      4: true
+  - !!python/object:solver_modules.models.Customer
+    id: 99
+    coordinates: !!python/tuple
+    - 10.0
+    - 5.0
+    - 0
+    demands:
+    - 0
+    - 0
+    - 11
+    - 11
+    - 11
+    planning_horizon: 5
+    is_serviced:
+      0: false
+      1: false
+      2: true
+      3: true
+      4: true
+  - !!python/object:solver_modules.models.Customer
+    id: 100
+    coordinates: !!python/tuple
+    - 12.0
+    - 6.0
+    - 0
+    demands:
+    - 7
+    - 0
+    - 7
+    - 0
+    - 0
+    planning_horizon: 5
+    is_serviced:
+      0: true
+      1: false
+      2: true
+      3: false
+      4: false
+  - !!python/object:solver_modules.models.Customer
+    id: 101
+    coordinates: !!python/tuple
+    - 8.0
+    - 4.0
+    - 0
+    demands:
+    - 9
+    - 9
+    - 9
+    - 0
+    - 0
+    planning_horizon: 5
+    is_serviced:
+      0: true
+      1: true
+      2: true
+      3: false
+      4: false
+  - !!python/object:solver_modules.models.Customer
+    id: 102
+    coordinates: !!python/tuple
+    - 6.0
+    - 3.0
+    - 0
+    demands:
+    - 0
+    - 0
+    - 0
+    - 11
+    - 0
+    planning_horizon: 5
+    is_serviced:
+      0: false
+      1: false
+      2: false
+      3: true
+      4: false
+  - !!python/object:solver_modules.models.Customer
+    id: 103
+    coordinates: !!python/tuple
+    - 10.0
+    - 10.0
+    - 0
+    demands:
+    - 12
+    - 12
+    - 0
+    - 12
+    - 0
+    planning_horizon: 5
+    is_serviced:
+      0: true
+      1: true
+      2: false
+      3: true
+      4: false
+  - !!python/object:solver_modules.models.Customer
+    id: 104
+    coordinates: !!python/tuple
+    - 8.0
+    - 8.0
+    - 0
+    demands:
+    - 7
+    - 7
+    - 7
+    - 0
+    - 7
+    planning_horizon: 5
+    is_serviced:
+      0: true
+      1: true
+      2: true
+      3: false
+      4: true
+  - !!python/object:solver_modules.models.Customer
+    id: 105
+    coordinates: !!python/tuple
+    - 4.0
+    - 5.0
+    - 0
+    demands:
+    - 8
+    - 8
+    - 8
+    - 0
+    - 8
+    planning_horizon: 5
+    is_serviced:
+      0: true
+      1: true
+      2: true
+      3: false
+      4: true
+  - !!python/object:solver_modules.models.Customer
+    id: 106
+    coordinates: !!python/tuple
+    - 5.0
+    - 6.0
+    - 0
+    demands:
+    - 0
+    - 6
+    - 0
+    - 6
+    - 0
+    planning_horizon: 5
+    is_serviced:
+      0: false
+      1: true
+      2: false
+      3: true
+      4: false
+  - !!python/object:solver_modules.models.Customer
+    id: 107
+    coordinates: !!python/tuple
+    - 6.0
+    - 9.0
+    - 0
+    demands:
+    - 5
+    - 5
+    - 5
+    - 5
+    - 5
+    planning_horizon: 5
+    is_serviced:
+      0: true
+      1: true
+      2: true
+      3: true
+      4: true
+  - !!python/object:solver_modules.models.Customer
+    id: 108
+    coordinates: !!python/tuple
+    - 18.0
+    - -12.0
+    - 0
+    demands:
+    - 12
+    - 0
+    - 12
+    - 12
+    - 0
+    planning_horizon: 5
+    is_serviced:
+      0: true
+      1: false
+      2: true
+      3: true
+      4: false
+  - !!python/object:solver_modules.models.Customer
+    id: 109
+    coordinates: !!python/tuple
+    - 23.0
+    - -7.0
+    - 0
+    demands:
+    - 0
+    - 0
+    - 0
+    - 13
+    - 0
+    planning_horizon: 5
+    is_serviced:
+      0: false
+      1: false
+      2: false
+      3: true
+      4: false
+  - !!python/object:solver_modules.models.Customer
+    id: 110
+    coordinates: !!python/tuple
+    - 20.0
+    - 5.0
+    - 0
+    demands:
+    - 0
+    - 7
+    - 0
+    - 7
+    - 7
+    planning_horizon: 5
+    is_serviced:
+      0: false
+      1: true
+      2: false
+      3: true
+      4: true
+  - !!python/object:solver_modules.models.Customer
+    id: 111
+    coordinates: !!python/tuple
+    - 3.0
+    - -5.0
+    - 0
+    demands:
+    - 7
+    - 7
+    - 7
+    - 7
+    - 7
+    planning_horizon: 5
+    is_serviced:
+      0: true
+      1: true
+      2: true
+      3: true
+      4: true
+  - !!python/object:solver_modules.models.Customer
+    id: 112
+    coordinates: !!python/tuple
+    - 5.0
+    - -9.0
+    - 0
+    demands:
+    - 8
+    - 8
+    - 8
+    - 0
+    - 0
+    planning_horizon: 5
+    is_serviced:
+      0: true
+      1: true
+      2: true
+      3: false
+      4: false
+  - !!python/object:solver_modules.models.Customer
+    id: 113
+    coordinates: !!python/tuple
+    - 8.0
+    - -14.0
+    - 0
+    demands:
+    - 0
+    - 11
+    - 11
+    - 11
+    - 11
+    planning_horizon: 5
+    is_serviced:
+      0: false
+      1: true
+      2: true
+      3: true
+      4: true
+  - !!python/object:solver_modules.models.Customer
+    id: 114
+    coordinates: !!python/tuple
+    - 15.0
+    - -8.0
+    - 0
+    demands:
+    - 13
+    - 13
+    - 13
+    - 13
+    - 13
+    planning_horizon: 5
+    is_serviced:
+      0: true
+      1: true
+      2: true
+      3: true
+      4: true
+  - !!python/object:solver_modules.models.Customer
+    id: 115
+    coordinates: !!python/tuple
+    - 20.0
+    - 1.0
+    - 0
+    demands:
+    - 0
+    - 11
+    - 11
+    - 11
+    - 0
+    planning_horizon: 5
+    is_serviced:
+      0: false
+      1: true
+      2: true
+      3: true
+      4: false
+  - !!python/object:solver_modules.models.Customer
+    id: 116
+    coordinates: !!python/tuple
+    - 15.0
+    - 7.0
+    - 0
+    demands:
+    - 10
+    - 0
+    - 10
+    - 0
+    - 10
+    planning_horizon: 5
+    is_serviced:
+      0: true
+      1: false
+      2: true
+      3: false
+      4: true
+  - !!python/object:solver_modules.models.Customer
+    id: 117
+    coordinates: !!python/tuple
+    - 6.0
+    - -12.0
+    - 0
+    demands:
+    - 7
+    - 0
+    - 7
+    - 7
+    - 7
+    planning_horizon: 5
+    is_serviced:
+      0: true
+      1: false
+      2: true
+      3: true
+      4: true
+  - !!python/object:solver_modules.models.Customer
+    id: 118
+    coordinates: !!python/tuple
+    - 15.0
+    - -10.0
+    - 0
+    demands:
+    - 4
+    - 4
+    - 4
+    - 4
+    - 4
+    planning_horizon: 5
+    is_serviced:
+      0: true
+      1: true
+      2: true
+      3: true
+      4: true
+  - !!python/object:solver_modules.models.Customer
+    id: 119
+    coordinates: !!python/tuple
+    - -5.0
+    - -5.0
+    - 0
+    demands:
+    - 0
+    - 20
+    - 20
+    - 20
+    - 0
+    planning_horizon: 5
+    is_serviced:
+      0: false
+      1: true
+      2: true
+      3: true
+      4: false
+  - !!python/object:solver_modules.models.Customer
+    id: 120
+    coordinates: !!python/tuple
+    - -5.0
+    - 5.0
+    - 0
+    demands:
+    - 13
+    - 0
+    - 0
+    - 13
+    - 13
+    planning_horizon: 5
+    is_serviced:
+      0: true
+      1: false
+      2: false
+      3: true
+      4: true
+  vehicle_types:
+  - &id001 !!python/object:solver_modules.models.VehicleType
+    vehicle_type_name: TYPE1
+    available_vehicles: 2
+    capacity: 250.0
+    fixed_cost: 250.0
+    variable_cost: 1.8
+    speed: 1.0
+  - &id002 !!python/object:solver_modules.models.VehicleType
+    vehicle_type_name: TYPE2
+    available_vehicles: 1
+    capacity: 200.0
+    fixed_cost: 200.0
+    variable_cost: 1.7
+    speed: 1.0
+  - &id003 !!python/object:solver_modules.models.VehicleType
+    vehicle_type_name: TYPE3
+    available_vehicles: 2
+    capacity: 180.0
+    fixed_cost: 180.0
+    variable_cost: 2.5
+    speed: 1.0
+  - &id004 !!python/object:solver_modules.models.VehicleType
+    vehicle_type_name: TYPE4
+    available_vehicles: 1
+    capacity: 150.0
+    fixed_cost: 50.0
+    variable_cost: 3.2
+    speed: 1.0
+  vehicles:
+  - id: 1
+    type: *id001
+  - id: 2
+    type: *id001
+  - id: 3
+    type: *id002
+  - id: 4
+    type: *id003
+  - id: 5
+    type: *id003
+  - id: 6
+    type: *id004
+  routes:
+    0:
+    - vehicle_id: 1
+      route:
+      - 0
+      - 111
+      - 112
+      - 117
+      - 2
+      - 1
+      - 24
+      - 36
+      - 29
+      - 44
+      - 45
+      - 64
+      - 63
+      - 56
+      - 55
+      - 107
+      - 120
+      - 0
+    - vehicle_id: 2
+      route:
+      - 0
+      - 83
+      - 3
+      - 11
+      - 20
+      - 28
+      - 49
+      - 47
+      - 61
+      - 57
+      - 52
+      - 80
+      - 75
+      - 76
+      - 98
+      - 100
+      - 104
+      - 94
+      - 0
+    - vehicle_id: 3
+      route:
+      - 0
+      - 101
+      - 103
+      - 70
+      - 71
+      - 53
+      - 62
+      - 40
+      - 51
+      - 50
+      - 26
+      - 23
+      - 16
+      - 5
+      - 18
+      - 85
+      - 87
+      - 0
+    - vehicle_id: 4
+      route:
+      - 0
+      - 69
+      - 68
+      - 79
+      - 54
+      - 60
+      - 66
+      - 42
+      - 39
+      - 37
+      - 32
+      - 35
+      - 27
+      - 25
+      - 21
+      - 108
+      - 118
+      - 91
+      - 92
+      - 0
+    - vehicle_id: 5
+      route:
+      - 0
+      - 82
+      - 81
+      - 84
+      - 90
+      - 114
+      - 6
+      - 15
+      - 31
+      - 38
+      - 78
+      - 116
+      - 97
+      - 96
+      - 105
+      - 0
+    - vehicle_id: 6
+      route:
+      - 0
+      - 0
+    1:
+    - vehicle_id: 1
+      route:
+      - 0
+      - 111
+      - 112
+      - 2
+      - 1
+      - 14
+      - 22
+      - 36
+      - 29
+      - 44
+      - 45
+      - 65
+      - 63
+      - 58
+      - 55
+      - 107
+      - 0
+    - vehicle_id: 2
+      route:
+      - 0
+      - 88
+      - 113
+      - 83
+      - 3
+      - 13
+      - 49
+      - 47
+      - 48
+      - 61
+      - 57
+      - 52
+      - 75
+      - 72
+      - 76
+      - 98
+      - 104
+      - 94
+      - 0
+    - vehicle_id: 3
+      route:
+      - 0
+      - 101
+      - 103
+      - 70
+      - 67
+      - 40
+      - 43
+      - 51
+      - 26
+      - 17
+      - 16
+      - 7
+      - 5
+      - 86
+      - 0
+    - vehicle_id: 4
+      route:
+      - 0
+      - 106
+      - 69
+      - 73
+      - 68
+      - 54
+      - 60
+      - 42
+      - 39
+      - 37
+      - 32
+      - 35
+      - 25
+      - 19
+      - 21
+      - 118
+      - 91
+      - 92
+      - 0
+    - vehicle_id: 5
+      route:
+      - 0
+      - 119
+      - 81
+      - 90
+      - 114
+      - 6
+      - 15
+      - 8
+      - 31
+      - 34
+      - 38
+      - 115
+      - 110
+      - 105
+      - 0
+    - vehicle_id: 6
+      route:
+      - 0
+      - 0
+    2:
+    - vehicle_id: 1
+      route:
+      - 0
+      - 111
+      - 112
+      - 117
+      - 2
+      - 1
+      - 4
+      - 14
+      - 22
+      - 24
+      - 33
+      - 36
+      - 29
+      - 44
+      - 45
+      - 63
+      - 55
+      - 107
+      - 0
+    - vehicle_id: 2
+      route:
+      - 0
+      - 113
+      - 83
+      - 13
+      - 20
+      - 49
+      - 47
+      - 48
+      - 61
+      - 57
+      - 52
+      - 80
+      - 72
+      - 74
+      - 77
+      - 76
+      - 98
+      - 100
+      - 104
+      - 99
+      - 95
+      - 0
+    - vehicle_id: 3
+      route:
+      - 0
+      - 101
+      - 70
+      - 53
+      - 40
+      - 43
+      - 51
+      - 23
+      - 17
+      - 16
+      - 7
+      - 5
+      - 85
+      - 86
+      - 87
+      - 0
+    - vehicle_id: 4
+      route:
+      - 0
+      - 69
+      - 73
+      - 79
+      - 54
+      - 60
+      - 66
+      - 42
+      - 39
+      - 35
+      - 25
+      - 19
+      - 21
+      - 108
+      - 118
+      - 91
+      - 92
+      - 0
+    - vehicle_id: 5
+      route:
+      - 0
+      - 119
+      - 82
+      - 89
+      - 90
+      - 114
+      - 9
+      - 15
+      - 8
+      - 31
+      - 115
+      - 116
+      - 96
+      - 105
+      - 0
+    - vehicle_id: 6
+      route:
+      - 0
+      - 0
+    3:
+    - vehicle_id: 1
+      route:
+      - 0
+      - 111
+      - 117
+      - 2
+      - 1
+      - 14
+      - 22
+      - 24
+      - 33
+      - 36
+      - 41
+      - 63
+      - 58
+      - 55
+      - 107
+      - 120
+      - 0
+    - vehicle_id: 2
+      route:
+      - 0
+      - 113
+      - 83
+      - 3
+      - 11
+      - 12
+      - 20
+      - 28
+      - 49
+      - 47
+      - 61
+      - 52
+      - 80
+      - 75
+      - 72
+      - 98
+      - 99
+      - 94
+      - 93
+      - 0
+    - vehicle_id: 3
+      route:
+      - 0
+      - 102
+      - 103
+      - 71
+      - 62
+      - 59
+      - 40
+      - 50
+      - 46
+      - 26
+      - 23
+      - 17
+      - 16
+      - 7
+      - 5
+      - 85
+      - 86
+      - 0
+    - vehicle_id: 4
+      route:
+      - 0
+      - 106
+      - 68
+      - 79
+      - 60
+      - 66
+      - 42
+      - 37
+      - 32
+      - 30
+      - 27
+      - 19
+      - 21
+      - 109
+      - 108
+      - 118
+      - 91
+      - 92
+      - 0
+    - vehicle_id: 5
+      route:
+      - 0
+      - 119
+      - 82
+      - 81
+      - 89
+      - 90
+      - 114
+      - 9
+      - 31
+      - 34
+      - 38
+      - 115
+      - 110
+      - 96
+      - 0
+    - vehicle_id: 6
+      route:
+      - 0
+      - 0
+    4:
+    - vehicle_id: 1
+      route:
+      - 0
+      - 111
+      - 117
+      - 2
+      - 1
+      - 24
+      - 33
+      - 36
+      - 44
+      - 45
+      - 65
+      - 64
+      - 58
+      - 55
+      - 107
+      - 120
+      - 0
+    - vehicle_id: 2
+      route:
+      - 0
+      - 113
+      - 83
+      - 3
+      - 11
+      - 28
+      - 49
+      - 47
+      - 48
+      - 61
+      - 52
+      - 80
+      - 72
+      - 76
+      - 98
+      - 104
+      - 99
+      - 94
+      - 93
+      - 0
+    - vehicle_id: 3
+      route:
+      - 0
+      - 70
+      - 53
+      - 62
+      - 43
+      - 50
+      - 23
+      - 17
+      - 16
+      - 5
+      - 18
+      - 85
+      - 87
+      - 0
+    - vehicle_id: 4
+      route:
+      - 0
+      - 69
+      - 73
+      - 68
+      - 79
+      - 54
+      - 60
+      - 66
+      - 39
+      - 32
+      - 27
+      - 25
+      - 19
+      - 118
+      - 91
+      - 92
+      - 0
+    - vehicle_id: 5
+      route:
+      - 0
+      - 81
+      - 89
+      - 90
+      - 114
+      - 6
+      - 10
+      - 15
+      - 8
+      - 38
+      - 110
+      - 116
+      - 96
+      - 105
+      - 0
+    - vehicle_id: 6
+      route:
+      - 0
+      - 0
+  total_cost:
+    0: 4126.018389957961
+    1: 3895.342811068904
+    2: 3893.0967308690415
+    3: 3975.921126318038
+    4: 3934.0991888046738

@@ -168,3 +168,7 @@ html, body {
     padding: 0.25rem 0.5rem;
     text-align: left;
 }
+
+.bg-best-solution {
+    background-color: rgba(12, 110, 121, 0.7);
+}

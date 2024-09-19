@@ -14,3 +14,5 @@ Depot_coordinates
 Customer_coordinates Service_time
 
 Customer_ID Customer_demand
+
+Customer_to_vehicle_compatability (if any)

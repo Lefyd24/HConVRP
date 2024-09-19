@@ -20,9 +20,11 @@ filterwarnings('ignore')
 def initialize_customers(data, planning_horizon):
     customers = []
     for idx, coordinates in enumerate(data["Customer_coordinates"]):
-        coordinates = tuple(coordinates)
+        
+        service_time = coordinates[2]
+        coordinates = tuple(coordinates[:2])
         demands = data["Customer_demands"][idx]
-        new_cust = Customer(idx + 1, coordinates, demands, planning_horizon)
+        new_cust = Customer(idx + 1, coordinates, demands, service_time, planning_horizon)
         customers.append(new_cust)
     return customers
 
@@ -160,244 +162,288 @@ class HConVRP:
                     break
         return frequent_customers
     
-    def distance(self, node1, node2):
+    def objective_function(self):
         """
-        Returns the distance between two nodes.
+        Calculate the total cost of the solution. The total cost is a combination of fixed and variable costs for each vehicle.
         """
-        return self.distance_matrix[node1.id, node2.id]
-
-    def calculate_insertion_cost(self, vehicle, customer, position, period=None, ignore_load=False, check_all_horizon=False):
-        prev_node = vehicle.routes[period][position - 1]
-        next_node = vehicle.routes[period][position]
-        
-        # Calculate the additional duration for the new customer
-        added_duration = (self.distance(prev_node, customer) + self.distance(customer, next_node) - self.distance(prev_node, next_node)) / vehicle.vehicle_type.speed
-        
-        # Calculate the new route duration
-        new_duration = vehicle.route_duration[period] + added_duration
-
-        # Check if the insertion is feasible with respect to load and duration constraints
-        if not ignore_load:
-            new_load = vehicle.load[period] + customer.demands[period]
-            feasible = new_duration <= self.max_route_duration and new_load <= vehicle.vehicle_type.capacity
-        else:
-            feasible = new_duration <= self.max_route_duration
-        
-        if check_all_horizon:
-            for p in range(self.planning_horizon):
-                prev_node = vehicle.routes[p][position - 1]
-                next_node = vehicle.routes[p][position]
-                added_duration = (self.distance(prev_node, customer) + self.distance(customer, next_node) - self.distance(prev_node, next_node)) / vehicle.vehicle_type.speed
-                new_duration = vehicle.route_duration[p] + added_duration
-                new_load = vehicle.load[p] + customer.demands[p]
-                feasible = feasible and (new_duration <= self.max_route_duration and new_load <= vehicle.vehicle_type.capacity)
-
-        # Calculate the cost if the insertion is feasible
-        if feasible:
-            cost = vehicle.variable_cost * added_duration
-        else:
-            cost = float('inf')
-
-        return cost, feasible
-    
-    def generate_template_routes(self):
-        """
-        Generate the template routes for the frequent customers.
-
-        Constraints:
-        - Each frequent customer should be serviced by the same vehicle over all periods in which it requires service.
-        - The vehicle should be the one that minimizes the total cost of serving the customer over all periods.
-        """
-        # by random shuffling the frequent customers, every run of the script will generate a different initial solution
-        random.shuffle(self.frequent_customers)
-        
-        for customer in self.frequent_customers:
-            best_vehicle = None
-            best_cost = float('inf')
-            best_position = None
-
-            for vehicle in self.vehicles:
-                if customer not in vehicle.compatible_customers:
-                    continue
-                
-                period = 0
-                for position in range(1, len(vehicle.routes[period])):
-                    cost, feasible = self.calculate_insertion_cost(vehicle, customer, position, period, 
-                                                                   check_all_horizon=True)
-                    if feasible and cost < best_cost:
-                        best_cost = cost
-                        best_vehicle = vehicle
-                        best_position = position
-
-            if best_vehicle is not None:
-                # Insert customer into the best vehicle's route for all periods
-                for period in range(self.planning_horizon):
-                    best_vehicle.insert_customer(customer, best_position, period)
-                    customer.is_serviced[period] = True
-                self.template_routes[customer] = (best_vehicle, best_position)
-
-        return self.template_routes
-    
-    def construct_inital_solution(self, start_time, socketio: object):
-        """
-        Generate the initial solution by removing frequent customers that do not require service in 
-        a period and inserting non-frequent customers that require service in that period.
-        """
-        # 1. Generate initial template routes
-        template_routes = self.generate_template_routes()
-        socketio.emit('solver_info', {'status': 'Info', 'progress': 5, 
-                                      'text': f"Template routes for frequent customers initiated. Frequent customers {len(self.frequent_customers)} - Non-frequent customers {len(self.non_frequent_customers)}", 
-                                      'time_elapsed': round(time.time()-start_time, 2)})
-        # 2. Remove frequent customers that do not require service in a period
+        total_cost = 0
         for period in range(self.planning_horizon):
-            for template_customer in list(template_routes.keys()):
-                vehicle, position = template_routes[template_customer]
-                if template_customer.demands[period] == 0:
-                    # Remove the template customer from the vehicle's route for the specific period
-                    vehicle.remove_customer(template_customer, period)
-                    template_customer.is_serviced[period] = False
-
-        # 3. Add non-frequent customers to the routes
-        #ßrandom.shuffle(self.non_frequent_customers)
-        for customer in self.non_frequent_customers:
-            # Determine the period in which the customer requires service
-            period = np.argmax(customer.demands)
-            if customer.is_serviced[period]:
-                continue
-
-            best_vehicle = None
-            best_cost = float('inf')
-            best_position = None
-
-            # Find the best vehicle and position for the customer
+            period_cost = 0
             for vehicle in self.vehicles:
-                # Compatibility constraint
-                if customer not in vehicle.compatible_customers:
-                    continue
+                # Fixed cost
+                period_cost += vehicle.fixed_cost
                 
-                # Capacity constraint
-                if customer.demands[period] + vehicle.load[period] > vehicle.vehicle_type.capacity:
-                    continue
-
-                for position in range(1, len(vehicle.routes[period])):
-                    # Duration constraint
-                    prev_node = vehicle.routes[period][position - 1]
-                    next_node = vehicle.routes[period][position]
-                    added_duration = (self.distance(prev_node, customer) + self.distance(customer, next_node) - self.distance(prev_node, next_node)) / vehicle.vehicle_type.speed
-                    new_duration = vehicle.route_duration[period] + added_duration
-                                    
-                    if new_duration > self.max_route_duration:
-                        continue
-                    
-                    # Calculate insertion cost and feasibility
-                    cost, feasible = self.calculate_insertion_cost(vehicle, customer, position, period)
-                    if feasible and cost < best_cost:
-                        best_cost = cost
-                        best_vehicle = vehicle
-                        best_position = position
+                # Variable cost based on distance traveled
+                route = vehicle.routes[period]
+                for i in range(len(route) - 1):
+                    start_node = route[i]
+                    end_node = route[i+1]
+                    period_cost += (self.distance_matrix[start_node.id][end_node.id] + end_node.service_time) * vehicle.variable_cost
             
-            # If a suitable vehicle and position are found, insert the customer
-            if best_vehicle is not None and best_position is not None:
-                try:
-                    best_vehicle.insert_customer(customer, best_position, period)
-                    customer.is_serviced[period] = True
-                except AssertionError as e:
-                    socketio.emit('solver_info', {'status': 'Failed', 'progress': 10, 
-                                        'text': f"Assertion Error during insertion: {e}", 
-                                        'time_elapsed': round(time.time()-start_time, 2)})
-                    print(colorize(f"Attempting to insert customer {customer.id} into vehicle {best_vehicle.id} at position {best_position} for period {period}", 'RED'))
-                    print(colorize(f"Assertion Error during insertion: {e}", 'RED'))
-            else:
-                for vehicle in self.vehicles:
-                    # Compatibility constraint
-                    if customer not in vehicle.compatible_customers:
-                        continue
-                    
-                    # Capacity constraint
-                    if customer.demands[period] + vehicle.load[period] > vehicle.vehicle_type.capacity:
-                        continue
+            total_cost += period_cost
+        
+        # Return the total cost over all periods
+        return total_cost
+    
+    def check_objective_improvement(self, previous_cost):
+        """
+        Check if the current objective function (total cost) is reduced compared to the previous cost.
+        """
+        current_cost = self.objective_function()
+        if current_cost < previous_cost:
+            print(f"Objective improved! Previous: {previous_cost}, Current: {current_cost}")
+        else:
+            print(f"No improvement. Previous: {previous_cost}, Current: {current_cost}")
+            
+        return current_cost - previous_cost
 
-                    for position in range(1, len(vehicle.routes[period])):
-                        # Duration constraint
-                        prev_node = vehicle.routes[period][position - 1]
-                        next_node = vehicle.routes[period][position]
-                        added_duration = (self.distance(prev_node, customer) + self.distance(customer, next_node) - self.distance(prev_node, next_node)) / vehicle.vehicle_type.speed
-                        new_duration = vehicle.route_duration[period] + added_duration
-                                        
-                        if new_duration > self.max_route_duration:
-                            continue
-                        
-                        # Calculate insertion cost and feasibility
-                        cost, feasible = self.calculate_insertion_cost(vehicle, customer, position, period)
-                        if feasible and cost < best_cost:
-                            best_cost = cost
-                            best_vehicle = vehicle
-                            best_position = position
-                
-                # If a suitable vehicle and position are found, insert the customer
-                if best_vehicle is not None and best_position is not None:
-                    try:
-                        best_vehicle.insert_customer(customer, best_position, period)
-                        customer.is_serviced[period] = True
-                    except AssertionError as e:
-                        socketio.emit('solver_info', {'status': 'Failed', 'progress': 10,
-                                            'text': f"Assertion Error during insertion: {e}", 
-                                            'time_elapsed': round(time.time()-start_time, 2)})
-                        print(colorize(f"Attempting to insert customer {customer.id} into vehicle {best_vehicle.id} at position {best_position} for period {period}", 'RED'))
-                        print(colorize(f"Assertion Error during insertion: {e}", 'RED'))
+        
+    def initial_assignment(self, start_time, socketio):
+        """
+        Initial Assignment steps, with tracking of objective function improvements.
+        """
+        # Frequent Customers
+        random.shuffle(self.frequent_customers)
+        for customer in self.frequent_customers:
+            period_vehicle_costs = {period: {vehicle: {"cost": float("inf"), "position": None} for vehicle in self.vehicles if customer in vehicle.compatible_customers} for period in range(self.planning_horizon) if customer.demands[period] > 0}
+            
+            for period in range(self.planning_horizon):
+                if not customer.demands[period] > 0:
+                    continue
                 else:
-                    socketio.emit('solver_info', {'status': 'Failed', 'progress': 10,
-                                            'text': f"Customer {customer.id} could not be serviced in period {period}", 
-                                            'time_elapsed': round(time.time()-start_time, 2)})
-                    print(f"Customer {customer.id} could not be serviced in period {period}")
+                    for vehicle in self.vehicles:
+                        for position in range(1, len(vehicle.routes[period])):
+                            # Validate customer insertion
+                            if vehicle._validate_customer_insertion(period, customer, position)[0]:
+                                # Calculate the move cost without physically inserting the customer
+                                move_cost = vehicle.calculate_insertion_cost(period, customer, position)
+                                
+                                if move_cost < period_vehicle_costs[period][vehicle]["cost"]:
+                                    period_vehicle_costs[period][vehicle]["cost"] = move_cost
+                                    period_vehicle_costs[period][vehicle]["position"] = position
+            
+            vehicle_period_costs = {vehicle: 0 for vehicle in self.vehicles if customer in vehicle.compatible_customers}
+            
+            for period in range(self.planning_horizon):
+                if period in period_vehicle_costs.keys():
+                    for vehicle in self.vehicles:
+                        vehicle_period_costs[vehicle] += period_vehicle_costs[period][vehicle]["cost"]
+            
+            best_vehicle = min(vehicle_period_costs, key=vehicle_period_costs.get)
+            
+            for period in range(self.planning_horizon):
+                if period in period_vehicle_costs.keys():
+                    vehicle = best_vehicle
+                    position = period_vehicle_costs[period][vehicle]["position"]
+                    vehicle.insert_customer(period, customer, position)
 
+        # Non-frequent Customers
+        non_frequent_customers = [customer for customer in self.customers if customer not in self.frequent_customers]
+        random.shuffle(non_frequent_customers)
+        for customer in non_frequent_customers:
+            for period in range(self.planning_horizon):
+                if customer.demands[period] > 0:
+                    # Initialize vehicle costs for the current period
+                    vehicle_costs = {vehicle: {"cost": float("inf"), "position": None} for vehicle in self.vehicles if customer in vehicle.compatible_customers}
+                    
+                    # Loop through all compatible vehicles
+                    for vehicle in self.vehicles:
+                        if customer in vehicle.compatible_customers:
+                            # Loop through all possible insertion positions
+                            for position in range(1, len(vehicle.routes[period])):
+                                # Validate whether the customer can be inserted at this position
+                                if vehicle._validate_customer_insertion(period, customer, position)[0]:
+                                    # Calculate the move cost without physically inserting the customer
+                                    move_cost = vehicle.calculate_insertion_cost(period, customer, position)
+                                    
+                                    # Track the lowest move cost and best position
+                                    if move_cost < vehicle_costs[vehicle]["cost"]:
+                                        vehicle_costs[vehicle]["cost"] = move_cost
+                                        vehicle_costs[vehicle]["position"] = position
+                    
+                    # Find the best vehicle for this customer (with the minimum cost)
+                    best_vehicle = min(vehicle_costs, key=lambda x: vehicle_costs[x]["cost"])
+                    position = vehicle_costs[best_vehicle]["position"]
+                    
+                    # Insert the customer in the best vehicle at the best position
+                    best_vehicle.insert_customer(period, customer, position)
+                    
+                    # Break since the customer requires service in only one period
+                    break
 
-        # 4. Add the finalized routes to the solution
+        # Add the routes to the solution object
+         # Add the routes to the solution object
         for period in range(self.planning_horizon):
             for vehicle in self.vehicles:
                 self.solution.add_route(period, vehicle, vehicle.routes[period])
 
         # 5. Calculate the total cost of the solution
-
         for period in range(self.planning_horizon):
-            total_cost = 0
-            for obj in self.solution.routes[period]:
-                vehicle, _ = obj
-                total_cost += vehicle.cost[period]
+            total_cost = sum(vehicle.cost[period] for vehicle in self.vehicles)
             self.solution.total_cost[period] = float(total_cost)
-
+        
         self.solution_df = pd.concat([self.solution_df, pd.DataFrame([["Initial"] + list(self.solution.total_cost.values()) + [sum(self.solution.total_cost.values())]], columns=self.solution_df.columns)], ignore_index=True)
 
-        return self.solution
-    
-    def optimize_solution(self, start_time, socketio):
-        """
-        Optimize the solution by relocating customers between vehicles.
-        """
-        #vehicles_copy = deepcopy(self.solution.vehicles)
+        # Calculate the total cost of the initial solution
+        final_cost = self.objective_function()
+        print(final_cost)
 
-        total_relocations = 0
-        #for i in range(40):
-        for period in range(self.planning_horizon):
-            for vehicle in self.vehicles:
-                for other_vehicle in self.vehicles:
-                    num_relocations = vehicle.find_best_relocation(other_vehicle, period)
-                    total_relocations += num_relocations
-            
-        # 4. Add the finalized routes to the solution
-        # First clear the routes
+  
+    def relocation_optimization(self, start_time, socketio, max_iterations=10):
+        """
+        Optimized relocation of customers between and within routes. The best relocations are identified and applied iteratively.
+        """
+        print("Starting relocation optimization...")
+        total_intra_relocations = 0
+        total_inter_relocations = 0
+        
+        # Apply the relocation optimization multiple times (like the provided script does it 17 times)
+          # Empirical iteration count
+        for _ in range(1, max_iterations):
+            for period in range(self.planning_horizon):
+                for vehicle in self.vehicles:
+                    for other_vehicle in self.vehicles:
+                        best_relocation = self.find_best_relocation(period, vehicle, other_vehicle)
+                        if best_relocation:
+                            #print(best_relocation)
+                            if vehicle.id == other_vehicle.id:
+                                vehicle.intra_route_relocate(period, best_relocation["first_route_node_index"], best_relocation["second_route_node_index"])
+                                total_intra_relocations += 1
+                            else:
+                                customer_is_frequent = best_relocation["is_frequent"]
+                                if customer_is_frequent:
+                                    for period in best_relocation["vehicle_positions"].keys():
+                                        vehicle.inter_route_relocate(period, other_vehicle, best_relocation['vehicle_positions'][period]["from"], best_relocation['vehicle_positions'][period]["to"])
+                                        total_inter_relocations += 1
+                                else:
+                                    vehicle.inter_route_relocate(period, other_vehicle, best_relocation["first_route_node_index"], best_relocation["second_route_node_index"])
+                                    total_inter_relocations += 1
+                        
+        socketio.emit('solver_info', {
+            'status': 'Info', 
+            'progress': 20, 
+            'text': f"Total intra relocations: {total_intra_relocations} | Total inter relocations: {total_inter_relocations}", 
+            'time_elapsed': round(time.time()-start_time, 2), 
+        })
+        print(f"Total intra relocations: {total_intra_relocations} | Total inter relocations: {total_inter_relocations}")
+        print(f"New objective function: {self.objective_function()}")
+        
         self.solution.routes = {}
         for period in range(self.planning_horizon):
-           for vehicle in self.vehicles:
-               self.solution.add_route(period, vehicle, vehicle.routes[period])
+            for vehicle in self.vehicles:
+                self.solution.add_route(period, vehicle, vehicle.routes[period])
 
         # 5. Calculate the total cost of the solution
         for period in range(self.planning_horizon):
-            total_cost = 0
-            for obj in self.solution.routes[period]:
-                vehicle, _ = obj
-                total_cost += vehicle.cost[period]
+            total_cost = sum(vehicle.cost[period] for vehicle in self.vehicles)
             self.solution.total_cost[period] = float(total_cost)
+            
+        self.solution_df = pd.concat([self.solution_df, pd.DataFrame([["Relocation"] + list(self.solution.total_cost.values()) + [sum(self.solution.total_cost.values())]], columns=self.solution_df.columns)], ignore_index=True)
 
-        self.solution_df = pd.concat([self.solution_df, pd.DataFrame([["Optimized"] + list(self.solution.total_cost.values()) + [sum(self.solution.total_cost.values())]], columns=self.solution_df.columns)], ignore_index=True)
-    
+    def find_best_relocation(self, period, vehicle, other_vehicle):
+        """
+        Finds the best relocation between two routes (intra or inter-vehicle) without modifying routes directly.
+
+        Args:
+            period (int): The current period.
+            vehicle (Vehicle): The vehicle whose route is being optimized.
+            other_vehicle (Vehicle): The other vehicle being considered for relocation.
+
+        Returns:
+            dict: The best relocation and its corresponding improvement, if found.
+        """
+        best_relocation = None
+        best_objective_improvement = 0
+
+        # Iterate through all customer positions in both vehicle routes
+        # Move type is moving the customer in first_route_node_index to second_route_node_index
+        for first_route_node_index in range(1, len(vehicle.routes[period]) - 1):  # Skip depot positions
+            for second_route_node_index in range(1, len(other_vehicle.routes[period]) - 1):  # Skip depot positions
+
+                # Skip invalid positions (avoid same vehicle + consecutive swaps)
+                if ((vehicle.id == other_vehicle.id) and (second_route_node_index == first_route_node_index or \
+                    second_route_node_index == first_route_node_index - 1 or \
+                    second_route_node_index == first_route_node_index + 1)) or \
+                        (first_route_node_index == 0 or second_route_node_index == 0):
+                    continue
+
+                # Calculate the cost of removing the customer from its current position
+                customer_is_frequent = vehicle.routes[period][first_route_node_index] in self.frequent_customers
+                vehicle_positions = None
+                if vehicle.routes[period][first_route_node_index] in other_vehicle.compatible_customers:
+                    if vehicle.id == other_vehicle.id:
+                        relocation_cost = vehicle.calculate_intra_relocation_move_cost(period, first_route_node_index, second_route_node_index)
+                    else:
+                        relocation_cost, vehicle_positions = vehicle.calculate_inter_relocation_move_cost(period, other_vehicle, first_route_node_index, second_route_node_index, customer_is_frequent)
+                    
+                    
+                    if relocation_cost < best_objective_improvement:
+                        if vehicle.id == other_vehicle.id:
+                            valid_relocation = vehicle._validate_intra_relocation(period, first_route_node_index, second_route_node_index)[0]
+                        else:
+                            valid_relocation = vehicle._validate_inter_relocation(period, other_vehicle, first_route_node_index, second_route_node_index, customer_is_frequent, vehicle_positions)[0]
+                        
+                        if valid_relocation:
+                            if vehicle_positions:
+                                best_relocation = {
+                                    'first_route_node_index': first_route_node_index,
+                                    'second_route_node_index': second_route_node_index,
+                                    'improvement': relocation_cost,
+                                    'vehicle': vehicle,
+                                    'other_vehicle': vehicle,
+                                    'is_frequent': customer_is_frequent,
+                                    'vehicle_positions': vehicle_positions
+                                }
+                            else:
+                                best_relocation = {
+                                    'first_route_node_index': first_route_node_index,
+                                    'second_route_node_index': second_route_node_index,
+                                    'improvement': relocation_cost,
+                                    'vehicle': vehicle,
+                                    'other_vehicle': vehicle,
+                                    'is_frequent': customer_is_frequent
+                                }
+                            best_objective_improvement = relocation_cost
+        return best_relocation
+
+
+    def calculate_relocation_cost(self, vehicle, other_vehicle, period, from_position, to_position):
+        """
+        Calculate the relocation cost without actually relocating the customer.
+        
+        Args:
+            vehicle (Vehicle): The vehicle where the customer is being relocated from.
+            other_vehicle (Vehicle): The vehicle where the customer is being relocated to.
+            period (int): The period for which the relocation is being evaluated.
+            from_position (int): The current position of the customer.
+            to_position (int): The new position where the customer is considered to be relocated.
+            
+        Returns:
+            float: The change in cost (negative means an improvement).
+        """
+
+        # Calculate the cost of removing the customer from the current route in 'vehicle'
+        customer_to_move = vehicle.routes[period][from_position]
+        
+        # For the vehicle, the customer will be removed from the route
+        previous_node = vehicle.routes[period][from_position - 1]
+        next_node = vehicle.routes[period][from_position + 1]
+        
+        # Cost change if we remove the customer from the current position in the vehicle's route
+        cost_removed_from_vehicle = (distance(previous_node, next_node, vehicle.distance_matrix) - 
+                                    distance(previous_node, customer_to_move, vehicle.distance_matrix) -
+                                    distance(customer_to_move, next_node, vehicle.distance_matrix))/vehicle.vehicle_type.speed
+        
+        # Calculate the cost of inserting the customer into the new position in 'other_vehicle'
+        prev_node_new_route = other_vehicle.routes[period][to_position - 1]
+        next_node_new_route = other_vehicle.routes[period][to_position]
+        
+        # Cost change if we add the customer to the new position in the other_vehicle's route
+        cost_added_to_other_vehicle = (distance(prev_node_new_route, customer_to_move, other_vehicle.distance_matrix) + 
+                                    distance(customer_to_move, next_node_new_route, other_vehicle.distance_matrix) - 
+                                    distance(prev_node_new_route, next_node_new_route, other_vehicle.distance_matrix))/other_vehicle.vehicle_type.speed
+        
+        # Calculate the total cost difference (removal cost + insertion cost)
+        relocation_cost = cost_removed_from_vehicle*vehicle.variable_cost + cost_added_to_other_vehicle*other_vehicle.variable_cost
+        
+        return relocation_cost

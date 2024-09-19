@@ -322,13 +322,13 @@ socket.on('solver_info', function(msg) {
 
     if ("solution" in msg) {
         var solution = JSON.parse(msg.solution);
-
+    
         // Get the keys from the first object in the solution array to create table headers
         var keys = Object.keys(solution[0]);
-
+    
         // Create a unique ID for each table for exporting
         var tableID = `table_${logIndex}`;
-
+    
         // Add a table under the rest of the info with an export button
         newListItem += `
         <div class="log-solution">
@@ -336,34 +336,40 @@ socket.on('solver_info', function(msg) {
                 <table id="${tableID}" class="table table-sm table-bordered table-hover table-striped mt-1 exportable-table">
                     <thead>
                         <tr class='text-center'>
-            `;
-
-            // Dynamically generate table headers
-            keys.forEach(function(key) {
-                newListItem += `<th>${key}</th>`;
-            });
-
-            newListItem += `
+        `;
+    
+        // Dynamically generate table headers
+        keys.forEach(function(key) {
+            newListItem += `<th>${key}</th>`;
+        });
+    
+        newListItem += `
                         </tr>
                     </thead>
                     <tbody>
-            `;
-
-            // Generate table rows
-            solution.forEach(function(item) {
-                newListItem += `<tr class='text-center'>`;
-                keys.forEach(function(key) {
-                    var value = item[key];
-                    // If the value is a number, convert it to a format that Excel can handle (no localization)
-                    if (typeof value === 'number') {
-                        value = value.toFixed(2); // Convert to dot decimal
-                    }
-                    newListItem += `<td>${value}</td>`;
-                });
-                newListItem += `</tr>`;
+        `;
+    
+        // Find the minimum total cost
+        var minTotalCost = parseFloat(msg.min_total_cost);  // Ensure it's a float for comparison
+    
+        // Generate table rows and highlight the row with the minimum "Total Cost"
+        solution.forEach(function(item) {
+            var totalCost = parseFloat(item["Total Cost"]);  // Ensure this value is float for comparison
+            var rowClass = (totalCost.toFixed(2) === minTotalCost.toFixed(2)) ? "bg-best-solution text-white" : "";
+    
+            newListItem += `<tr class='text-center ${rowClass}'>`;
+            keys.forEach(function(key) {
+                var value = item[key];
+                // If the value is a number, convert it to a format that Excel can handle (no localization)
+                if (typeof value === 'number') {
+                    value = value.toFixed(2); // Convert to dot decimal
+                }
+                newListItem += `<td>${value}</td>`;
             });
-
-            newListItem += `
+            newListItem += `</tr>`;
+        });
+    
+        newListItem += `
                     </tbody>
                 </table>
                 <button class="btn btn-sm btn-success ms-auto align-self-stretch mt-1" 
@@ -374,8 +380,9 @@ socket.on('solver_info', function(msg) {
             </div>
         </div>
         `;
-
     }
+    
+    
     newListItem += `</li>`;
 
     // Append the new list item to the updates list
