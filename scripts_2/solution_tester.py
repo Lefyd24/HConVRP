@@ -307,7 +307,7 @@ class SolutionChecker:
             for vehicle, route in routes:
                 period_cost += vehicle.fixed_cost
                 for i in range(1, len(route)):
-                    period_cost += vehicle.variable_cost*(self.distance_matrix[route[i-1].id, route[i].id]/vehicle.vehicle_type.speed)
+                    period_cost += vehicle.variable_cost*((self.distance_matrix[route[i-1].id, route[i].id] + route[i].service_time)/vehicle.vehicle_type.speed)
             total_cost += period_cost
             print(colorize(f"Period {period} cost: {period_cost}", "YELLOW"))
         return total_cost

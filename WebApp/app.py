@@ -21,4 +21,4 @@ app.register_blueprint(dataset_bp)
 app.register_blueprint(solver_bp)
 
 if __name__ == '__main__':
-    socketio.run(app, debug=True)
+    socketio.run(app, debug=True, port=5050)

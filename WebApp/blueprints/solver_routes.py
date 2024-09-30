@@ -5,6 +5,7 @@ from solver_modules.solver import HConVRP, Solution
 from blueprints import globals
 import os 
 import re
+import copy
 
 solver_bp = Blueprint('solver_bp', __name__)
 
@@ -23,44 +24,118 @@ def solve():
     SolutionObj = Solution(depot=globals.depot)
     Solver = HConVRP(globals.depot, globals.customers, globals.vehicles, globals.vehicle_types, globals.planning_horizon, globals.route_duration, globals.distance_matrix, SolutionObj)
     socketio.emit('solver_info', {'status': 'Initiation', 'progress': 0, 'text': "HConVRP Solver has initiated successfully.", 'time_elapsed': round(time.time()-start_time, 2)})
+    socketio.emit('solver_info', {'status': 'Initiation', 'progress': 0, 'text': f"Number of frequent customers: <span style='color:blue;'>{len(Solver.frequent_customers)}</span>", 'time_elapsed': round(time.time()-start_time, 2)})
     
     # Initial Solution
-    solution = Solver.initial_assignment(start_time, socketio)
+    try:
+        solution = Solver.initial_assignment(start_time, socketio)
+    except TypeError:
+        socketio.emit('solver_info', {'status': 'Error', 'progress': 100, 'text': "Error in initial assignment. Please try again.", 'time_elapsed': round(time.time()-start_time, 2)})
+        return '', 400
     solution_json = Solver.solution_df.to_json(orient='records', double_precision=3)
     
     # Find the row with the lowest "Total Cost"
-    min_total_cost = Solver.solution_df['Total Cost'].min()
+    # Get initial total cost
+    best_cost = Solver.objective_function()
+    best_solution = copy.deepcopy(Solver)  # Deep copy the initial best solution
 
     socketio.emit('solver_info', {
-        'status': 'Info', 
-        'progress': 20, 
+        'status': 'Initiation', 
+        'progress': 10, 
         'text': "Initial Solution constructed", 
         'time_elapsed': round(time.time()-start_time, 2), 
         'solution': solution_json,
-        'min_total_cost': min_total_cost  # Send the minimum total cost to the front-end
+        'min_total_cost': best_cost  # Send the initial total cost to the front-end
     })
     
-    #for i in range(10):
-    socketio.emit('solver_info', {'status': 'Info', 'progress': 20, 'text': "Solution Optimization...", 'time_elapsed': round(time.time()-start_time, 2)})
-    for i in range(3):
-        Solver.relocation_optimization(start_time, socketio)
-        solution_json = Solver.solution_df.to_json(orient='records', double_precision=3)
-        min_total_cost = Solver.solution_df['Total Cost'].min()
+    # VND Loop: Swap and Relocation Optimization with neighborhood switching
+    VND_iterator = 0
+    k = 2  # Number of neighborhoods
+    improved = True
+    
+    while improved or k > 0:
+        print(f"k: {k}")
+        improved = False  # Assume no improvement initially
+        if k == 2:
+            # Store cost and solution before swap optimization
+            pre_swap_cost = best_cost
+            pre_swap_solver = copy.deepcopy(best_solution)  # Deep copy of the solver before swap optimization
+
+            # Perform swap optimization
+            best_solution.swap_optimization(start_time, socketio)
+            
+            # Get cost after swap optimization
+            post_swap_cost = best_solution.objective_function()
+            
+            # If swap improved the solution, keep it
+            if post_swap_cost < pre_swap_cost:
+                best_cost = post_swap_cost
+                improved = True
+                socketio.emit('solver_info', {
+                    'status': 'Info', 
+                    'progress': 30 + VND_iterator * 10,  # Dynamic progress
+                    'text': f"Swap optimization improved the solution by <span style='color:green'>{round(pre_swap_cost - post_swap_cost, 2)}</span>.",
+                    'time_elapsed': round(time.time()-start_time, 2),
+                    'min_total_cost': best_cost
+                })
+                if pre_swap_cost - post_swap_cost <= 2: # If the improvement is less than 2, reduce the neighborhood to 1
+                    k -= 1
+            else:
+                k -= 1
+                socketio.emit('solver_info', {
+                    'status': 'Info', 
+                    'progress': 30 + VND_iterator * 10, 
+                    'text': f"Swap optimization did not improve the solution (<span style='color:red'>Obj. Change {round(pre_swap_cost - post_swap_cost, 2)}</span> - New Total Cost {post_swap_cost}).",
+                    'time_elapsed': round(time.time()-start_time, 2),
+                    'min_total_cost': best_cost
+                })
+                best_solution = copy.deepcopy(pre_swap_solver)  # Deep copy the previous best solution
+                continue
+        elif k == 1 : # or k == 0
+            # Perform relocation optimization
+            pre_relocate_cost = best_cost
+            pre_relocate_solver = copy.deepcopy(best_solution)  # Deep copy of the solution before relocation
+            best_solution.relocation_optimization(start_time, socketio)
+            post_relocate_cost = best_solution.objective_function()
+
+            # If relocation improved the solution, keep it
+            if post_relocate_cost < pre_relocate_cost:
+                best_cost = post_relocate_cost
+                improved = True
+                socketio.emit('solver_info', {
+                    'status': 'Info', 
+                    'progress': 30 + VND_iterator * 10, 
+                    'text': f"Relocation optimization improved the solution by <span style='color:green'>{round(pre_relocate_cost - post_relocate_cost, 2)}</span>.",
+                    'time_elapsed': round(time.time()-start_time, 2),
+                    'min_total_cost': best_cost
+                })
+                k = 2
+            else:
+                # If relocation doesn't improve, restore previous best solution
+                k -= 1
+                best_solution = copy.deepcopy(pre_relocate_solver)
+                continue
+        
+        # If either swap or relocation improved the solution, increment the iteration counter
+        VND_iterator += 1
+        solution_json = best_solution.solution_df.to_json(orient='records', double_precision=3)
         socketio.emit('solver_info', {
             'status': 'Info', 
-            'progress': 20, 
-            'text': f"Solution Optimization {i+1}/3", 
+            'progress': min(90, 30 + VND_iterator * 10),  # Dynamic progress
+            'text': f"VND Optimization - Iteration {VND_iterator}",
             'time_elapsed': round(time.time()-start_time, 2), 
             'solution': solution_json,
-            'min_total_cost': min_total_cost  # Send the minimum total cost to the front-end
+            'min_total_cost': best_cost  # Send the updated total cost to the front-end
         })
 
     socketio.emit('solver_info', {'status': 'Completed', 'progress': 100, 'text': "Solver has completed!", 'time_elapsed': round(time.time()-start_time, 2)})
+    solution_json = best_solution.solution_df.to_json(orient='records', double_precision=3)
+    socketio.emit('solver_info', {'status': 'Solution', 'progress': 100, 'text': "Final Solution", 'time_elapsed': round(time.time()-start_time, 2), 'solution': solution_json})
     
     dataset_path = str(globals.dataset_path).split("/")[-1]
     solution_filename  = f"sol_{globals.data['Instance_Name']}_{safe_text(dataset_path)}.yml"
     solution_filepath = os.path.join(current_app.config['SOLUTION_PATH'], solution_filename)
-    SolutionObj.write_solution(solution_filepath)
+    best_solution.solution.write_solution(solution_filepath)
     
     return '', 200
 

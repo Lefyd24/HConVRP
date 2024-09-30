@@ -101,7 +101,7 @@ class Vehicle:
             return False, "Duration"
         return True, "Success"
     
-    def _validate_inter_relocation(self, period, other_vehicle:'Vehicle', from_position, to_position, customer_is_frequent, vehicle_positions):
+    def _validate_inter_relocation(self, period, other_vehicle:'Vehicle', from_position, to_position, customer_is_frequent=False, vehicle_positions=None):
         if customer_is_frequent:
             demand_periods = [i for i in range(self.planning_horizon) if self.routes[period][from_position].demands[i] > 0]
             for p in demand_periods:
@@ -134,18 +134,39 @@ class Vehicle:
     def calculate_insertion_duration_change(self, period, customer, position):
         previous_node = self.routes[period][position - 1]
         next_node = self.routes[period][position]
-        return (distance(previous_node, customer, self.distance_matrix) + customer.service_time + \
-            distance(customer, next_node, self.distance_matrix) + next_node.service_time)/self.vehicle_type.speed - \
-                (distance(previous_node, next_node, self.distance_matrix) + next_node.service_time)/self.vehicle_type.speed
+        return (distance(previous_node, customer, self.distance_matrix) + customer.service_time + distance(customer, next_node, self.distance_matrix) + next_node.service_time)/self.vehicle_type.speed - (distance(previous_node, next_node, self.distance_matrix) + next_node.service_time)/self.vehicle_type.speed
     
-    def calculate_insertion_cost(self, period, customer, position):
+    def calculate_duration_change(self, period, previous_node:Customer, node_to_remove:Customer, next_node:Customer, node_to_insert:Customer):
+        """
+        Calculate the duration change of removing a customer from a vehicle's route
+
+        ## Parameters:
+        - period (int): The period from which to remove the customer.
+        - previous_node (Customer): The customer before the customer to be removed.
+        - node_to_remove (Customer): The customer to be removed.
+        - next_node (Customer): The customer after the customer to be removed.
+        - node_to_insert (Customer): The customer to be inserted.
+
+        """
+        return (distance(previous_node, next_node, self.distance_matrix) + next_node.service_time)/self.vehicle_type.speed - \
+                    (distance(previous_node, node_to_remove, self.distance_matrix) + node_to_remove.service_time + \
+                    distance(node_to_remove, next_node, self.distance_matrix) + next_node.service_time)/self.vehicle_type.speed + \
+                (distance(previous_node, node_to_insert, self.distance_matrix) + node_to_insert.service_time + \
+                 distance(node_to_insert, next_node, self.distance_matrix) + next_node.service_time)/self.vehicle_type.speed
+    
+    def calculate_insertion_cost(self, period, customer, position, for_swap=False):
         """
         Calculate the cost of inserting a customer into a vehicle's route
         at a specified position without actually modifying the route.
         """
         # Retrieve the previous and next node based on the position
-        previous_node = self.routes[period][position - 1]
-        next_node = self.routes[period][position]
+        if not for_swap:
+            previous_node = self.routes[period][position - 1]
+            next_node = self.routes[period][position]
+        else:
+            # if for_swap is True, then the next node is not the customer at the position but the next customer
+            previous_node = self.routes[period][position-1]
+            next_node = self.routes[period][position+1]
         
         # Calculate the duration added by inserting the customer between previous_node and next_node
         cost_previous_to_customer = (distance(previous_node, customer, self.distance_matrix) + customer.service_time) * self.variable_cost / self.vehicle_type.speed
@@ -191,7 +212,7 @@ class Vehicle:
         # Scenario 2: If the move cost is positive, it means that the relocation is not beneficial
         return move_cost
     
-    def calculate_inter_relocation_move_cost(self, period, other_vehicle:'Vehicle', position1, position2, customer_is_frequent):
+    def calculate_inter_relocation_move_cost(self, period, other_vehicle:'Vehicle', position1, position2, customer_is_frequent=False):
         """
         Calculate the move cost of relocating a customer from one vehicle to another
         without actually modifying the routes.
@@ -321,8 +342,3 @@ class Vehicle:
         
         # Insert the customer into the other vehicle
         other_vehicle.insert_customer(period, customer, to_position)
-
-        
-        
-        
-        

@@ -303,6 +303,8 @@ socket.on('solver_info', function(msg) {
         updateType = 'log-completed';
     } else if (msg.status === 'Failed') {
         updateType = 'log-failed';
+    } else if (msg.status === 'Solution') {
+        updateType = 'log-final-solution';
     }
 
     // Create a new list item for the update
@@ -391,6 +393,11 @@ socket.on('solver_info', function(msg) {
     if (msg.status === 'Completed' || msg.status === 'Failed') {
         $('#solverLoader').attr('hidden', true);
     }
+
+    // Scroll to the bottom of the page
+    window.scrollTo(0, document.body.scrollHeight);
+
+
 });
 
 // Function to export table to Excel
