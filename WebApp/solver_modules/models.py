@@ -68,6 +68,7 @@ class Vehicle:
     def __repr__(self):
         return f"Vehicle_{self.id} - {self.vehicle_type.vehicle_type_name}"
     
+    
     def _added_duration(self, period, customer, position):
         previous_node = self.routes[period][position - 1]
         next_node = self.routes[period][position]
@@ -292,7 +293,7 @@ class Vehicle:
         #else:
         #    raise AssertionError("Customer insertion is not allowed due to the following reason: " + message)
         
-    def remove_customer(self, period, position):
+    def remove_customer(self, period, position=None, customer=None):
         """
         Removes a customer from the specified period and position in the routes list.
 
@@ -300,7 +301,11 @@ class Vehicle:
         - period (int): The period from which to remove the customer.
         - position (int): The position of the customer in the routes list.
         """
-        self.routes[period].remove(self.routes[period][position])
+        if position is not None:
+            self.routes[period].remove(self.routes[period][position])
+        elif customer is not None:
+            customer_position = self.routes[period].index(customer)
+            self.routes[period].remove(self.routes[period][customer_position])
         self.update_vehicle()
         
     

@@ -54,7 +54,7 @@ class Vehicle:
         self.cost = {i: self.fixed_cost for i in range(planning_horizon)}
         self.route_duration = {i: 0.0 for i in range(planning_horizon)}
         self.routes = {i: [self.current_location, self.current_location] for i in range(planning_horizon)}
-        self.sliding_variable_cost = {i: [] for i in range(planning_horizon)}
+        #self.sliding_variable_cost = {i: [] for i in range(planning_horizon)}
 
     def __str__(self):
         return (f"Vehicle {self.id} of type {self.vehicle_type.vehicle_type_name}.\n"
@@ -273,9 +273,9 @@ class Vehicle:
                 next_node = self.routes[period][i]
                 self.route_duration[period] += (distance(previous_node, next_node, self.distance_matrix) + next_node.service_time) /self.vehicle_type.speed
             # Update the sliding costs
-            self.sliding_variable_cost[period] = [0]
-            for i in range(1, len(self.routes[period])):
-                self.sliding_variable_cost[period].append(self.sliding_variable_cost[period][i - 1] + self.variable_cost * ((distance(self.routes[period][i - 1], self.routes[period][i], self.distance_matrix) + self.routes[period][i].service_time)/self.vehicle_type.speed))
+            #self.sliding_variable_cost[period] = [0]
+            #for i in range(1, len(self.routes[period])):
+            #    self.sliding_variable_cost[period].append(self.sliding_variable_cost[period][i - 1] + self.variable_cost * ((distance(self.routes[period][i - 1], self.routes[period][i], self.distance_matrix) + self.routes[period][i].service_time)/self.vehicle_type.speed))
             # Update the cost
             self.cost[period] = self.fixed_cost + self.variable_cost * self.route_duration[period]
             # Update the load

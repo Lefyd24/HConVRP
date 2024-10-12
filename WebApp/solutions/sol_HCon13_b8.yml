@@ -1,0 +1,282 @@
+metadata:
+  datetime: '2024-10-06 17:34:06'
+  solution_for_file: null
+  description: Solution for Heterogeneous Consistent Vehicle Routing Problem (HConVRP)
+  computation_time_seconds: 0
+solution:
+  planning_horizon: 3
+  max_route_duration: 35
+  depot: !!python/object:solver_modules.models.Customer
+    id: 0
+    coordinates: !!python/tuple
+    - 0.0
+    - 0.0
+    demands:
+    - 0
+    - 0
+    - 0
+    planning_horizon: 3
+    service_time: 0
+    is_serviced:
+      0: false
+      1: false
+      2: false
+  nodes:
+  - !!python/object:solver_modules.models.Customer
+    id: 1
+    coordinates: !!python/tuple
+    - 6.411
+    - 7.437
+    demands:
+    - 1
+    - 1
+    - 1
+    planning_horizon: 3
+    service_time: 1
+    is_serviced:
+      0: false
+      1: false
+      2: false
+  - !!python/object:solver_modules.models.Customer
+    id: 2
+    coordinates: !!python/tuple
+    - 7.263
+    - 5.66
+    demands:
+    - 2
+    - 2
+    - 2
+    planning_horizon: 3
+    service_time: 1
+    is_serviced:
+      0: false
+      1: false
+      2: false
+  - !!python/object:solver_modules.models.Customer
+    id: 3
+    coordinates: !!python/tuple
+    - 7.485
+    - 3.395
+    demands:
+    - 3
+    - 3
+    - 0
+    planning_horizon: 3
+    service_time: 1
+    is_serviced:
+      0: false
+      1: false
+      2: false
+  - !!python/object:solver_modules.models.Customer
+    id: 4
+    coordinates: !!python/tuple
+    - 1.432
+    - 3.817
+    demands:
+    - 2
+    - 2
+    - 0
+    planning_horizon: 3
+    service_time: 1
+    is_serviced:
+      0: false
+      1: false
+      2: false
+  - !!python/object:solver_modules.models.Customer
+    id: 5
+    coordinates: !!python/tuple
+    - 1.921
+    - 4.169
+    demands:
+    - 0
+    - 3
+    - 3
+    planning_horizon: 3
+    service_time: 1
+    is_serviced:
+      0: false
+      1: false
+      2: false
+  - !!python/object:solver_modules.models.Customer
+    id: 6
+    coordinates: !!python/tuple
+    - 9.957
+    - 5.77
+    demands:
+    - 1
+    - 0
+    - 1
+    planning_horizon: 3
+    service_time: 1
+    is_serviced:
+      0: false
+      1: false
+      2: false
+  - !!python/object:solver_modules.models.Customer
+    id: 7
+    coordinates: !!python/tuple
+    - 2.847
+    - 5.453
+    demands:
+    - 2
+    - 2
+    - 2
+    planning_horizon: 3
+    service_time: 1
+    is_serviced:
+      0: false
+      1: false
+      2: false
+  - !!python/object:solver_modules.models.Customer
+    id: 8
+    coordinates: !!python/tuple
+    - 1.674
+    - 0.576
+    demands:
+    - 0
+    - 3
+    - 0
+    planning_horizon: 3
+    service_time: 1
+    is_serviced:
+      0: false
+      1: false
+      2: false
+  - !!python/object:solver_modules.models.Customer
+    id: 9
+    coordinates: !!python/tuple
+    - 2.228
+    - 4.792
+    demands:
+    - 1
+    - 1
+    - 1
+    planning_horizon: 3
+    service_time: 1
+    is_serviced:
+      0: false
+      1: false
+      2: false
+  - !!python/object:solver_modules.models.Customer
+    id: 10
+    coordinates: !!python/tuple
+    - 5.879
+    - 2.075
+    demands:
+    - 3
+    - 3
+    - 0
+    planning_horizon: 3
+    service_time: 1
+    is_serviced:
+      0: false
+      1: false
+      2: false
+  - !!python/object:solver_modules.models.Customer
+    id: 11
+    coordinates: !!python/tuple
+    - 4.724
+    - 9.378
+    demands:
+    - 0
+    - 3
+    - 3
+    planning_horizon: 3
+    service_time: 1
+    is_serviced:
+      0: false
+      1: false
+      2: false
+  - !!python/object:solver_modules.models.Customer
+    id: 12
+    coordinates: !!python/tuple
+    - 6.587
+    - 8.195
+    demands:
+    - 2
+    - 0
+    - 0
+    planning_horizon: 3
+    service_time: 1
+    is_serviced:
+      0: false
+      1: false
+      2: false
+  vehicle_types:
+  - &id001 !!python/object:solver_modules.models.VehicleType
+    vehicle_type_name: TYPE1
+    available_vehicles: 1
+    capacity: 18.0
+    fixed_cost: 130.0
+    variable_cost: 5.0
+    speed: 1.0
+  - &id002 !!python/object:solver_modules.models.VehicleType
+    vehicle_type_name: TYPE2
+    available_vehicles: 1
+    capacity: 15.0
+    fixed_cost: 100.0
+    variable_cost: 3.0
+    speed: 1.0
+  vehicles:
+  - id: 1
+    type: *id001
+  - id: 2
+    type: *id002
+  routes:
+    0:
+    - vehicle_id: 1
+      route:
+      - 0
+      - 4
+      - 12
+      - 3
+      - 0
+    - vehicle_id: 2
+      route:
+      - 0
+      - 10
+      - 6
+      - 2
+      - 1
+      - 7
+      - 9
+      - 0
+    1:
+    - vehicle_id: 1
+      route:
+      - 0
+      - 8
+      - 3
+      - 11
+      - 4
+      - 0
+    - vehicle_id: 2
+      route:
+      - 0
+      - 5
+      - 9
+      - 7
+      - 1
+      - 2
+      - 10
+      - 0
+    2:
+    - vehicle_id: 1
+      route:
+      - 0
+      - 11
+      - 0
+    - vehicle_id: 2
+      route:
+      - 0
+      - 5
+      - 9
+      - 7
+      - 1
+      - 2
+      - 6
+      - 0
+  total_cost:
+    0: 462.7319043518272
+    1: 461.73965482130495
+    2: 437.3394014303174

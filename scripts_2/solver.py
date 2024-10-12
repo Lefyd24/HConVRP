@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 
 filterwarnings('ignore')
 
-data_filename = os.path.join(os.path.dirname(__file__), 'HConVRPDatasets_YML', 'Medium', '50%', 'b10.yml') # '15%', 
+data_filename = os.path.join(os.path.dirname(__file__), 'HConVRPDatasets_YML', 'Medium', '15%', 'b3.yml') # '15%', 
 #data_filename = os.path.join(os.path.dirname(__file__), 'HConVRPDatasets_YML', 'Small', 'b9.yml')
 
 data = yaml.load(open(data_filename), Loader=yaml.FullLoader)
@@ -834,7 +834,6 @@ print(solver)
 print("-"*50)
 start = time.time()
 solver.initial_assignment()
-solver.solution.write_solution("solutions/solution.yml")  
 print(solver.solution_df)
 
 total_swaps, total_intra_relocations, total_inter_relocations = 0, 0, 0
@@ -876,13 +875,13 @@ while k > 0:
             k -= 1
             continue
 
-
+solver.solution.computation_time = time.time() - start
 solver.solution.write_solution("solutions/solution.yml")  
 print(solver.solution_df)
 # show only the row with the lowest total cost
 min_total_cost = solver.solution_df["TotalCost"].min()
 min_cost_rows = solver.solution_df[solver.solution_df["TotalCost"] == min_total_cost]
-print(colorize(min_cost_rows.iloc[[0]], 'GREEN'))
+print(colorize(min_cost_rows.iloc[[-1]], 'GREEN'))
 print("Computation time:", time.time() - start)
 
 print("Total swaps of the solution:",colorize(total_swaps, 'GREEN'))

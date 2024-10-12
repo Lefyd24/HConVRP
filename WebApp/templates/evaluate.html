@@ -1,0 +1,166 @@
+{% extends "base.html" %}
+{% block title %}HConVRP Solver{% endblock %}
+{% block links %}
+<link href="https://cdnjs.cloudflare.com/ajax/libs/jsoneditor/9.5.0/jsoneditor.min.css" rel="stylesheet" />
+{% endblock %}
+{% block content %}
+
+<header class="bg-aueb-primary text-white py-0">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class='row d-flex justify-content-between align-items-center'>
+                    <div class='col-6'>
+                        <h1 class="display-5 p-0">Evaluator</h1>
+                    </div>
+                    <div class='col-6 text-end'>
+                        <h6 class="text-white">Evaluate your solutions</h6>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<div class="container-fluid mt-4 mb-4" style="height: calc(100vh - 100px);">
+    <div class="row" style="height: 100%;">
+        <!-- Left Column: Folder Structure -->
+        <div class="col-md-3" style="height: 100%; overflow-y: auto;">
+            <div id="dataset-tree" class="card h-100 shadow">
+                <div class="card-body">
+                    <h5 class="card-title">Your stored solutions (Click to view)</h5>
+                    <div class="card-body">
+                        <ul class="list-group">
+                            {% for solution in solution_files %}
+                                <li class="list-group item">
+                                    <a href="#" class="list-group-item list-group-item-action solution-link" data-solution="{{ solution }}">{{ solution }}</a>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4" style="height: 100%; overflow-y: auto;">
+            <div id="file-content" class="card h-100">
+                <div class="card-body">
+                    <div class="card-title d-flex justify-content-between align-items-center">
+                        <h5>File Content</h5>
+                        <a id='evaluationBtn' href="#" class="btn btn-primary disabled" data-file="">Evaluate <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                    <div id="file-display" class="text-muted" style="height: calc(100vh - 200px);"></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-5" style="height: 100%; overflow-y: auto;">
+            <div id="evaluation-results" class="card h-100">
+                <div class="card-body">
+                    <div class="card-title d-flex justify-content-between align-items-center">
+                        <h5>Evaluation Results</h5>
+                    </div>
+                    <div id="evaluation-results-content" class="text-muted" style="height: calc(100vh - 100px);"></div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+                    
+
+{% endblock %}
+{% block scripts %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jsoneditor/9.5.0/jsoneditor.min.js"></script>
+
+<script>
+    $("#solverNav").removeClass("active");
+    $("#contactNav").removeClass("active");
+    $("#datasetNav").removeClass("active");
+    $("#documentationNav").removeClass("active");
+    $("#evaluationNav").addClass("active");
+
+    // Wait until the document is fully loaded
+    document.addEventListener('DOMContentLoaded', function() {
+        // Create the JSON Editor instance
+        var container = document.getElementById("file-display");
+        var options = {
+            mode: 'view', // Other modes: 'tree', 'code', 'form', 'text'
+            modes: ['tree', 'view', 'form', 'code'] // Allowed modes for switching
+        };
+        var editor = new JSONEditor(container, options);
+
+        // Attach click event to solution links
+        document.querySelectorAll(".solution-link").forEach(function(element) {
+            element.addEventListener("click", function(event) {
+                event.preventDefault(); // Prevent the default link click behavior
+
+                // Get the solution file name from the data attribute
+                var solutionFileName = event.target.getAttribute('data-solution');
+
+                // Fetch the solution JSON using AJAX
+                fetch('/evaluate/' + solutionFileName + '?view=true')
+                .then(response => response.json()) // Parse the JSON response
+                .then(data => {
+                    // Set the JSON data to the editor
+                    editor.set(data);
+                    // Enable the evaluate button
+                    document.getElementById('evaluationBtn').classList.remove('disabled');
+                    document.getElementById('evaluationBtn').setAttribute('data-file', solutionFileName);
+                })
+                .catch(error => console.error('Error fetching solution:', error));
+            });
+        });
+    });
+
+    // Attach click event to the evaluate button
+    // Attach click event to the evaluate button
+// Attach click event to the evaluate button
+document.getElementById('evaluationBtn').addEventListener('click', function(event) {
+    event.preventDefault(); // Prevent the default link click behavior
+
+    // Get the solution file name from the data attribute
+    var solutionFileName = event.target.getAttribute('data-file');
+
+    // Fetch the evaluation results using AJAX
+    fetch('/evaluate/' + solutionFileName)
+    .then(response => response.json()) // Parse the JSON response
+    .then(data => {
+        // Display the evaluation results in a user-friendly format
+        var evaluationResultsContent = document.getElementById('evaluation-results-content');
+
+        // Build a table for displaying the results
+        let resultsHtml = '<table class="table table-striped">';
+        resultsHtml += '<thead><tr><th>Criterion</th><th>Value</th></tr></thead>';
+        resultsHtml += '<tbody>';
+
+        // Iterate over the JSON keys and values to build rows
+        for (let [key, value] of Object.entries(data)) {
+            // Capitalize the first letter of each word and format the key
+            let formattedKey = key.replace(/_/g, ' ').replace(/\b\w/g, char => char.toUpperCase());
+
+            // Style each value based on its type (true/false/number)
+            let formattedValue;
+            if (typeof value === 'boolean') {
+                // Use green/red colors for true/false values
+                formattedValue = value ? '<span class="text-success">✔ True</span>' : '<span class="text-danger">✘ False</span>';
+            } else if (typeof value === 'number') {
+                // Format numbers to 2 decimal places
+                formattedValue = value.toFixed(2);
+            } else {
+                formattedValue = value;
+            }
+
+            // Add a table row for each key-value pair
+            resultsHtml += `<tr><td>${formattedKey}</td><td>${formattedValue}</td></tr>`;
+        }
+
+        resultsHtml += '</tbody></table>';
+
+        // Insert the constructed HTML into the evaluation-results-content div
+        evaluationResultsContent.innerHTML = resultsHtml;
+    })
+    .catch(error => console.error('Error fetching evaluation results:', error));
+});
+
+
+</script>
+{% endblock %}

@@ -27,12 +27,14 @@ def solve():
     socketio.emit('solver_info', {'status': 'Initiation', 'progress': 0, 'text': f"Number of frequent customers: <span style='color:blue;'>{len(Solver.frequent_customers)}</span>", 'time_elapsed': round(time.time()-start_time, 2)})
     
     # Initial Solution
-    try:
-        solution = Solver.initial_assignment(start_time, socketio)
-    except TypeError:
-        socketio.emit('solver_info', {'status': 'Error', 'progress': 100, 'text': "Error in initial assignment. Please try again.", 'time_elapsed': round(time.time()-start_time, 2)})
-        return '', 400
+    #try:
+    solution = Solver.initial_assignment(start_time, socketio)
+    #except TypeError as e:
+    #    socketio.emit('solver_info', {'status': 'Error', 'progress': 100, 'text': f"Error in initial assignment. Please try again. Error: {e} in line {e.__traceback__.tb_lineno}", 'time_elapsed': round(time.time()-start_time, 2)})
+    #    return '', 400
     solution_json = Solver.solution_df.to_json(orient='records', double_precision=3)
+    # store the initial solution
+    Solver.solution.write_solution(os.path.join(current_app.config['SOLUTION_PATH'], f"sol_{globals.data['Instance_Name']}_{safe_text(str(globals.dataset_path).split('/')[-1])}_initial.yml"))
     
     # Find the row with the lowest "Total Cost"
     # Get initial total cost
@@ -50,13 +52,38 @@ def solve():
     
     # VND Loop: Swap and Relocation Optimization with neighborhood switching
     VND_iterator = 0
-    k = 2  # Number of neighborhoods
+    k = 0  # Number of neighborhoods
     improved = True
     
-    while improved or k > 0:
+    while improved or k < 4:
         print(f"k: {k}")
         improved = False  # Assume no improvement initially
-        if k == 2:
+
+        if k == 0:
+            pre_ChangeVehicleChain_cost = best_cost
+            pre_ChangeVehicleChain_solver = copy.deepcopy(best_solution)  # Deep copy of the solver before ChangeVehicleChain optimization
+            best_solution.change_vehicle_chain_optimization(start_time, socketio)
+            post_ChangeVehicleChain_cost = best_solution.objective_function()
+
+            if post_ChangeVehicleChain_cost < pre_ChangeVehicleChain_cost:
+                best_cost = post_ChangeVehicleChain_cost
+                improved = True
+                socketio.emit('solver_info', {
+                    'status': 'Info', 
+                    'progress': 30 + VND_iterator * 10,  # Dynamic progress
+                    'text': f"ChangeVehicleChain optimization improved the solution by <span style='color:green'>{round(pre_ChangeVehicleChain_cost - post_ChangeVehicleChain_cost, 2)}</span>.",
+                    'time_elapsed': round(time.time()-start_time, 2),
+                    'min_total_cost': best_cost
+                })
+                
+            else:
+                print(f"ChangeVehicleChain optimization did not improve the solution (Obj. Change {round(pre_ChangeVehicleChain_cost - post_ChangeVehicleChain_cost, 2)} - New Total Cost {post_ChangeVehicleChain_cost}).")
+                k += 1
+                best_solution = copy.deepcopy(pre_ChangeVehicleChain_solver)
+                continue
+
+
+        elif k == 1:
             # Store cost and solution before swap optimization
             pre_swap_cost = best_cost
             pre_swap_solver = copy.deepcopy(best_solution)  # Deep copy of the solver before swap optimization
@@ -78,10 +105,9 @@ def solve():
                     'time_elapsed': round(time.time()-start_time, 2),
                     'min_total_cost': best_cost
                 })
-                if pre_swap_cost - post_swap_cost <= 2: # If the improvement is less than 2, reduce the neighborhood to 1
-                    k -= 1
+                k = 0  # Reset the neighborhood counter
             else:
-                k -= 1
+                k += 1 # Send it to the next neighborhood (Relocation)
                 socketio.emit('solver_info', {
                     'status': 'Info', 
                     'progress': 30 + VND_iterator * 10, 
@@ -91,7 +117,7 @@ def solve():
                 })
                 best_solution = copy.deepcopy(pre_swap_solver)  # Deep copy the previous best solution
                 continue
-        elif k == 1 : # or k == 0
+        elif k == 2 or k == 3 : 
             # Perform relocation optimization
             pre_relocate_cost = best_cost
             pre_relocate_solver = copy.deepcopy(best_solution)  # Deep copy of the solution before relocation
@@ -109,10 +135,10 @@ def solve():
                     'time_elapsed': round(time.time()-start_time, 2),
                     'min_total_cost': best_cost
                 })
-                k = 2
+                k = 0  # Reset the neighborhood counter
             else:
                 # If relocation doesn't improve, restore previous best solution
-                k -= 1
+                k += 1
                 best_solution = copy.deepcopy(pre_relocate_solver)
                 continue
         

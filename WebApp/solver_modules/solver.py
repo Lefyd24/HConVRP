@@ -7,6 +7,7 @@ import numpy as np
 import datetime as dt
 import time
 import pandas as pd
+import multiprocessing as mp
 # from helpers import colorize, create_node_matrix
 from warnings import filterwarnings
 filterwarnings('ignore')
@@ -195,6 +196,20 @@ class HConVRP:
     def __str__(self):
         return colorize(f"HConVRP with {len(self.customers)} customers and {len(self.vehicles)} vehicles. Planning horizon: {self.planning_horizon}. Route duration: {self.max_route_duration}", 'CYAN')
 
+    def get_vehicle_by_id(self, vehicle_id:int) -> Vehicle:
+        """
+        Retrieve a vehicle object by its unique identifier.
+
+        Args:
+            vehicle_id (int): The unique identifier of the vehicle to retrieve.
+
+        Returns:
+            Vehicle: The vehicle object with the specified ID, or None if no such vehicle exists.
+        """
+        for vehicle in self.vehicles:
+            if int(vehicle.id) == int(vehicle_id):
+                return vehicle
+        return None
 
     def _find_frequent_customers(self) -> list: 
         """
@@ -845,3 +860,119 @@ class HConVRP:
             vehicle.update_vehicle()
             other_vehicle.update_vehicle()
         return True
+    
+    def change_vehicle_chain_optimization(self, start_time, socketio):
+        """
+        Change Vehicle Chain Optimization: Move a frequent customer from one vehicle to another vehicle, while at the same time
+        moving another frequent customer from the second vehicle to a third vehicle.
+        """
+        socketio.emit('solver_info', {
+            'status': 'Info', 
+            'progress': 20, 
+            'text': f"Performing ChangeVehicleChain Optimization on solution with cost: <u>{round(self.solution_df['Total Cost'].iloc[-1], 2)}</u> - (Number of vehicle combinations: {len(self.vehicles) ** 3})",
+            'time_elapsed': round(time.time()-start_time, 2), 
+        })
+        total_chain_relocations = 0
+        tasks = []
+        for period in range(self.planning_horizon):
+            for vehicle_from in self.vehicles:
+                for vehicle_middle in self.vehicles:
+                    if vehicle_from.id == vehicle_middle.id:
+                        continue
+                    for vehicle_to in self.vehicles:
+                        if vehicle_middle.id == vehicle_to.id or vehicle_from.id == vehicle_to.id:
+                            continue
+                        best_chain_relocation = self.find_best_chain_relocation(period, vehicle_from, vehicle_middle, vehicle_to)
+                        if best_chain_relocation:
+                            # Perform the chain relocation by first relocating the customer from vehicle_middle to vehicle_to
+                            for p in best_chain_relocation[f"{vehicle_middle.id}-{vehicle_to.id}"].keys():
+                                vehicle_middle.inter_route_relocate(p, vehicle_to, best_chain_relocation[f"{vehicle_middle.id}-{vehicle_to.id}"][p]["from"], best_chain_relocation[f"{vehicle_middle.id}-{vehicle_to.id}"][p]["to"])
+                            # Then relocate the customer from vehicle_from to vehicle_middle
+                            for p in best_chain_relocation[f"{vehicle_from.id}-{vehicle_middle.id}"].keys():
+                                vehicle_from.inter_route_relocate(p, vehicle_middle, best_chain_relocation[f"{vehicle_from.id}-{vehicle_middle.id}"][p]["from"], best_chain_relocation[f"{vehicle_from.id}-{vehicle_middle.id}"][p]["to"])
+                            total_chain_relocations += 1
+                        tasks.append((period, vehicle_from, vehicle_middle, vehicle_to))
+
+
+        socketio.emit('solver_info', {
+            'status': 'Info', 
+            'progress': 20, 
+            'text': f"Total chain relocations: {total_chain_relocations}", 
+            'time_elapsed': round(time.time()-start_time, 2), 
+        })
+
+        # Recalculate the total cost after chain relocations
+        for period in range(self.planning_horizon):
+            total_cost = sum(vehicle.cost[period] for vehicle in self.vehicles)
+            self.solution.total_cost[period] = float(total_cost)
+
+        self.solution_df = pd.concat([self.solution_df, pd.DataFrame([["ChangeVehicleChain"] + list(self.solution.total_cost.values()) + [sum(self.solution.total_cost.values())]], columns=self.solution_df.columns)], ignore_index=True)
+        
+        return total_chain_relocations
+
+    def find_relocation_wrapper(self, args):
+        return self.find_best_chain_relocation(*args)
+    
+    def find_best_chain_relocation(self, period, vehicle_from:Vehicle, vehicle_middle:Vehicle, vehicle_to:Vehicle):
+        best_chain_relocation = None
+        best_objective_improvement = 0
+
+        combinations = dict()
+
+        for first_route_node_index in range(1, len(vehicle_from.routes[period]) - 1):
+            customer1 = vehicle_from.routes[period][first_route_node_index] 
+            if customer1 not in self.frequent_customers:
+                continue  # Skip non-frequent customers
+
+            for second_route_node_index in range(1, len(vehicle_middle.routes[period]) - 1):
+                customer2 = vehicle_middle.routes[period][second_route_node_index] 
+                if customer2 not in self.frequent_customers:
+                    continue
+                for third_route_node_index in range(1, len(vehicle_to.routes[period]) - 1):
+                    vehicle_positions = dict()
+
+                    # Calculate the cost of the chain relocation
+                    # First relocate customer 2 from vehicle_middle to vehicle_to
+                    relocation_cost2, vehicle_positions2 = vehicle_middle.calculate_inter_relocation_move_cost(period, vehicle_to, second_route_node_index, third_route_node_index, True)
+                    # Then create a copy of the current vehicle_middle, remove the customer2
+                    vehicle_middle_copy =  deepcopy(vehicle_middle)
+                    for p in range(self.planning_horizon):
+                        if customer2.demands[p] > 0:
+                            customer2_alias = [c for c in vehicle_middle_copy.routes[p] if c.id == customer2.id][0]
+                            vehicle_middle_copy.remove_customer(p, customer=customer2_alias)
+                    # Now relocate customer 1 from vehicle_from to vehicle_middle_copy and calculate the cost
+                    relocation_cost1, vehicle_positions1 = vehicle_from.calculate_inter_relocation_move_cost(period, vehicle_middle_copy, first_route_node_index, second_route_node_index, True)
+                    # Calculate the total cost of the chain relocation
+                    total_cost = relocation_cost1 + relocation_cost2
+                    
+                    if total_cost < 0:
+                        relocations_are_valid = True
+                        # Validate the chain relocation between vehicle_from -> vehicle_middle
+                        for p in vehicle_positions1.keys():
+                            from_position = vehicle_positions1[p]["from"]
+                            to_position = vehicle_positions1[p]["to"]
+                            valid_relocation = vehicle_from._validate_inter_relocation(p, vehicle_middle_copy, from_position, to_position)
+                            if not valid_relocation[0]:
+                                relocations_are_valid = False
+                                break
+                        
+                        # Validate the chain relocation between vehicle_middle -> vehicle_to
+                        if relocations_are_valid:
+                            for p in vehicle_positions2.keys():
+                                from_position = vehicle_positions2[p]["from"]
+                                to_position = vehicle_positions2[p]["to"]
+                                valid_relocation = vehicle_middle_copy._validate_inter_relocation(p, vehicle_to, from_position, to_position)
+                                if not valid_relocation[0]:
+                                    relocations_are_valid = False
+                                    break
+                        
+                        if relocations_are_valid:
+                            vehicle_positions[f"{vehicle_from.id}-{vehicle_middle.id}"] = vehicle_positions1
+                            vehicle_positions[f"{vehicle_middle.id}-{vehicle_to.id}"] = vehicle_positions2
+                            combinations[(first_route_node_index, second_route_node_index, third_route_node_index)] = vehicle_positions
+
+                            if total_cost < best_objective_improvement:
+                                best_chain_relocation = combinations[(first_route_node_index, second_route_node_index, third_route_node_index)]
+                                best_objective_improvement = total_cost
+
+        return best_chain_relocation
