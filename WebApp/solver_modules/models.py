@@ -286,13 +286,9 @@ class Vehicle:
                 
     
     def insert_customer(self, period, customer, position):
-        #validate, message = self._validate_customer_insertion(period, customer, position)
-        #if validate:
         self.routes[period].insert(position, customer)
         self.update_vehicle()
-        #else:
-        #    raise AssertionError("Customer insertion is not allowed due to the following reason: " + message)
-        
+
     def remove_customer(self, period, position=None, customer=None):
         """
         Removes a customer from the specified period and position in the routes list.

@@ -3,25 +3,12 @@ import os
 import yaml
 from blueprints.extensions import socketio  # Import socketio if needed here
 from solver_modules.solver import initialize_customers, initialize_vehicle_types, initialize_vehicles, HConVRP, Solution
-from solver_modules.helpers import create_node_matrix
+from solver_modules.helpers import create_node_matrix, get_directory_structure
 from solver_modules.models import *
 from blueprints import globals
 
 dataset_bp = Blueprint('dataset_bp', __name__)
 
-
-def get_directory_structure(rootdir):
-    dir_structure = {}
-    for dirpath, dirnames, filenames in os.walk(rootdir):
-        print(dirpath, dirnames, filenames)
-        folder = os.path.relpath(dirpath, rootdir)
-        subdir = dir_structure
-        if folder != '.':
-            for part in folder.split(os.sep):
-                subdir = subdir.setdefault(part, {})
-        subdir.update({dirname: {} for dirname in dirnames})
-        subdir.update({filename: None for filename in filenames})
-    return dir_structure
 
 @dataset_bp.route('/datasets')
 def datasets():

@@ -55,7 +55,7 @@ def solve():
     k = 0  # Number of neighborhoods
     improved = True
     
-    while improved or k < 4:
+    while improved or k <= 5:
         print(f"k: {k}")
         improved = False  # Assume no improvement initially
 
@@ -117,7 +117,7 @@ def solve():
                 })
                 best_solution = copy.deepcopy(pre_swap_solver)  # Deep copy the previous best solution
                 continue
-        elif k == 2 or k == 3 : 
+        elif k == 2:
             # Perform relocation optimization
             pre_relocate_cost = best_cost
             pre_relocate_solver = copy.deepcopy(best_solution)  # Deep copy of the solution before relocation
@@ -139,8 +139,74 @@ def solve():
             else:
                 # If relocation doesn't improve, restore previous best solution
                 k += 1
+                socketio.emit('solver_info', {
+                    'status': 'Info', 
+                    'progress': 30 + VND_iterator * 10, 
+                    'text': f"Relocation optimization did not improve the solution (<span style='color:red'>Obj. Change {round(pre_relocate_cost - post_relocate_cost, 2)}</span> - New Total Cost {post_relocate_cost}).",
+                    'time_elapsed': round(time.time()-start_time, 2),
+                    'min_total_cost': best_cost
+                })
                 best_solution = copy.deepcopy(pre_relocate_solver)
                 continue
+        elif k == 3:
+            # Perform 2-opt optimization
+            pre_two_opt_cost = best_cost
+            pre_two_opt_solver = copy.deepcopy(best_solution)  # Deep copy of the solution before 2-opt optimization
+            best_solution.two_opt_optimization(start_time, socketio)
+            post_two_opt_cost = best_solution.objective_function()
+            
+            # If 2-opt improved the solution, keep it
+            if post_two_opt_cost < pre_two_opt_cost:
+                best_cost = post_two_opt_cost
+                improved = True
+                socketio.emit('solver_info', {
+                    'status': 'Info', 
+                    'progress': 30 + VND_iterator * 10, 
+                    'text': f"2-opt optimization improved the solution by <span style='color:green'>{round(pre_two_opt_cost - post_two_opt_cost, 2)}</span>.",
+                    'time_elapsed': round(time.time()-start_time, 2),
+                    'min_total_cost': best_cost
+                })
+                k = 0  # Reset the neighborhood counter
+            else:
+                k += 1
+                socketio.emit('solver_info', {
+                    'status': 'Info', 
+                    'progress': 30 + VND_iterator * 10, 
+                    'text': f"2-opt optimization did not improve the solution (<span style='color:red'>Obj. Change {round(pre_two_opt_cost - post_two_opt_cost, 2)}</span> - New Total Cost {post_two_opt_cost}).",
+                    'time_elapsed': round(time.time()-start_time, 2),
+                    'min_total_cost': best_cost
+                })
+                best_solution = copy.deepcopy(pre_two_opt_solver)  # Deep copy the previous best solution
+                continue
+        elif k == 4 or k == 5 :
+            pre_or_opt_cost = best_cost
+            pre_or_opt_solver = copy.deepcopy(best_solution)
+            best_solution.or_opt_optimization(start_time, socketio)
+            post_or_opt_cost = best_solution.objective_function()
+            
+            if post_or_opt_cost < pre_or_opt_cost:
+                best_cost = post_or_opt_cost
+                improved = True
+                socketio.emit('solver_info', {
+                    'status': 'Info', 
+                    'progress': 30 + VND_iterator * 10, 
+                    'text': f"Or-opt optimization improved the solution by <span style='color:green'>{round(pre_or_opt_cost - post_or_opt_cost, 2)}</span>.",
+                    'time_elapsed': round(time.time()-start_time, 2),
+                    'min_total_cost': best_cost
+                })
+                k = 0
+            else:
+                k += 1
+                socketio.emit('solver_info', {
+                    'status': 'Info', 
+                    'progress': 30 + VND_iterator * 10, 
+                    'text': f"Or-opt optimization did not improve the solution (<span style='color:red'>Obj. Change {round(pre_or_opt_cost - post_or_opt_cost, 2)}</span> - New Total Cost {post_or_opt_cost}).",
+                    'time_elapsed': round(time.time()-start_time, 2),
+                    'min_total_cost': best_cost
+                })
+                best_solution = copy.deepcopy(pre_or_opt_solver)
+                continue 
+            
         
         # If either swap or relocation improved the solution, increment the iteration counter
         VND_iterator += 1
@@ -154,13 +220,26 @@ def solve():
             'min_total_cost': best_cost  # Send the updated total cost to the front-end
         })
 
-    socketio.emit('solver_info', {'status': 'Completed', 'progress': 100, 'text': "Solver has completed!", 'time_elapsed': round(time.time()-start_time, 2)})
+    end_time = time.time()
+    socketio.emit('solver_info', {'status': 'Completed', 'progress': 100, 'text': f'Solver has completed in {round(end_time-start_time, 2)}"', 'time_elapsed': round(time.time()-start_time, 2)})
     solution_json = best_solution.solution_df.to_json(orient='records', double_precision=3)
-    socketio.emit('solver_info', {'status': 'Solution', 'progress': 100, 'text': "Final Solution", 'time_elapsed': round(time.time()-start_time, 2), 'solution': solution_json})
+    socketio.emit('solver_info', {'status': 'Solution', 'progress': 100, 'text': "Final Solution:", 'time_elapsed': round(time.time()-start_time, 2), 'solution': solution_json})
     
     dataset_path = str(globals.dataset_path).split("/")[-1]
-    solution_filename  = f"sol_{globals.data['Instance_Name']}_{safe_text(dataset_path)}.yml"
-    solution_filepath = os.path.join(current_app.config['SOLUTION_PATH'], solution_filename)
+    datetime_now = time.strftime("%y%m%d_%H%M%S")
+    solution_filename  = f"sol_{datetime_now}.yml"
+    
+    if not os.path.exists(os.path.join(current_app.config['SOLUTION_PATH'], safe_text(dataset_path))):
+        os.makedirs(os.path.join(current_app.config['SOLUTION_PATH'], safe_text(dataset_path)))
+        
+    solution_filepath = os.path.join(current_app.config['SOLUTION_PATH'], safe_text(dataset_path), solution_filename)
+    
+    best_solution.solution.computation_time = round(end_time-start_time, 2)
+    best_solution.solution.data_filename = dataset_path
+    best_solution.solution.instance_name = globals.data['Instance_Name']
+    best_solution.solution.vnd_iterations = VND_iterator
+    best_solution.solution.solution_df = best_solution.solution_df.to_json(orient='records', double_precision=3)
+    
     best_solution.solution.write_solution(solution_filepath)
     
     return '', 200

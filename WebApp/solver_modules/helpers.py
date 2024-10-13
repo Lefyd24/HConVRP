@@ -1,3 +1,4 @@
+import os
 from colorama import Fore, Style
 import numpy as np
 import itertools
@@ -137,3 +138,15 @@ def create_interactive_graph(graph, edges, solution, filename='solution_with_sli
     with open(filename, 'w') as f:
         f.write(html_content)
 
+def get_directory_structure(rootdir):
+    dir_structure = {}
+    for dirpath, dirnames, filenames in os.walk(rootdir):
+        print(dirpath, dirnames, filenames)
+        folder = os.path.relpath(dirpath, rootdir)
+        subdir = dir_structure
+        if folder != '.':
+            for part in folder.split(os.sep):
+                subdir = subdir.setdefault(part, {})
+        subdir.update({dirname: {} for dirname in dirnames})
+        subdir.update({filename: None for filename in filenames})
+    return dir_structure

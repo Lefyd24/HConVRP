@@ -4,7 +4,43 @@
 <link href="https://cdnjs.cloudflare.com/ajax/libs/jsoneditor/9.5.0/jsoneditor.min.css" rel="stylesheet" />
 {% endblock %}
 {% block content %}
+<style>
+    /* Remove list item bullets and padding */
+    .folder > ul {
+        margin-left: 20px;
+        list-style-type: none; /* Hide list dots */
+        padding-left: 0;
+    }
 
+    .folder-toggle, .file {
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        padding: 5px 0;
+    }
+
+    .folder-toggle i, .file i {
+        margin-right: 8px;
+    }
+
+    .file {
+        list-style-type: none; /* Hide list dots */
+        padding-left: 28px; /* Align files to the folder level */
+    }
+
+    /* Hover effects for folders and files */
+    .folder-toggle:hover .folder-text,
+    .file:hover .file-text {
+        color: #007bff; /* Change text color on hover */
+        text-decoration: underline; /* Add underline to indicate clickability */
+    }
+
+    /* Highlight the selected file */
+    .file.selected {
+        background-color: #e9ecef;
+        border-radius: 4px;
+    }
+</style>
 <header class="bg-aueb-primary text-white py-0">
     <div class="container-fluid">
         <div class="row">
@@ -26,18 +62,29 @@
     <div class="row" style="height: 100%;">
         <!-- Left Column: Folder Structure -->
         <div class="col-md-3" style="height: 100%; overflow-y: auto;">
-            <div id="dataset-tree" class="card h-100 shadow">
+            <div id="dataset-tree" class="card h-100">
                 <div class="card-body">
-                    <h5 class="card-title">Your stored solutions (Click to view)</h5>
-                    <div class="card-body">
-                        <ul class="list-group">
-                            {% for solution in solution_files %}
-                                <li class="list-group item">
-                                    <a href="#" class="list-group-item list-group-item-action solution-link" data-solution="{{ solution }}">{{ solution }}</a>
-                                </li>
-                            {% endfor %}
+                    <h5 class="card-title">Solution Tree</h5>
+                    {% macro render_tree(structure, parent_path="") %}
+                        <ul class="folder">
+                        {% for key, value in structure.items() %}
+                            <li>
+                                {% if value is mapping %}
+                                    <span class="folder-toggle " data-folder="{{ parent_path }}/{{ key }}">
+                                        <i class="fas fa-chevron-down"></i> <!-- Start with right arrow -->
+                                        <i class="fas fa-folder"></i> <span class="folder-text">{{ key }}</span>
+                                    </span>
+                                    {{ render_tree(value, parent_path ~ "/" ~ key) }}
+                                {% else %}
+                                    <span class="file solution-link" data-file="{{ parent_path }}/{{ key }}">
+                                        <i class="fas fa-file"></i> <span class="file-text">{{ key }}</span>
+                                    </span>
+                                {% endif %}
+                            </li>
+                        {% endfor %}
                         </ul>
-                    </div>
+                    {% endmacro %}
+                    {{ render_tree(solutions) }}
                 </div>
             </div>
         </div>
@@ -55,10 +102,13 @@
         <div class="col-md-5" style="height: 100%; overflow-y: auto;">
             <div id="evaluation-results" class="card h-100">
                 <div class="card-body">
-                    <div class="card-title d-flex justify-content-between align-items-center">
+                    <div class="card-title">
                         <h5>Evaluation Results</h5>
                     </div>
-                    <div id="evaluation-results-content" class="text-muted" style="height: calc(100vh - 100px);"></div>
+                    <div id="evaluation-results-content" class="text-muted"></div>
+                    <br>
+                    <h5 class="card-title mt-2" id='solution-df-title' hidden>Solution Dataframe</h5>
+                    <div id="solution-df-content" class="text-muted" style="height: calc(100vh - 200px);"></div>
                 </div>
             </div>
         </div>
@@ -78,35 +128,67 @@
     $("#documentationNav").removeClass("active");
     $("#evaluationNav").addClass("active");
 
-    // Wait until the document is fully loaded
     document.addEventListener('DOMContentLoaded', function() {
-        // Create the JSON Editor instance
+        // JSON Editor instance
         var container = document.getElementById("file-display");
         var options = {
-            mode: 'view', // Other modes: 'tree', 'code', 'form', 'text'
-            modes: ['tree', 'view', 'form', 'code'] // Allowed modes for switching
+            mode: 'view' // Read-only mode
         };
         var editor = new JSONEditor(container, options);
 
-        // Attach click event to solution links
-        document.querySelectorAll(".solution-link").forEach(function(element) {
-            element.addEventListener("click", function(event) {
-                event.preventDefault(); // Prevent the default link click behavior
+        // Initially hide all nested folders (folders should be initially closed)
+        document.querySelectorAll('.folder > ul').forEach(function(ul) {
+            ul.style.display = 'none'; // All folders start closed
+        });
 
-                // Get the solution file name from the data attribute
-                var solutionFileName = event.target.getAttribute('data-solution');
+        // Add click event listener to toggle folders with single click
+        document.querySelectorAll('.folder-toggle').forEach(function(folder) {
+            folder.addEventListener('click', function() {
+                var sublist = this.nextElementSibling;
+                var arrowIcon = this.querySelector('.fa-chevron-right') || this.querySelector('.fa-chevron-down');
+                var folderIcon = this.querySelector('.fa-folder') || this.querySelector('.fa-folder-open');
+                if (sublist.style.display === 'none') {
+                    sublist.style.display = 'block';
+                    arrowIcon.classList.replace('fa-chevron-right', 'fa-chevron-down');
+                    folderIcon.classList.replace('fa-folder', 'fa-folder-open');
+                } else {
+                    sublist.style.display = 'none';
+                    arrowIcon.classList.replace('fa-chevron-down', 'fa-chevron-right');
+                    folderIcon.classList.replace('fa-folder-open', 'fa-folder');
+                }
+            });
+        });
 
-                // Fetch the solution JSON using AJAX
-                fetch('/evaluate/' + solutionFileName + '?view=true')
-                .then(response => response.json()) // Parse the JSON response
-                .then(data => {
-                    // Set the JSON data to the editor
-                    editor.set(data);
-                    // Enable the evaluate button
-                    document.getElementById('evaluationBtn').classList.remove('disabled');
-                    document.getElementById('evaluationBtn').setAttribute('data-file', solutionFileName);
-                })
-                .catch(error => console.error('Error fetching solution:', error));
+        // Add click event listener to display file content and highlight the selected file
+        document.querySelectorAll('.file').forEach(function(file) {
+            file.addEventListener('click', function() {
+                // Remove 'selected' class from all files
+                document.querySelectorAll('.file').forEach(function(f) {
+                    f.classList.remove('selected');
+                });
+
+                // Add 'selected' class to the clicked file
+                this.classList.add('selected');
+
+                var filePath = this.dataset.file.trim(); // Assuming dataset.file contains the relative path
+                console.log("File path being sent:", filePath);
+                $.ajax({
+                    url: '/get_solution_file',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ file_path: filePath , view: 'true'}),
+                    success: function(response) {
+                        // Display the JSON content in the editor
+                        editor.set(response);
+                        // Enable the evaluation button
+                        document.getElementById('evaluationBtn').classList.remove('disabled');
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error loading file content:', xhr);
+                        // Disable the evaluation button
+                        document.getElementById('evaluationBtn').classList.add('disabled');
+                    }
+                });
             });
         });
     });
@@ -117,48 +199,132 @@
 document.getElementById('evaluationBtn').addEventListener('click', function(event) {
     event.preventDefault(); // Prevent the default link click behavior
 
-    // Get the solution file name from the data attribute
-    var solutionFileName = event.target.getAttribute('data-file');
+    var filePath = document.querySelector('.file.selected').dataset.file.trim();
+    console.log("Evaluating file:", filePath);
 
-    // Fetch the evaluation results using AJAX
-    fetch('/evaluate/' + solutionFileName)
-    .then(response => response.json()) // Parse the JSON response
-    .then(data => {
-        // Display the evaluation results in a user-friendly format
-        var evaluationResultsContent = document.getElementById('evaluation-results-content');
+    $.ajax({
+        url: '/get_solution_file',
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({ file_path: filePath }),
+        success: function(response) {
+            var evaluation_results = response.evaluation_results;
+            var solution_df = response.solution_df;
 
-        // Build a table for displaying the results
-        let resultsHtml = '<table class="table table-striped">';
-        resultsHtml += '<thead><tr><th>Criterion</th><th>Value</th></tr></thead>';
-        resultsHtml += '<tbody>';
+            var resultsContent = document.getElementById('evaluation-results-content');
+            var solutionDfContent = document.getElementById('solution-df-content');
+            
+            // Start building the table
+            var table = '<table class="table table-hover">';
+            table += '<thead><tr><th>Criteria</th><th>Value</th></tr></thead><tbody>';
+            
+            // Function to format numbers to 2 decimal places
+            function formatNumber(num) {
+                return parseFloat(num).toFixed(2);
+            }
+    
+            // Loop through the JSON object and create table rows
+            for (var key in evaluation_results) {
+                if (evaluation_results.hasOwnProperty(key)) {
+                    table += '<tr>';
+                    table += '<td>' + key + '</td>'; // Table column for the criteria
+                    
+                    var value = evaluation_results[key];
+    
+                    // Handle boolean values with conditional styling
+                    if (value === true) {
+                        table += '<td class="text-success"><i class="fas fa-check"></i> True</td>'; // Green with a tick icon
+                    } else if (value === false) {
+                        table += '<td class="text-danger"><i class="fas fa-times"></i> False</td>'; // Red with a cross icon
+                    }
+                    // Handle numbers, formatting them to 2 decimal places
+                    else if (!isNaN(value)) {
+                        table += '<td>' + formatNumber(value) + '</td>'; // Format number to 2 decimals
+                    }
+                    // For other values, just display them as is
+                    else {
+                        table += '<td>' + value + '</td>';
+                    }
+    
+                    table += '</tr>';
+                }
+            }
+    
+            // Close the table
+            table += '</tbody></table>';
+            
+            // Set the generated table as the inner HTML of the resultsContent div
+            resultsContent.innerHTML = table;
 
-        // Iterate over the JSON keys and values to build rows
-        for (let [key, value] of Object.entries(data)) {
-            // Capitalize the first letter of each word and format the key
-            let formattedKey = key.replace(/_/g, ' ').replace(/\b\w/g, char => char.toUpperCase());
-
-            // Style each value based on its type (true/false/number)
-            let formattedValue;
-            if (typeof value === 'boolean') {
-                // Use green/red colors for true/false values
-                formattedValue = value ? '<span class="text-success">✔ True</span>' : '<span class="text-danger">✘ False</span>';
-            } else if (typeof value === 'number') {
-                // Format numbers to 2 decimal places
-                formattedValue = value.toFixed(2);
+            // Create a second table for the solution dataframe if it exists
+            // solution_df looks like: 
+            /* '[{"Step":"Initial","Period 0":3108.747,"Period 1":2908.432,"Period 2":3884.89,"Period
+                3":3589.561,"Period 4":3010.052,"Total Cost":16501.683},{"Step":"Relocation","Period
+                0":2553.469,"Period 1":2525.271,"Period 2":3094.089,"Period 3":2636.318,"Period
+                4":2364.799,"Total Cost":13173.946},{"Step":"Swap","Period 0":2553.469,"Period
+                1":2519.871,"Period 2":3094.089,"Period 3":2636.318,"Period 4":2364.799,"Total
+                Cost":13168.546},{"Step":"2-opt","Period 0":2553.469,"Period 1":2426.822,"Period
+                2":3094.089,"Period 3":2635.975,"Period 4":2364.799,"Total Cost":13075.154}]'
+            */
+            if (solution_df) {
+                // unhide the solution dataframe title
+                document.getElementById('solution-df-title').hidden = false;
+                // Parse the JSON string to an array of objects
+                var df = JSON.parse(solution_df);
+    
+                // Start building the table
+                var dfTable = '<table class="table table-hover">';
+                dfTable += '<thead><tr>';
+    
+                // Loop through the first object to get the column names
+                for (var key in df[0]) {
+                    if (df[0].hasOwnProperty(key)) {
+                        dfTable += '<th>' + key + '</th>';
+                    }
+                }
+    
+                dfTable += '</tr></thead><tbody>';
+    
+                // Loop through the array of objects to create table rows
+                for (var i = 0; i < df.length; i++) {
+                    dfTable += '<tr>';
+    
+                    // Loop through each object to get the values
+                    for (var key in df[i]) {
+                        if (df[i].hasOwnProperty(key)) {
+                            var value = df[i][key];
+    
+                            // Handle numbers, formatting them to 2 decimal places
+                            if (!isNaN(value)) {
+                                dfTable += '<td>' + formatNumber(value) + '</td>'; // Format number to 2 decimals
+                            }
+                            // For other values, just display them as is
+                            else {
+                                dfTable += '<td>' + value + '</td>';
+                            }
+                        }
+                    }
+    
+                    dfTable += '</tr>';
+                }
+    
+                // Close the table
+                dfTable += '</tbody></table>';
+    
+                // Set the generated table as the inner HTML of the solutionDfContent div
+                solutionDfContent.innerHTML = dfTable;
             } else {
-                formattedValue = value;
+                // If no solution dataframe is provided, clear the content
+                solutionDfContent.innerHTML = '';
             }
 
-            // Add a table row for each key-value pair
-            resultsHtml += `<tr><td>${formattedKey}</td><td>${formattedValue}</td></tr>`;
+        },
+        error: function(xhr, status, error) {
+            console.error('Error evaluating solution:', xhr);
         }
-
-        resultsHtml += '</tbody></table>';
-
-        // Insert the constructed HTML into the evaluation-results-content div
-        evaluationResultsContent.innerHTML = resultsHtml;
-    })
-    .catch(error => console.error('Error fetching evaluation results:', error));
+    });
+    
+    
 });
 
 
