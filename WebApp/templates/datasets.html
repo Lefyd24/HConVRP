@@ -12,11 +12,17 @@
         padding-left: 0;
     }
 
+    .folder-text {
+        font-weight: bold;
+        /* italic */
+        font-style: italic;
+    }
+
     .folder-toggle, .file {
         cursor: pointer;
         display: flex;
         align-items: center;
-        padding: 5px 0;
+        padding: 1px 0;
     }
 
     .folder-toggle i, .file i {
@@ -31,8 +37,20 @@
     /* Hover effects for folders and files */
     .folder-toggle:hover .folder-text,
     .file:hover .file-text {
-        color: #007bff; /* Change text color on hover */
+        color: #e22028; /* Change text color on hover */
         text-decoration: underline; /* Add underline to indicate clickability */
+    }
+
+    /* Highlight the selected file */
+    .file.selected {
+        background-color: #762023;
+        color: #fff;
+        border-radius: 4px;
+    }
+
+    .file.selected:hover .file-text {
+        color: #fff;
+        text-decoration: none;
     }
 
     /* Styles for the card */
@@ -49,12 +67,6 @@
     .card-title {
         color: #343a40; /* Dark color for the card title */
         font-weight: bold;
-    }
-
-    /* Highlight the selected file */
-    .file.selected {
-        background-color: #e9ecef;
-        border-radius: 4px;
     }
 </style>
 

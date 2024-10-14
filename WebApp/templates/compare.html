@@ -1,0 +1,328 @@
+{% extends "base.html" %}
+{% block title %}HConVRP Solver{% endblock %}
+{% block links %}
+<link href="https://cdnjs.cloudflare.com/ajax/libs/jsoneditor/9.5.0/jsoneditor.min.css" rel="stylesheet" />
+{% endblock %}
+{% block content %}
+<style>
+    /* Ensure table columns fit the container and wrap text */
+    table {
+        width: 100%;
+        table-layout: fixed;
+    }
+
+    th, td {
+        word-wrap: break-word;
+        white-space: normal;
+    }
+
+    /* Reduce width for each table column */
+    th, td {
+        padding: 8px;
+        text-align: center;
+    }
+
+    /* Highlight rows with Rank 1 */
+    .highlight-row {
+        background-color: #1ae000; /* Light green background */
+        font-weight: bold;
+    }
+</style>
+<header class="bg-aueb-primary text-white py-0">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class='row d-flex justify-content-between align-items-center'>
+                    <div class='col-6'>
+                        <h1 class="display-5 p-0">Compare Solutions</h1>
+                    </div>
+                    <div class='col-6 text-end'>
+                        <h6 class="text-white">Compare similare solutions</h6>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<div class="container-fluid mt-4 mb-4" style="height: calc(100vh - 100px);">
+    <div class="row" style="height: 100%;">
+        <!-- Left Column: Folder Structure -->
+        <div class="col-md-3" style="height: 100%; ">
+            <div id="dataset-tree" class="card h-100 shadow" >
+                <div class="card-header bg-aueb-secondary">
+                    <div class='row d-flex justify-content-between align-items-center'>
+                        <div class='col-6'>
+                            <h5 class="text-white align-items-center pt-1">Folder Structure</h5>
+                        </div>
+                        <div class='col-6 text-end'>
+                            <button id="comparisonBtn" class="btn btn-aueb-info disabled">Compare <i class="fas fa-arrow-alt-circle-right"></i></button>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body" style='overflow-y: auto; overflow-x: auto;'>
+                    {% macro render_tree(structure, parent_path="") %}
+                        <ul class="folder">
+                        {% for key, value in structure.items() %}
+                            <li>
+                                {% if value is mapping %}
+                                    <span class="folder-toggle " data-folder="{{ parent_path }}/{{ key }}">
+                                        <i class="fas fa-chevron-down"></i> <!-- Start with right arrow -->
+                                        <i class="fas fa-folder"></i> <span class="folder-text">{{ key }}</span>
+                                    </span>
+                                    {{ render_tree(value, parent_path ~ "/" ~ key) }}
+                                {% else %}
+                                    <label>
+                                        <input type="checkbox" class="file-checkbox" data-file="{{ parent_path }}/{{ key }}">
+                                        <span class="file-text">{{ key }}</span>
+                                    </label>
+                                {% endif %}
+                            </li>
+                        {% endfor %}
+                        </ul>
+                    {% endmacro %}
+
+                    {{ render_tree(solutions) }}
+                </div>
+            </div>
+        </div>
+        <div class="col-md-9" style="height: 100%; overflow-y: auto;">
+            <div id="evaluation-results" class="card">
+                <div class="card-header bg-aueb-secondary">
+                    <h5 class="text-white align-items-center pt-1">Comparison Results</h5>
+                </div>
+                <div class="card-body">
+                    <div id="comparison-results-content" class="text-muted">
+                        <p class="text-muted">Select at least two files to enable comparison.</p>
+                    </div>
+                    <br>
+                    <h5 class="card-title mt-2" id='solution-df-title' hidden>Solution Dataframe</h5>
+                    <div id="solution-df-content" class="text-muted"></div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+                    
+
+{% endblock %}
+{% block scripts %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jsoneditor/9.5.0/jsoneditor.min.js"></script>
+
+<script>
+    $("#solverNav").removeClass("active");
+    $("#contactNav").removeClass("active");
+    $("#datasetNav").removeClass("active");
+    $("#documentationNav").removeClass("active");
+    $("#evaluationNav").removeClass("active");
+    $("#comparisonNav").addClass("active");
+
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initially hide all nested folders (folders should be initially closed)
+        document.querySelectorAll('.folder > ul').forEach(function(ul) {
+            ul.style.display = 'none'; // All folders start closed
+        });
+    
+        // Add click event listener to toggle folders with a single click
+        document.querySelectorAll('.folder-toggle').forEach(function(folder) {
+            folder.addEventListener('click', function() {
+                var sublist = this.nextElementSibling;
+                var arrowIcon = this.querySelector('.fa-chevron-right') || this.querySelector('.fa-chevron-down');
+                var folderIcon = this.querySelector('.fa-folder') || this.querySelector('.fa-folder-open');
+                if (sublist.style.display === 'none') {
+                    sublist.style.display = 'block';
+                    arrowIcon.classList.replace('fa-chevron-right', 'fa-chevron-down');
+                    folderIcon.classList.replace('fa-folder', 'fa-folder-open');
+                } else {
+                    sublist.style.display = 'none';
+                    arrowIcon.classList.replace('fa-chevron-down', 'fa-chevron-right');
+                    folderIcon.classList.replace('fa-folder-open', 'fa-folder');
+                }
+            });
+        });
+    
+        // Function to enable the Compare button if more than one file is selected
+        function updateComparisonButton() {
+            var selectedFiles = document.querySelectorAll('.file-checkbox:checked');
+            var compareBtn = document.getElementById('comparisonBtn');
+            if (selectedFiles.length >= 2) {
+                compareBtn.classList.remove('disabled');
+            } else {
+                compareBtn.classList.add('disabled');
+            }
+        }
+    
+        // Attach click event listeners to the checkboxes
+        document.querySelectorAll('.file-checkbox').forEach(function(checkbox) {
+            checkbox.addEventListener('change', updateComparisonButton);
+        });
+    
+        // Attach click event to the evaluate button
+        document.getElementById('comparisonBtn').addEventListener('click', function(event) {
+            event.preventDefault(); // Prevent the default link click behavior
+    
+            var selectedFiles = [];
+            document.querySelectorAll('.file-checkbox:checked').forEach(function(checkbox) {
+                selectedFiles.push(checkbox.dataset.file.trim());
+            });
+    
+            if (selectedFiles.length >= 2) {
+                console.log("Comparing files:", selectedFiles);
+                $.ajax({
+                    url: '/compare_solutions',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ files: selectedFiles }),
+                    success: function(response) {
+
+                        var costComparisonJSON = JSON.parse(response.results.cost_comparison);
+                        //var routesComparisonJSON = JSON.parse(response.results.routes_comparison);
+                        var timeComparisonJSON = JSON.parse(response.results.time_comparison);
+                        
+                        // Display each comparison result as a table 
+                        var comparisonResultsContent = document.getElementById('comparison-results-content');
+                        comparisonResultsContent.innerHTML = "";  // Clear previous results
+
+                        // Create and display the comparison sections with titles
+                        createCostComparisonSection(costComparisonJSON, comparisonResultsContent);
+                        createTimeComparisonSection(timeComparisonJSON, comparisonResultsContent);
+                        
+                        
+                        // Function to create the cost comparison section with a title and Bootstrap styling
+                        function createCostComparisonSection(data, parentElement) {
+                            // Create a Bootstrap card for the Cost Comparison
+                            var card = document.createElement('div');
+                            card.classList.add('card', 'mb-4', 'border-aueb-light', 'shadow');
+
+                            // Create the card header for the title
+                            var cardHeader = document.createElement('div');
+                            cardHeader.classList.add('card-header', 'p-2', 'text-center', 'text-dark', 'bg-aueb-light', 'font-weight-bold', 'align-items-center');
+                            cardHeader.innerHTML = 'Cost Comparison';
+                            cardHeader.style.borderBottom = '1px solid #762023';
+                            card.appendChild(cardHeader);
+
+                            // Create the card body for the table
+                            var cardBody = document.createElement('div');
+                            cardBody.classList.add('card-body', 'p-0', 'm-0');
+
+                            // Create the cost comparison table inside the card body
+                            createCostComparisonTable(data, cardBody);
+                            card.appendChild(cardBody);
+
+                            // Append the card to the parent element
+                            parentElement.appendChild(card);
+                        }
+
+                        // Function to create the time comparison section with a title and Bootstrap styling
+                        function createTimeComparisonSection(data, parentElement) {
+                            // Create a Bootstrap card for the Time Comparison
+                            var card = document.createElement('div');
+                            card.classList.add('card', 'mb-4', 'border-aueb-light', 'shadow');
+
+                            // Create the card header for the title
+                            var cardHeader = document.createElement('div');
+                            cardHeader.classList.add('card-header', 'p-2',  'text-center', 'text-dark', 'bg-aueb-light', 'font-weight-bold', 'align-items-center');
+                            cardHeader.innerHTML = 'Time Comparison';
+                            cardHeader.style.borderBottom = '1px solid #762023';
+                            card.appendChild(cardHeader);
+
+                            // Create the card body for the table
+                            var cardBody = document.createElement('div');
+                            cardBody.classList.add('card-body', 'p-0', 'm-0');
+
+                            // Create the time comparison table inside the card body
+                            createTimeComparisonTable(data, cardBody);
+                            card.appendChild(cardBody);
+
+                            // Append the card to the parent element
+                            parentElement.appendChild(card);
+                        }
+                        
+                        // Function to create the cost comparison table with Rank 1 highlighting
+                        function createCostComparisonTable(data, parentElement) {
+                            var table = document.createElement('table');
+                            table.classList.add('table', 'table-bordered', 'p-0', 'm-0');
+
+                            // Create the table header
+                            var thead = document.createElement('thead');
+                            var headerRow = document.createElement('tr');
+                            headerRow.classList.add('text-center', 'bg-aueb-light', 'text-dark');
+                            headerRow.innerHTML = '<th>Solution</th><th>Total Cost</th><th>Rank</th>';
+                            thead.appendChild(headerRow);
+                            table.appendChild(thead);
+
+                            // Create the table body
+                            var tbody = document.createElement('tbody');
+                            for (var solution in data) {
+                                var row = document.createElement('tr');
+
+                                // Highlight row if Rank = 1
+                                if (data[solution]['Rank'] === 1) {
+                                    row.classList.add('highlight-row');
+                                }
+
+                                row.innerHTML = `
+                                    <td>${solution}</td>
+                                    <td>${data[solution]['Total Cost'].toFixed(2)}</td>
+                                    <td>${data[solution]['Rank']}</td>
+                                `;
+                                tbody.appendChild(row);
+                            }
+                            table.appendChild(tbody);
+
+                            // Append the table to the parent element
+                            parentElement.appendChild(table);
+                        }
+
+                        // Function to create the time comparison table with Rank 1 highlighting
+                        function createTimeComparisonTable(data, parentElement) {
+                            var table = document.createElement('table');
+                            table.classList.add('table', 'table-bordered');
+
+                            // Create the table header
+                            var thead = document.createElement('thead');
+                            var headerRow = document.createElement('tr');
+                            headerRow.classList.add('text-center', 'bg-aueb-light', 'text-dark');
+                            headerRow.innerHTML = '<th>Solution</th><th>Time (s)</th><th>Rank</th>';
+                            thead.appendChild(headerRow);
+                            table.appendChild(thead);
+
+                            // Create the table body
+                            var tbody = document.createElement('tbody');
+                            for (var solution in data) {
+                                var row = document.createElement('tr');
+
+                                // Highlight row if Rank = 1
+                                if (data[solution]['Rank'] === 1) {
+                                    row.classList.add('highlight-row');
+                                }
+
+                                row.innerHTML = `
+                                    <td>${solution}</td>
+                                    <td>${data[solution]['Time (s)'].toFixed(2)}</td>
+                                    <td>${data[solution]['Rank']}</td>
+                                `;
+                                tbody.appendChild(row);
+                            }
+                            table.appendChild(tbody);
+
+                            // Append the table to the parent element
+                            parentElement.appendChild(table);
+                        }
+
+                    }
+                });
+                // Add your comparison logic here
+            } else {
+                console.log("Please select at least two files.");
+            }
+        });
+    });
+    
+    // Function to create the routes comparison table
+
+
+</script>
+{% endblock %}

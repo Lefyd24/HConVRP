@@ -1,5 +1,5 @@
 from flask import Flask
-from blueprints import basic_bp, dataset_bp, solver_bp, evaluator_bp
+from blueprints import basic_bp, dataset_bp, solver_bp, evaluator_bp, comparison_bp
 from blueprints.extensions import socketio  # Import the initialized socketio
 import warnings
 import os
@@ -20,6 +20,7 @@ app.register_blueprint(basic_bp)
 app.register_blueprint(dataset_bp)
 app.register_blueprint(solver_bp)
 app.register_blueprint(evaluator_bp)
+app.register_blueprint(comparison_bp)
 
 if __name__ == '__main__':
     socketio.run(app, debug=True, port=5050)

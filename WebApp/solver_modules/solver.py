@@ -247,24 +247,12 @@ class HConVRP:
                 for i in range(len(route) - 1):
                     start_node = route[i]
                     end_node = route[i+1]
-                    period_cost += (self.distance_matrix[start_node.id][end_node.id] + end_node.service_time) * vehicle.variable_cost
+                    period_cost += ((self.distance_matrix[start_node.id][end_node.id] + end_node.service_time)/vehicle.vehicle_type.speed) * vehicle.variable_cost
             
             total_cost += period_cost
         
         # Return the total cost over all periods
         return total_cost
-    
-    def check_objective_improvement(self, previous_cost):
-        """
-        Check if the current objective function (total cost) is reduced compared to the previous cost.
-        """
-        current_cost = self.objective_function()
-        if current_cost < previous_cost:
-            print(f"Objective improved! Previous: {previous_cost}, Current: {current_cost}")
-        else:
-            print(f"No improvement. Previous: {previous_cost}, Current: {current_cost}")
-            
-        return current_cost - previous_cost
 
         
     def initial_assignment(self, start_time, socketio):

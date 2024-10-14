@@ -27,8 +27,16 @@ html, body {
     background-color: #9a615e;
 }
 
+.bg-aueb-light {
+    background-color: #f2d0ca;
+}
+
 .border-aueb {
     border: 1px solid #762023;
+}
+
+.border-aueb-light {
+    border: 1px solid #f2d0ca;
 }
 
 .btn-link-aueb {
@@ -59,6 +67,26 @@ html, body {
     color: #fff;
     background-color: #8d4e4a;
     border-color: #8d4e4a;
+}
+
+.btn-aueb-info {
+    color: #fff;
+    background-color: #e22028;
+    border-color: #e22028;
+}
+.btn-aueb-info:hover {
+    color: #fff;
+    background-color: #e25e62;
+    border-color: #e25e62;
+}
+.btn-aueb-info:focus {
+    color: #fff;
+    background-color: #d20c12;
+    border-color: #d20c12;
+}
+.bg-aueb-info.disabled {
+    background-color: #e59496;
+    border-color: #e59496;
 }
 
 .font-weight-bold {
@@ -175,4 +203,54 @@ html, body {
 
 .bg-best-solution {
     background-color: rgba(12, 110, 121, 0.7);
+}
+
+/* JsonEditor styling */
+/* Remove list item bullets and padding */
+.folder > ul {
+    margin-left: 20px;
+    list-style-type: none; /* Hide list dots */
+    padding-left: 0;
+}
+
+.folder-text {
+    font-weight: bold;
+    /* italic */
+    font-style: italic;
+    
+}
+
+.folder-toggle, .file {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    padding: 1px 0;
+}
+
+.folder-toggle i, .file i {
+    margin-right: 8px;
+}
+
+.file {
+    list-style-type: none; /* Hide list dots */
+    padding-left: 20px; /* Align files to the folder level */
+}
+
+/* Hover effects for folders and files */
+.folder-toggle:hover .folder-text,
+.file:hover .file-text {
+    color: #e22028; /* Change text color on hover */
+    text-decoration: underline; /* Add underline to indicate clickability */
+}
+
+/* Highlight the selected file */
+.file.selected {
+    background-color: #762023;
+    color: #fff;
+    border-radius: 4px;
+}
+
+.file.selected:hover .file-text {
+    color: #fff;
+    text-decoration: none;
 }
