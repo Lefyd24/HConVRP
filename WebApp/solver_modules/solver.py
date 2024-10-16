@@ -422,16 +422,16 @@ class HConVRP:
         
         for _ in range(max_iterations):
             for period in range(self.planning_horizon):
-                for vehicle in self.vehicles: 
+                for vehicle in self.vehicles:
                     for other_vehicle in self.vehicles:
-                        # best_known_cost = self.objective_function()
-                        best_swap, best_swap_is_frequent = self.swap_neighborhood.find_best_swap(vehicle, other_vehicle, period)
+                        current_cost = self.objective_function()
+                        
+                        # Find the best swap
+                        best_swap, best_swap_is_frequent = self.swap_neighborhood.find_best_swap(vehicle, other_vehicle, period, self.tabu_search, current_cost)
 
                         if best_swap:
                             if best_swap_is_frequent:
-                                
                                 for move in best_swap:
-
                                     if move[3] == "swap":
                                         self.swap_neighborhood.perform_swap(move[0], vehicle, other_vehicle, move[1], move[2])
                                     elif move[3] == "relocate":
@@ -440,15 +440,10 @@ class HConVRP:
                                         elif move[4] == 'rtl':
                                             other_vehicle.inter_route_relocate(move[0], vehicle, move[1], move[2])
                                 total_frequent_swaps += 1
-                            else: 
+                            else:
                                 # Perform the swap if valid
-                                print(f"Best swap: {best_swap}")
                                 move = (period, vehicle.id, other_vehicle.id, best_swap[0], best_swap[1])
-                                current_cost = self.objective_function()
-
-                                # Check if the move is tabu or if it satisfies the aspiration criterion
                                 if not self.tabu_search.is_tabu(move, current_cost):
-                                    # Perform the swap
                                     self.swap_neighborhood.perform_swap(period, vehicle, other_vehicle, best_swap[0], best_swap[1])
 
                                     if vehicle.id == other_vehicle.id:
@@ -464,8 +459,7 @@ class HConVRP:
                                     self.tabu_search.update_best_cost(new_cost)
                                 else:
                                     print(f"Tabu move: {move}")
-                            
-            # Increment the tabu search iteration
+            
             self.tabu_search.increment_iteration()
 
         
@@ -502,57 +496,57 @@ class HConVRP:
         })
         total_chain_relocations = 0
 
-        #for period in range(self.planning_horizon):
-        for vehicle_from in self.vehicles:
-            for vehicle_middle in self.vehicles:
-                if vehicle_from.id == vehicle_middle.id:
-                    continue
-                for vehicle_to in self.vehicles:
-                    if vehicle_middle.id == vehicle_to.id or vehicle_from.id == vehicle_to.id:
+        for period in range(self.planning_horizon):
+            for vehicle_from in self.vehicles:
+                for vehicle_middle in self.vehicles:
+                    if vehicle_from.id == vehicle_middle.id:
                         continue
-                    best_chain_relocation = self.find_best_chain_relocation(vehicle_from, vehicle_middle, vehicle_to)
-                    if best_chain_relocation:
-                        # Check if the chain relocation is tabu
-                        # 1. Find which frequent customers are being relocated
-                        frequent_customers_set = set()
-                        for idx, key in enumerate(best_chain_relocation.keys()):
-                            first_period = list(best_chain_relocation[key].keys())[0]
-                            data_first_period = best_chain_relocation[key][first_period]
-                            if idx == 0: # Vehicles vehicle_from -> vehicle_middle
-                                customer_from = vehicle_from.routes[first_period][data_first_period["from"]]
-                                frequent_customers_set.add(customer_from)
-                            else: # Vehicles vehicle_middle -> vehicle_to
-                                customer_middle = vehicle_middle.routes[first_period][data_first_period["from"]]
-                                frequent_customers_set.add(customer_middle)
-                        # 2. Check if the chain relocation is tabu
-                        move = frequent_customers_set
-                        print(f"Move: {colorize(vehicle_from.id, 'YELLOW')} (CUST: {customer_from.id}) -> {colorize(vehicle_middle.id, 'YELLOW')} (CUST: {customer_middle.id}) -> {colorize(vehicle_to.id, 'YELLOW')}")
-                        if self.tabu_search.is_tabu(move, self.objective_function()):
-                            print(f"Tabu move: {move}")
+                    for vehicle_to in self.vehicles:
+                        if vehicle_middle.id == vehicle_to.id or vehicle_from.id == vehicle_to.id:
                             continue
-                    
-                        # Perform the chain relocation by first relocating the customer from vehicle_middle to vehicle_to
-                        for p in best_chain_relocation[f"{vehicle_middle.id}-{vehicle_to.id}"].keys():
-                            vehicle_middle.inter_route_relocate(p, vehicle_to, best_chain_relocation[f"{vehicle_middle.id}-{vehicle_to.id}"][p]["from"], best_chain_relocation[f"{vehicle_middle.id}-{vehicle_to.id}"][p]["to"])
-                        # Then relocate the customer from vehicle_from to vehicle_middle
-                        for p in best_chain_relocation[f"{vehicle_from.id}-{vehicle_middle.id}"].keys():
-                            vehicle_from.inter_route_relocate(p, vehicle_middle, best_chain_relocation[f"{vehicle_from.id}-{vehicle_middle.id}"][p]["from"], best_chain_relocation[f"{vehicle_from.id}-{vehicle_middle.id}"][p]["to"])
+                        best_chain_relocation = self.find_best_chain_relocation(period, vehicle_from, vehicle_middle, vehicle_to)
+                        if best_chain_relocation:
+                            # Check if the chain relocation is tabu
+                            # 1. Find which frequent customers are being relocated
+                            frequent_customers_set = set()
+                            for idx, key in enumerate(best_chain_relocation.keys()):
+                                first_period = list(best_chain_relocation[key].keys())[0]
+                                data_first_period = best_chain_relocation[key][first_period]
+                                if idx == 0: # Vehicles vehicle_from -> vehicle_middle
+                                    customer_from = vehicle_from.routes[first_period][data_first_period["from"]]
+                                    frequent_customers_set.add(customer_from)
+                                else: # Vehicles vehicle_middle -> vehicle_to
+                                    customer_middle = vehicle_middle.routes[first_period][data_first_period["from"]]
+                                    frequent_customers_set.add(customer_middle)
+                            # 2. Check if the chain relocation is tabu
+                            move = frequent_customers_set
+                            print(f"Move: {colorize(vehicle_from.id, 'YELLOW')} (CUST: {customer_from.id}) -> {colorize(vehicle_middle.id, 'YELLOW')} (CUST: {customer_middle.id}) -> {colorize(vehicle_to.id, 'YELLOW')}")
+                            if self.tabu_search.is_tabu(move, self.objective_function()):
+                                print(f"Tabu move: {move}")
+                                continue
                         
-                        # Check if the capacity or duration constraints are violated
-                        for vehicle in [vehicle_from, vehicle_middle, vehicle_to]:
-                            for period in range(self.planning_horizon):
-                                if vehicle.route_duration[period] > vehicle.max_route_duration:
-                                    print(f"Warning: Route duration constraint violated for vehicle {vehicle}")
-                                    print(f"Move operated: {best_chain_relocation}")
-                                if vehicle.load[period] > vehicle.vehicle_type.capacity:
-                                    print(f"Warning: Capacity constraint violated for vehicle {vehicle}")
-                                    print(f"Move operated: {best_chain_relocation}")
-                        total_chain_relocations += 1
+                            # Perform the chain relocation by first relocating the customer from vehicle_middle to vehicle_to
+                            for p in best_chain_relocation[f"{vehicle_middle.id}-{vehicle_to.id}"].keys():
+                                vehicle_middle.inter_route_relocate(p, vehicle_to, best_chain_relocation[f"{vehicle_middle.id}-{vehicle_to.id}"][p]["from"], best_chain_relocation[f"{vehicle_middle.id}-{vehicle_to.id}"][p]["to"])
+                            # Then relocate the customer from vehicle_from to vehicle_middle
+                            for p in best_chain_relocation[f"{vehicle_from.id}-{vehicle_middle.id}"].keys():
+                                vehicle_from.inter_route_relocate(p, vehicle_middle, best_chain_relocation[f"{vehicle_from.id}-{vehicle_middle.id}"][p]["from"], best_chain_relocation[f"{vehicle_from.id}-{vehicle_middle.id}"][p]["to"])
+                            
+                            # Check if the capacity or duration constraints are violated
+                            for vehicle in [vehicle_from, vehicle_middle, vehicle_to]:
+                                for period in range(self.planning_horizon):
+                                    if vehicle.route_duration[period] > vehicle.max_route_duration:
+                                        print(f"Warning: Route duration constraint violated for vehicle {vehicle}")
+                                        print(f"Move operated: {best_chain_relocation}")
+                                    if vehicle.load[period] > vehicle.vehicle_type.capacity:
+                                        print(f"Warning: Capacity constraint violated for vehicle {vehicle}")
+                                        print(f"Move operated: {best_chain_relocation}")
+                            total_chain_relocations += 1
 
-                        # Update tabu list
-                        self.tabu_search.add_tabu_move(move)
-                        new_cost = self.objective_function()
-                        self.tabu_search.update_best_cost(new_cost)
+                            # Update tabu list
+                            self.tabu_search.add_tabu_move(move)
+                            new_cost = self.objective_function()
+                            self.tabu_search.update_best_cost(new_cost)
 
 
         socketio.emit('solver_info', {
@@ -576,68 +570,67 @@ class HConVRP:
         return total_chain_relocations
 
     
-    def find_best_chain_relocation(self, vehicle_from:Vehicle, vehicle_middle:Vehicle, vehicle_to:Vehicle):
+    def find_best_chain_relocation(self, period, vehicle_from:Vehicle, vehicle_middle:Vehicle, vehicle_to:Vehicle):
         best_chain_relocation = None
         best_objective_improvement = 0
 
         combinations = dict()
         
-        for period in range(self.planning_horizon):
-            for first_route_node_index in range(1, len(vehicle_from.routes[period]) - 1):
-                customer1 = vehicle_from.routes[period][first_route_node_index] 
-                if customer1 not in self.frequent_customers:
-                    continue  # Skip non-frequent customers
+        
+        for first_route_node_index in range(1, len(vehicle_from.routes[period]) - 1):
+            customer1 = vehicle_from.routes[period][first_route_node_index] 
+            if customer1 not in self.frequent_customers:
+                continue  # Skip non-frequent customers
 
-                for second_route_node_index in range(1, len(vehicle_middle.routes[period]) - 1):
-                    customer2 = vehicle_middle.routes[period][second_route_node_index] 
-                    if customer2 not in self.frequent_customers:
-                        continue
-                    for third_route_node_index in range(1, len(vehicle_to.routes[period]) - 1):
-                        vehicle_positions = dict()
+            for second_route_node_index in range(1, len(vehicle_middle.routes[period]) - 1):
+                customer2 = vehicle_middle.routes[period][second_route_node_index] 
+                if customer2 not in self.frequent_customers:
+                    continue
+                for third_route_node_index in range(1, len(vehicle_to.routes[period]) - 1):
+                    vehicle_positions = dict()
 
-                        # Calculate the cost of the chain relocation
-                        # First relocate customer 2 from vehicle_middle to vehicle_to
-                        relocation_cost2, vehicle_positions2 = vehicle_middle.calculate_inter_relocation_move_cost(period, vehicle_to, second_route_node_index, third_route_node_index, True)
-                        # Then create a copy of the current vehicle_middle, remove the customer2
-                        vehicle_middle_copy =  deepcopy(vehicle_middle)
-                        for p in range(self.planning_horizon):
-                            if customer2.demands[p] > 0:
-                                customer2_alias = [c for c in vehicle_middle_copy.routes[p] if c.id == customer2.id][0]
-                                vehicle_middle_copy.remove_customer(p, customer=customer2_alias)
-                        # Now relocate customer 1 from vehicle_from to vehicle_middle_copy and calculate the cost
-                        relocation_cost1, vehicle_positions1 = vehicle_from.calculate_inter_relocation_move_cost(period, vehicle_middle_copy, first_route_node_index, second_route_node_index, True)
-                        # Calculate the total cost of the chain relocation
-                        total_cost = relocation_cost1 + relocation_cost2
+                    # First relocate customer 2 from vehicle_middle to vehicle_to
+                    relocation_cost2, vehicle_positions2 = vehicle_middle.calculate_inter_relocation_move_cost(period, vehicle_to, second_route_node_index, third_route_node_index, True)
+                    # Then create a copy of the current vehicle_middle, remove the customer2
+                    vehicle_middle_copy =  deepcopy(vehicle_middle)
+                    for p in range(self.planning_horizon):
+                        if customer2.demands[p] > 0:
+                            customer2_alias = [c for c in vehicle_middle_copy.routes[p] if c.id == customer2.id][0]
+                            vehicle_middle_copy.remove_customer(p, customer=customer2_alias)
+                    # Now relocate customer 1 from vehicle_from to vehicle_middle_copy and calculate the cost
+                    relocation_cost1, vehicle_positions1 = vehicle_from.calculate_inter_relocation_move_cost(period, vehicle_middle_copy, first_route_node_index, second_route_node_index, True)
+                    # Calculate the total cost of the chain relocation
+                    total_cost = relocation_cost1 + relocation_cost2
+                    
+                    if total_cost < 0:
+                        relocations_are_valid = True
+                        # Validate the chain relocation between vehicle_from -> vehicle_middle
+                        for p in vehicle_positions1.keys():
+                            from_position = vehicle_positions1[p]["from"]
+                            to_position = vehicle_positions1[p]["to"]
+                            valid_relocation = vehicle_from._validate_inter_relocation(p, vehicle_middle_copy, from_position, to_position)
+                            if not valid_relocation[0]:
+                                relocations_are_valid = False
+                                break
                         
-                        if total_cost < 0:
-                            relocations_are_valid = True
-                            # Validate the chain relocation between vehicle_from -> vehicle_middle
-                            for p in vehicle_positions1.keys():
-                                from_position = vehicle_positions1[p]["from"]
-                                to_position = vehicle_positions1[p]["to"]
-                                valid_relocation = vehicle_from._validate_inter_relocation(p, vehicle_middle_copy, from_position, to_position)
+                        # Validate the chain relocation between vehicle_middle -> vehicle_to
+                        if relocations_are_valid:
+                            for p in vehicle_positions2.keys():
+                                from_position = vehicle_positions2[p]["from"]
+                                to_position = vehicle_positions2[p]["to"]
+                                valid_relocation = vehicle_middle._validate_inter_relocation(p, vehicle_to, from_position, to_position)
                                 if not valid_relocation[0]:
                                     relocations_are_valid = False
                                     break
-                            
-                            # Validate the chain relocation between vehicle_middle -> vehicle_to
-                            if relocations_are_valid:
-                                for p in vehicle_positions2.keys():
-                                    from_position = vehicle_positions2[p]["from"]
-                                    to_position = vehicle_positions2[p]["to"]
-                                    valid_relocation = vehicle_middle._validate_inter_relocation(p, vehicle_to, from_position, to_position)
-                                    if not valid_relocation[0]:
-                                        relocations_are_valid = False
-                                        break
-                            
-                            if relocations_are_valid:
-                                vehicle_positions[f"{vehicle_from.id}-{vehicle_middle.id}"] = vehicle_positions1
-                                vehicle_positions[f"{vehicle_middle.id}-{vehicle_to.id}"] = vehicle_positions2
-                                combinations[(first_route_node_index, second_route_node_index, third_route_node_index)] = vehicle_positions
+                        
+                        if relocations_are_valid:
+                            vehicle_positions[f"{vehicle_from.id}-{vehicle_middle.id}"] = vehicle_positions1
+                            vehicle_positions[f"{vehicle_middle.id}-{vehicle_to.id}"] = vehicle_positions2
+                            combinations[(first_route_node_index, second_route_node_index, third_route_node_index)] = vehicle_positions
 
-                                if total_cost < best_objective_improvement:
-                                    best_chain_relocation = combinations[(first_route_node_index, second_route_node_index, third_route_node_index)]
-                                    best_objective_improvement = total_cost
+                            if total_cost < best_objective_improvement:
+                                best_chain_relocation = combinations[(first_route_node_index, second_route_node_index, third_route_node_index)]
+                                best_objective_improvement = total_cost
 
         return best_chain_relocation
     

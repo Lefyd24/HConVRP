@@ -338,6 +338,7 @@ class SolutionsComparator:
         
         df = pd.DataFrame(times, index=['Time (s)']).T
         df['Rank'] = df['Time (s)'].rank()
+        df.sort_index(inplace=True)
         return df.to_json(orient='index', indent=4)
     
     def _compare_costs(self):
@@ -352,6 +353,7 @@ class SolutionsComparator:
         df['Total Cost'] = df.sum(axis=1)
         df.drop(df.columns[:df.shape[1]-1], axis=1, inplace=True)
         df['Rank'] = df['Total Cost'].rank().astype(int)
+        df.sort_index(inplace=True)
         return df.to_json(orient='index', indent=4)
     
     def _compare_vehicles_per_period(self):

@@ -1,14 +1,27 @@
 metadata:
-  datetime: '2024-10-13 21:04:33'
-  solution_for_file: null
-  instance_name: null
+  datetime: '2024-10-14 21:24:47'
+  solution_for_file: b1.yml
+  instance_name: HCon51
   description: Solution for Heterogeneous Consistent Vehicle Routing Problem (HConVRP)
-  computation_time_seconds: 0
-  vnd_iterations: 0
-  steps: null
+  computation_time_seconds: 184.96
+  vnd_iterations: 7
+  steps: '[{"Step":"Initial","Period 0":3075.586,"Period 1":3099.319,"Period 2":3949.785,"Period
+    3":3819.76,"Period 4":3177.743,"Total Cost":17122.193},{"Step":"Relocation","Period
+    0":2757.492,"Period 1":3025.67,"Period 2":3611.42,"Period 3":3202.439,"Period
+    4":2490.415,"Total Cost":15087.435},{"Step":"Relocation","Period 0":2757.492,"Period
+    1":3025.67,"Period 2":3440.152,"Period 3":3202.439,"Period 4":2490.415,"Total
+    Cost":14916.166},{"Step":"Swap","Period 0":2685.95,"Period 1":2704.876,"Period
+    2":3323.738,"Period 3":3105.379,"Period 4":2395.607,"Total Cost":14215.549},{"Step":"Relocation","Period
+    0":2709.713,"Period 1":2704.876,"Period 2":3286.632,"Period 3":2959.785,"Period
+    4":2346.954,"Total Cost":14007.959},{"Step":"2-opt","Period 0":2609.17,"Period
+    1":2647.152,"Period 2":3181.041,"Period 3":2874.728,"Period 4":2346.954,"Total
+    Cost":13659.044},{"Step":"Relocation","Period 0":2609.17,"Period 1":2647.152,"Period
+    2":3181.041,"Period 3":2873.318,"Period 4":2346.954,"Total Cost":13657.634},{"Step":"Or-opt","Period
+    0":2602.945,"Period 1":2647.152,"Period 2":3174.889,"Period 3":2873.318,"Period
+    4":2315.913,"Total Cost":13614.216}]'
 solution:
   planning_horizon: 5
-  max_route_duration: 300
+  max_route_duration: 240
   depot: !!python/object:solver_modules.models.Customer
     id: 0
     coordinates: !!python/tuple
@@ -36,12 +49,12 @@ solution:
     - 12.0
     demands:
     - 7
-    - 0
     - 7
     - 7
     - 0
+    - 7
     planning_horizon: 5
-    service_time: 10
+    service_time: 0
     is_serviced:
       0: false
       1: false
@@ -56,11 +69,11 @@ solution:
     demands:
     - 30
     - 30
-    - 0
-    - 0
     - 30
+    - 30
+    - 0
     planning_horizon: 5
-    service_time: 10
+    service_time: 0
     is_serviced:
       0: false
       1: false
@@ -73,13 +86,13 @@ solution:
     - 22.0
     - 24.0
     demands:
-    - 16
-    - 16
     - 0
     - 16
     - 16
+    - 16
+    - 16
     planning_horizon: 5
-    service_time: 10
+    service_time: 0
     is_serviced:
       0: false
       1: false
@@ -92,13 +105,13 @@ solution:
     - -10.0
     - -14.0
     demands:
+    - 9
+    - 9
+    - 9
     - 0
     - 9
-    - 9
-    - 9
-    - 9
     planning_horizon: 5
-    service_time: 10
+    service_time: 0
     is_serviced:
       0: false
       1: false
@@ -117,7 +130,7 @@ solution:
     - 0
     - 0
     planning_horizon: 5
-    service_time: 10
+    service_time: 0
     is_serviced:
       0: false
       1: false
@@ -130,13 +143,13 @@ solution:
     - -9.0
     - 7.0
     demands:
-    - 0
-    - 0
+    - 15
+    - 15
     - 15
     - 0
-    - 0
+    - 15
     planning_horizon: 5
-    service_time: 10
+    service_time: 0
     is_serviced:
       0: false
       1: false
@@ -149,13 +162,13 @@ solution:
     - -13.0
     - 23.0
     demands:
-    - 19
-    - 19
     - 0
     - 19
     - 19
+    - 19
+    - 19
     planning_horizon: 5
-    service_time: 10
+    service_time: 0
     is_serviced:
       0: false
       1: false
@@ -172,9 +185,9 @@ solution:
     - 23
     - 23
     - 0
-    - 23
+    - 0
     planning_horizon: 5
-    service_time: 10
+    service_time: 0
     is_serviced:
       0: false
       1: false
@@ -187,13 +200,13 @@ solution:
     - 22.0
     - -7.0
     demands:
-    - 0
+    - 11
     - 0
     - 11
     - 11
     - 11
     planning_horizon: 5
-    service_time: 10
+    service_time: 0
     is_serviced:
       0: false
       1: false
@@ -208,11 +221,11 @@ solution:
     demands:
     - 5
     - 5
-    - 5
     - 0
     - 5
+    - 0
     planning_horizon: 5
-    service_time: 10
+    service_time: 0
     is_serviced:
       0: false
       1: false
@@ -226,12 +239,12 @@ solution:
     - 1.0
     demands:
     - 19
+    - 0
     - 19
     - 19
     - 0
-    - 19
     planning_horizon: 5
-    service_time: 10
+    service_time: 0
     is_serviced:
       0: false
       1: false
@@ -245,12 +258,12 @@ solution:
     - -8.0
     demands:
     - 29
-    - 29
-    - 29
-    - 29
+    - 0
+    - 0
+    - 0
     - 29
     planning_horizon: 5
-    service_time: 10
+    service_time: 0
     is_serviced:
       0: false
       1: false
@@ -263,13 +276,13 @@ solution:
     - -25.0
     - -15.0
     demands:
-    - 23
+    - 0
     - 23
     - 23
     - 23
     - 0
     planning_horizon: 5
-    service_time: 10
+    service_time: 0
     is_serviced:
       0: false
       1: false
@@ -282,13 +295,13 @@ solution:
     - -18.0
     - 2.0
     demands:
-    - 21
     - 0
     - 21
-    - 21
-    - 21
+    - 0
+    - 0
+    - 0
     planning_horizon: 5
-    service_time: 10
+    service_time: 0
     is_serviced:
       0: false
       1: false
@@ -302,12 +315,12 @@ solution:
     - -24.0
     demands:
     - 10
-    - 10
     - 0
     - 10
     - 0
+    - 10
     planning_horizon: 5
-    service_time: 10
+    service_time: 0
     is_serviced:
       0: false
       1: false
@@ -320,13 +333,13 @@ solution:
     - 22.0
     - 1.0
     demands:
-    - 15
-    - 15
+    - 0
+    - 0
     - 15
     - 15
     - 15
     planning_horizon: 5
-    service_time: 10
+    service_time: 0
     is_serviced:
       0: false
       1: false
@@ -339,13 +352,13 @@ solution:
     - -3.0
     - -17.0
     demands:
-    - 0
-    - 0
+    - 3
+    - 3
+    - 3
     - 3
     - 0
-    - 3
     planning_horizon: 5
-    service_time: 10
+    service_time: 0
     is_serviced:
       0: false
       1: false
@@ -362,9 +375,9 @@ solution:
     - 41
     - 41
     - 0
-    - 41
+    - 0
     planning_horizon: 5
-    service_time: 10
+    service_time: 0
     is_serviced:
       0: false
       1: false
@@ -379,11 +392,11 @@ solution:
     demands:
     - 9
     - 9
-    - 9
+    - 0
     - 9
     - 9
     planning_horizon: 5
-    service_time: 10
+    service_time: 0
     is_serviced:
       0: false
       1: false
@@ -396,13 +409,13 @@ solution:
     - 27.0
     - 18.0
     demands:
-    - 10
+    - 28
     - 0
-    - 0
-    - 0
+    - 28
+    - 28
     - 0
     planning_horizon: 5
-    service_time: 10
+    service_time: 0
     is_serviced:
       0: false
       1: false
@@ -415,13 +428,13 @@ solution:
     - 32.0
     - 2.0
     demands:
+    - 8
     - 0
     - 8
     - 8
     - 8
-    - 8
     planning_horizon: 5
-    service_time: 10
+    service_time: 0
     is_serviced:
       0: false
       1: false
@@ -437,10 +450,10 @@ solution:
     - 8
     - 8
     - 8
-    - 0
     - 8
+    - 0
     planning_horizon: 5
-    service_time: 10
+    service_time: 0
     is_serviced:
       0: false
       1: false
@@ -453,13 +466,13 @@ solution:
     - -14.0
     - 17.0
     demands:
-    - 16
-    - 16
+    - 0
     - 0
     - 16
-    - 16
+    - 0
+    - 0
     planning_horizon: 5
-    service_time: 10
+    service_time: 0
     is_serviced:
       0: false
       1: false
@@ -472,13 +485,13 @@ solution:
     - -22.0
     - 12.0
     demands:
-    - 0
     - 10
-    - 0
-    - 0
-    - 0
+    - 10
+    - 10
+    - 10
+    - 10
     planning_horizon: 5
-    service_time: 10
+    service_time: 0
     is_serviced:
       0: false
       1: false
@@ -492,12 +505,12 @@ solution:
     - -2.0
     demands:
     - 28
-    - 0
+    - 28
     - 28
     - 0
     - 28
     planning_horizon: 5
-    service_time: 10
+    service_time: 0
     is_serviced:
       0: false
       1: false
@@ -510,13 +523,13 @@ solution:
     - -3.0
     - 28.0
     demands:
+    - 7
     - 0
     - 7
     - 7
     - 7
-    - 7
     planning_horizon: 5
-    service_time: 10
+    service_time: 0
     is_serviced:
       0: false
       1: false
@@ -529,13 +542,13 @@ solution:
     - 0.0
     - 8.0
     demands:
-    - 15
-    - 15
-    - 15
     - 0
+    - 15
+    - 15
+    - 15
     - 0
     planning_horizon: 5
-    service_time: 10
+    service_time: 0
     is_serviced:
       0: false
       1: false
@@ -549,12 +562,12 @@ solution:
     - 27.0
     demands:
     - 0
-    - 14
-    - 14
-    - 14
     - 0
+    - 14
+    - 14
+    - 14
     planning_horizon: 5
-    service_time: 10
+    service_time: 0
     is_serviced:
       0: false
       1: false
@@ -567,13 +580,13 @@ solution:
     - 28.0
     - 8.0
     demands:
-    - 6
-    - 6
+    - 0
+    - 0
     - 0
     - 6
     - 0
     planning_horizon: 5
-    service_time: 10
+    service_time: 0
     is_serviced:
       0: false
       1: false
@@ -587,12 +600,12 @@ solution:
     - -13.0
     demands:
     - 0
-    - 0
-    - 0
-    - 0
     - 19
+    - 19
+    - 19
+    - 0
     planning_horizon: 5
-    service_time: 10
+    service_time: 0
     is_serviced:
       0: false
       1: false
@@ -605,13 +618,13 @@ solution:
     - 7.0
     - 29.0
     demands:
+    - 0
+    - 0
     - 11
-    - 0
-    - 0
     - 11
     - 11
     planning_horizon: 5
-    service_time: 10
+    service_time: 0
     is_serviced:
       0: false
       1: false
@@ -625,12 +638,12 @@ solution:
     - 6.0
     demands:
     - 12
-    - 0
+    - 12
     - 12
     - 12
     - 12
     planning_horizon: 5
-    service_time: 10
+    service_time: 0
     is_serviced:
       0: false
       1: false
@@ -643,13 +656,13 @@ solution:
     - 16.0
     - -30.0
     demands:
-    - 0
     - 23
+    - 0
     - 0
     - 23
     - 23
     planning_horizon: 5
-    service_time: 10
+    service_time: 0
     is_serviced:
       0: false
       1: false
@@ -662,13 +675,13 @@ solution:
     - 31.0
     - -7.0
     demands:
-    - 26
     - 0
     - 0
     - 26
+    - 0
     - 0
     planning_horizon: 5
-    service_time: 10
+    service_time: 0
     is_serviced:
       0: false
       1: false
@@ -681,13 +694,13 @@ solution:
     - 32.0
     - 23.0
     demands:
+    - 17
     - 0
     - 17
     - 17
     - 17
-    - 17
     planning_horizon: 5
-    service_time: 10
+    service_time: 0
     is_serviced:
       0: false
       1: false
@@ -700,13 +713,13 @@ solution:
     - 33.0
     - 29.0
     demands:
-    - 6
-    - 0
     - 0
     - 6
     - 6
+    - 6
+    - 0
     planning_horizon: 5
-    service_time: 10
+    service_time: 0
     is_serviced:
       0: false
       1: false
@@ -720,12 +733,12 @@ solution:
     - -18.0
     demands:
     - 9
+    - 0
     - 9
-    - 9
-    - 9
+    - 0
     - 9
     planning_horizon: 5
-    service_time: 10
+    service_time: 0
     is_serviced:
       0: false
       1: false
@@ -739,12 +752,12 @@ solution:
     - -5.0
     demands:
     - 15
-    - 0
     - 15
     - 0
     - 15
+    - 0
     planning_horizon: 5
-    service_time: 10
+    service_time: 0
     is_serviced:
       0: false
       1: false
@@ -757,13 +770,13 @@ solution:
     - 29.0
     - -25.0
     demands:
-    - 14
-    - 14
-    - 14
     - 0
     - 14
+    - 14
+    - 14
+    - 14
     planning_horizon: 5
-    service_time: 10
+    service_time: 0
     is_serviced:
       0: false
       1: false
@@ -776,13 +789,13 @@ solution:
     - -25.0
     - -34.0
     demands:
-    - 7
-    - 7
-    - 7
+    - 0
+    - 0
     - 7
     - 0
+    - 7
     planning_horizon: 5
-    service_time: 10
+    service_time: 0
     is_serviced:
       0: false
       1: false
@@ -795,13 +808,13 @@ solution:
     - -20.0
     - -23.0
     demands:
-    - 0
-    - 0
-    - 0
+    - 27
     - 27
     - 0
+    - 0
+    - 0
     planning_horizon: 5
-    service_time: 10
+    service_time: 0
     is_serviced:
       0: false
       1: false
@@ -815,12 +828,12 @@ solution:
     - -30.0
     demands:
     - 13
-    - 0
+    - 13
+    - 13
     - 13
     - 0
-    - 0
     planning_horizon: 5
-    service_time: 10
+    service_time: 0
     is_serviced:
       0: false
       1: false
@@ -834,12 +847,12 @@ solution:
     - 24.0
     demands:
     - 11
+    - 0
+    - 0
     - 11
-    - 11
-    - 11
-    - 11
+    - 0
     planning_horizon: 5
-    service_time: 10
+    service_time: 0
     is_serviced:
       0: false
       1: false
@@ -853,12 +866,12 @@ solution:
     - -25.0
     demands:
     - 16
-    - 16
     - 0
-    - 16
-    - 16
+    - 0
+    - 0
+    - 0
     planning_horizon: 5
-    service_time: 10
+    service_time: 0
     is_serviced:
       0: false
       1: false
@@ -871,13 +884,13 @@ solution:
     - 9.0
     - -30.0
     demands:
-    - 10
-    - 10
-    - 10
+    - 0
     - 10
     - 0
+    - 10
+    - 10
     planning_horizon: 5
-    service_time: 10
+    service_time: 0
     is_serviced:
       0: false
       1: false
@@ -890,13 +903,13 @@ solution:
     - 2.0
     - -1.0
     demands:
+    - 0
+    - 5
+    - 5
     - 5
     - 0
-    - 0
-    - 0
-    - 0
     planning_horizon: 5
-    service_time: 10
+    service_time: 0
     is_serviced:
       0: false
       1: false
@@ -909,13 +922,13 @@ solution:
     - -5.0
     - -8.0
     demands:
-    - 25
-    - 25
     - 0
     - 0
     - 25
+    - 25
+    - 0
     planning_horizon: 5
-    service_time: 10
+    service_time: 0
     is_serviced:
       0: false
       1: false
@@ -929,12 +942,12 @@ solution:
     - 15.0
     demands:
     - 0
+    - 0
+    - 0
     - 17
-    - 17
-    - 17
-    - 17
+    - 0
     planning_horizon: 5
-    service_time: 10
+    service_time: 0
     is_serviced:
       0: false
       1: false
@@ -947,13 +960,13 @@ solution:
     - 18.0
     - -12.0
     demands:
+    - 0
+    - 0
+    - 0
     - 18
-    - 18
-    - 18
-    - 18
-    - 18
+    - 0
     planning_horizon: 5
-    service_time: 10
+    service_time: 0
     is_serviced:
       0: false
       1: false
@@ -966,13 +979,13 @@ solution:
     - 26.0
     - -3.0
     demands:
-    - 0
-    - 0
     - 10
     - 0
-    - 0
+    - 10
+    - 10
+    - 10
     planning_horizon: 5
-    service_time: 10
+    service_time: 0
     is_serviced:
       0: false
       1: false
@@ -1015,253 +1028,240 @@ solution:
     - vehicle_id: 1
       route:
       - 0
-      - 12
-      - 45
-      - 38
-      - 34
-      - 32
-      - 20
-      - 1
-      - 7
-      - 23
+      - 11
       - 0
     - vehicle_id: 2
       route:
       - 0
-      - 2
-      - 11
-      - 39
-      - 42
-      - 40
-      - 25
+      - 6
+      - 8
+      - 1
+      - 32
+      - 12
+      - 44
+      - 19
+      - 41
       - 18
-      - 47
       - 0
     - vehicle_id: 3
       route:
       - 0
-      - 19
-      - 13
-      - 8
-      - 31
-      - 3
-      - 36
-      - 16
-      - 10
-      - 49
+      - 38
+      - 9
+      - 50
+      - 21
+      - 35
+      - 2
+      - 26
+      - 43
+      - 24
+      - 25
       - 0
     - vehicle_id: 4
       route:
       - 0
-      - 37
-      - 15
-      - 44
-      - 14
-      - 43
       - 22
-      - 29
-      - 46
-      - 27
+      - 20
+      - 10
+      - 33
+      - 15
+      - 37
+      - 17
+      - 42
+      - 4
       - 0
     1:
     - vehicle_id: 1
       route:
       - 0
-      - 12
-      - 45
-      - 35
-      - 7
-      - 24
-      - 23
+      - 46
+      - 30
       - 0
     - vehicle_id: 2
       route:
       - 0
-      - 11
-      - 2
-      - 39
-      - 33
-      - 40
-      - 47
+      - 19
+      - 41
+      - 13
       - 18
+      - 6
+      - 27
+      - 8
+      - 1
+      - 32
       - 0
     - vehicle_id: 3
       route:
       - 0
-      - 19
-      - 13
-      - 8
-      - 28
+      - 14
+      - 25
+      - 24
+      - 7
       - 3
-      - 21
-      - 16
-      - 10
-      - 49
+      - 36
+      - 2
+      - 38
       - 0
     - vehicle_id: 4
       route:
       - 0
-      - 27
-      - 48
-      - 43
-      - 26
       - 22
-      - 29
-      - 37
-      - 15
-      - 44
+      - 10
+      - 39
+      - 45
+      - 42
+      - 17
       - 4
       - 0
     2:
     - vehicle_id: 1
       route:
       - 0
-      - 12
-      - 45
-      - 38
-      - 50
-      - 35
-      - 1
-      - 32
+      - 46
+      - 5
+      - 30
+      - 34
+      - 11
+      - 23
       - 0
     - vehicle_id: 2
       route:
       - 0
-      - 11
-      - 39
-      - 42
-      - 40
-      - 25
+      - 47
       - 18
+      - 13
+      - 6
+      - 27
+      - 8
+      - 31
+      - 1
+      - 32
       - 0
     - vehicle_id: 3
       route:
       - 0
-      - 19
-      - 13
-      - 6
-      - 8
-      - 28
+      - 9
+      - 50
       - 21
-      - 16
-      - 10
-      - 49
-      - 5
+      - 2
+      - 35
+      - 36
+      - 3
+      - 28
+      - 26
+      - 7
+      - 24
+      - 25
       - 0
     - vehicle_id: 4
       route:
       - 0
+      - 22
+      - 20
+      - 16
+      - 39
+      - 15
       - 37
       - 17
+      - 42
+      - 40
       - 4
-      - 14
-      - 43
-      - 48
-      - 26
-      - 22
-      - 9
-      - 27
       - 0
     3:
     - vehicle_id: 1
       route:
       - 0
-      - 12
-      - 45
-      - 34
-      - 35
-      - 32
-      - 1
-      - 7
-      - 23
+      - 11
+      - 30
+      - 49
+      - 46
       - 0
     - vehicle_id: 2
       route:
       - 0
-      - 41
-      - 40
-      - 33
+      - 27
+      - 32
+      - 31
+      - 48
+      - 13
+      - 19
+      - 47
       - 0
     - vehicle_id: 3
       route:
       - 0
-      - 19
-      - 13
-      - 31
-      - 28
-      - 3
-      - 36
+      - 38
+      - 9
+      - 50
       - 21
-      - 16
-      - 49
+      - 29
+      - 2
+      - 35
+      - 36
+      - 3
+      - 28
+      - 26
+      - 7
+      - 43
+      - 24
       - 0
     - vehicle_id: 4
       route:
       - 0
-      - 14
-      - 43
-      - 48
-      - 26
-      - 29
-      - 9
-      - 37
-      - 15
-      - 44
-      - 4
+      - 22
+      - 20
+      - 16
+      - 10
+      - 39
+      - 33
+      - 45
+      - 42
+      - 17
       - 0
     4:
     - vehicle_id: 1
       route:
       - 0
-      - 23
-      - 7
-      - 35
-      - 32
-      - 30
-      - 38
-      - 12
       - 0
     - vehicle_id: 2
       route:
       - 0
-      - 11
-      - 2
-      - 39
-      - 33
-      - 47
-      - 18
-      - 25
+      - 12
+      - 19
+      - 6
+      - 31
+      - 1
+      - 32
       - 0
     - vehicle_id: 3
       route:
       - 0
-      - 8
-      - 31
-      - 3
-      - 36
+      - 9
+      - 50
       - 21
-      - 16
-      - 49
-      - 10
-      - 19
+      - 35
+      - 3
+      - 28
+      - 26
+      - 7
+      - 24
+      - 25
       - 0
     - vehicle_id: 4
       route:
       - 0
-      - 14
-      - 43
-      - 48
-      - 26
-      - 22
-      - 9
+      - 16
+      - 39
+      - 33
+      - 45
+      - 15
       - 37
-      - 44
-      - 17
+      - 40
       - 4
       - 0
   total_cost:
-    0: 5787.832927871039
-    1: 5364.685265924103
-    2: 5109.874099464791
-    3: 5075.372754088444
-    4: 5188.227724079321
+    0: 2602.944686817412
+    1: 2647.1519757781825
+    2: 3174.8894714119333
+    3: 2873.3178191988104
+    4: 2315.912543916607

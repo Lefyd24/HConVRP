@@ -130,9 +130,9 @@ class SwapNeighborhood(Neighborhood):
     between two routes or within the same route.
     """
     
-    def find_best_swap(self, vehicle, other_vehicle, period):
+    def find_best_swap(self, vehicle, other_vehicle, period, tabu_search, current_cost):
         """
-        Find the best swap between two vehicles or within the same vehicle, while adhering to capacity and route duration constraints.
+        Find the best swap between two vehicles or within the same vehicle, while adhering to capacity, route duration constraints, and tabu list.
         """
         best_swap = None
         best_swap_is_frequent = False
@@ -144,9 +144,12 @@ class SwapNeighborhood(Neighborhood):
 
             for second_route_node_index in range(start_of_second_index, len(other_vehicle.routes[period]) - 1):  # Skip depot
 
-                # check if the move is tabu
-                # if self._is_tabu(period, (first_route_node_index, second_route_node_index), vehicle, other_vehicle):
-                #     continue
+                # Get the move that would be made
+                move = (period, vehicle.id, other_vehicle.id, first_route_node_index, second_route_node_index)
+
+                # Check if the move is tabu
+                if tabu_search.is_tabu(move, current_cost):
+                    continue  # Skip this move if it's tabu and doesn't meet the aspiration criterion
                 
                 a1 = vehicle.routes[period][first_route_node_index - 1]
                 b1 = vehicle.routes[period][first_route_node_index]
@@ -154,34 +157,31 @@ class SwapNeighborhood(Neighborhood):
                 a2 = other_vehicle.routes[period][second_route_node_index - 1]
                 b2 = other_vehicle.routes[period][second_route_node_index]
                 c2 = other_vehicle.routes[period][second_route_node_index + 1]
-                
-                move_cost = None
+
                 # Check for frequent customers, compatibility, and capacity constraints
                 if not self.validate_swap(period, vehicle, other_vehicle, a1, b1, c1, a2, b2, c2):
                     continue
 
                 # Calculate move cost for both intra and inter-vehicle swap
+                move_cost = None
                 if vehicle.id == other_vehicle.id:
                     # Same vehicle swap
                     move_cost = self.calculate_intra_swap_cost(period, vehicle, first_route_node_index, second_route_node_index)
-                    
                     if move_cost < 0 and move_cost < best_move_cost:
                         best_swap = (first_route_node_index, second_route_node_index)
                         best_move_cost = move_cost
                         best_swap_is_frequent = False
                 else:
-                    if b1 in self.frequent_customers and b2 in self.frequent_customers: # Frequent customers can only be swapped with other frequent customers
+                    if b1 in self.frequent_customers and b2 in self.frequent_customers:  # Frequent customers can only be swapped with other frequent customers
                         move_cost, moves = self.calculate_inter_frequent_swap_cost(vehicle, other_vehicle, b1, b2)
-
                         if move_cost < 0 and move_cost < best_move_cost:
                             best_swap = moves
                             best_move_cost = move_cost
                             best_swap_is_frequent = True
-                        
-                    elif b1 in self.frequent_customers or b2 in self.frequent_customers: # Frequent customers can only be swapped with other frequent customers
-                        continue 
-                    # Inter-vehicle swap
+                    elif b1 in self.frequent_customers or b2 in self.frequent_customers:
+                        continue  # Skip if only one of the customers is frequent
                     else:
+                        # Inter-vehicle swap
                         move_cost = self.calculate_inter_swap_cost(period, vehicle, other_vehicle, a1, b1, c1, a2, b2, c2, first_route_node_index, second_route_node_index)
                         if move_cost < 0 and move_cost < best_move_cost:
                             best_swap = (first_route_node_index, second_route_node_index)
@@ -189,6 +189,7 @@ class SwapNeighborhood(Neighborhood):
                             best_swap_is_frequent = False
 
         return best_swap, best_swap_is_frequent
+
     
     def validate_swap(self, period, vehicle, other_vehicle, a1, b1, c1, a2, b2, c2):
         """

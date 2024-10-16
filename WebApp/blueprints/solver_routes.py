@@ -33,10 +33,6 @@ def solve():
     #    socketio.emit('solver_info', {'status': 'Error', 'progress': 100, 'text': f"Error in initial assignment. Please try again. Error: {e} in line {e.__traceback__.tb_lineno}", 'time_elapsed': round(time.time()-start_time, 2)})
     #    return '', 400
     solution_json = Solver.solution_df.to_json(orient='records', double_precision=3)
-    # store the initial solution
-    Solver.solution.write_solution(os.path.join(current_app.config['SOLUTION_PATH'], f"sol_{globals.data['Instance_Name']}_{safe_text(str(globals.dataset_path).split('/')[-1])}_initial.yml"))
-    
-    # Find the row with the lowest "Total Cost"
     # Get initial total cost
     best_cost = Solver.objective_function()
     best_solution = copy.deepcopy(Solver)  # Deep copy the initial best solution
@@ -75,7 +71,7 @@ def solve():
                     'time_elapsed': round(time.time()-start_time, 2),
                     'min_total_cost': best_cost
                 })
-                
+                k = 0  # Reset the neighborhood counter
             else:
                 print(f"ChangeVehicleChain optimization did not improve the solution (Obj. Change {round(pre_ChangeVehicleChain_cost - post_ChangeVehicleChain_cost, 2)} - New Total Cost {post_ChangeVehicleChain_cost}).")
                 k += 1

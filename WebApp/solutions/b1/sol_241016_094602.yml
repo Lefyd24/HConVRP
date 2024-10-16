@@ -1,11 +1,31 @@
 metadata:
-  datetime: '2024-10-14 21:03:12'
-  solution_for_file: null
-  instance_name: null
+  datetime: '2024-10-16 09:46:02'
+  solution_for_file: b1.yml
+  instance_name: HCon51
   description: Solution for Heterogeneous Consistent Vehicle Routing Problem (HConVRP)
-  computation_time_seconds: 0
-  vnd_iterations: 0
-  steps: null
+  computation_time_seconds: 457.28
+  vnd_iterations: 11
+  steps: '[{"Step":"Initial","Period 0":3117.114,"Period 1":2768.445,"Period 2":3812.949,"Period
+    3":3431.884,"Period 4":3259.664,"Total Cost":16390.056},{"Step":"ChangeVehicleChain","Period
+    0":2954.585,"Period 1":2596.413,"Period 2":3414.025,"Period 3":3522.972,"Period
+    4":2749.825,"Total Cost":15237.821},{"Step":"ChangeVehicleChain","Period 0":2869.914,"Period
+    1":2519.429,"Period 2":3207.363,"Period 3":3259.796,"Period 4":2686.938,"Total
+    Cost":14543.44},{"Step":"ChangeVehicleChain","Period 0":2876.574,"Period 1":2415.075,"Period
+    2":3212.812,"Period 3":3193.529,"Period 4":2736.276,"Total Cost":14434.266},{"Step":"Swap","Period
+    0":2766.464,"Period 1":2408.119,"Period 2":3135.812,"Period 3":2964.552,"Period
+    4":2466.588,"Total Cost":13741.534},{"Step":"ChangeVehicleChain","Period 0":2561.306,"Period
+    1":2442.959,"Period 2":3092.159,"Period 3":3010.92,"Period 4":2490.661,"Total
+    Cost":13598.005},{"Step":"Swap","Period 0":2609.417,"Period 1":2275.618,"Period
+    2":3191.441,"Period 3":2850.719,"Period 4":2291.724,"Total Cost":13218.918},{"Step":"ChangeVehicleChain","Period
+    0":2578.973,"Period 1":2245.805,"Period 2":3245.864,"Period 3":2862.883,"Period
+    4":2237.963,"Total Cost":13171.488},{"Step":"Swap","Period 0":2578.973,"Period
+    1":2245.805,"Period 2":3176.863,"Period 3":2862.883,"Period 4":2237.963,"Total
+    Cost":13102.487},{"Step":"Relocation","Period 0":2322.249,"Period 1":2224.385,"Period
+    2":3190.071,"Period 3":2756.919,"Period 4":2143.527,"Total Cost":12637.151},{"Step":"Swap","Period
+    0":2322.249,"Period 1":2224.385,"Period 2":3190.071,"Period 3":2613.536,"Period
+    4":2143.527,"Total Cost":12493.768},{"Step":"2-opt","Period 0":2322.249,"Period
+    1":2224.385,"Period 2":3059.515,"Period 3":2575.674,"Period 4":2143.527,"Total
+    Cost":12325.35}]'
 solution:
   planning_horizon: 5
   max_route_duration: 240
@@ -1015,240 +1035,240 @@ solution:
     - vehicle_id: 1
       route:
       - 0
-      - 2
-      - 37
+      - 11
       - 0
     - vehicle_id: 2
       route:
       - 0
-      - 43
-      - 8
-      - 11
-      - 21
-      - 50
-      - 33
+      - 25
+      - 18
+      - 4
+      - 42
+      - 44
       - 15
+      - 33
+      - 10
       - 12
       - 0
     - vehicle_id: 3
       route:
       - 0
-      - 44
-      - 42
-      - 18
-      - 25
-      - 24
-      - 26
-      - 20
-      - 38
       - 32
+      - 2
+      - 20
+      - 22
+      - 8
+      - 26
+      - 43
+      - 24
+      - 6
       - 0
     - vehicle_id: 4
       route:
       - 0
-      - 17
-      - 4
-      - 19
       - 41
-      - 6
-      - 1
-      - 22
-      - 35
+      - 19
+      - 17
+      - 37
+      - 38
       - 9
-      - 10
+      - 50
+      - 21
+      - 35
+      - 1
       - 0
     1:
     - vehicle_id: 1
       route:
       - 0
-      - 2
+      - 27
       - 0
     - vehicle_id: 2
       route:
       - 0
-      - 8
-      - 3
-      - 36
-      - 30
-      - 45
       - 46
+      - 30
+      - 39
+      - 10
+      - 45
+      - 42
+      - 4
+      - 18
+      - 25
+      - 14
       - 0
     - vehicle_id: 3
       route:
       - 0
-      - 42
-      - 13
-      - 18
-      - 25
+      - 6
       - 24
-      - 14
-      - 27
+      - 7
+      - 8
+      - 22
+      - 2
       - 32
-      - 38
       - 0
     - vehicle_id: 4
       route:
       - 0
-      - 1
-      - 22
-      - 7
-      - 6
+      - 13
       - 41
       - 19
-      - 4
       - 17
-      - 39
-      - 10
+      - 38
+      - 36
+      - 3
+      - 1
       - 0
     2:
     - vehicle_id: 1
       route:
       - 0
-      - 34
-      - 2
-      - 23
       - 5
-      - 37
+      - 34
+      - 11
+      - 27
+      - 23
       - 0
     - vehicle_id: 2
       route:
       - 0
-      - 46
-      - 11
-      - 16
-      - 8
-      - 31
-      - 3
-      - 36
-      - 21
-      - 50
-      - 30
-      - 15
-      - 40
       - 47
+      - 18
+      - 25
+      - 4
+      - 42
+      - 15
+      - 39
+      - 30
+      - 16
+      - 46
       - 0
     - vehicle_id: 3
       route:
       - 0
-      - 42
-      - 13
-      - 18
-      - 25
-      - 24
-      - 26
-      - 27
-      - 20
       - 32
+      - 2
+      - 20
+      - 22
+      - 28
+      - 31
+      - 8
+      - 26
+      - 7
+      - 24
+      - 6
       - 0
     - vehicle_id: 4
       route:
       - 0
+      - 13
+      - 40
       - 17
-      - 4
-      - 6
-      - 7
-      - 1
-      - 22
-      - 28
-      - 35
+      - 37
       - 9
-      - 39
+      - 50
+      - 21
+      - 35
+      - 36
+      - 3
+      - 1
       - 0
     3:
     - vehicle_id: 1
       route:
       - 0
-      - 2
+      - 11
+      - 27
       - 0
     - vehicle_id: 2
       route:
       - 0
-      - 46
-      - 43
-      - 31
-      - 3
-      - 36
-      - 21
-      - 50
-      - 16
-      - 11
-      - 30
-      - 33
-      - 45
       - 47
+      - 42
+      - 45
+      - 33
+      - 39
+      - 30
+      - 10
+      - 49
+      - 16
+      - 46
       - 0
     - vehicle_id: 3
       route:
       - 0
-      - 49
-      - 42
-      - 13
-      - 24
-      - 26
-      - 27
+      - 32
+      - 2
       - 29
       - 20
-      - 38
-      - 32
+      - 22
+      - 28
+      - 31
+      - 26
+      - 7
+      - 43
+      - 24
+      - 48
       - 0
     - vehicle_id: 4
       route:
       - 0
+      - 13
       - 19
       - 17
-      - 10
-      - 39
+      - 38
       - 9
+      - 50
+      - 21
       - 35
-      - 28
-      - 22
-      - 48
-      - 7
+      - 36
+      - 3
       - 0
     4:
     - vehicle_id: 1
       route:
       - 0
-      - 37
       - 0
     - vehicle_id: 2
       route:
       - 0
-      - 31
-      - 3
-      - 16
-      - 21
-      - 50
-      - 33
-      - 45
+      - 25
+      - 4
       - 15
-      - 40
+      - 45
+      - 33
+      - 39
+      - 16
       - 12
       - 0
     - vehicle_id: 3
       route:
       - 0
       - 32
+      - 28
+      - 31
       - 26
+      - 7
       - 24
-      - 25
+      - 6
       - 0
     - vehicle_id: 4
       route:
       - 0
-      - 4
-      - 19
-      - 6
-      - 7
       - 1
-      - 28
+      - 3
       - 35
+      - 21
+      - 50
       - 9
-      - 39
+      - 37
+      - 19
+      - 40
       - 0
   total_cost:
-    0: 3271.3275192794827
-    1: 2822.124672287828
-    2: 4156.496048077246
-    3: 3689.022349380697
-    4: 2817.539877132511
+    0: 2322.2489185010413
+    1: 2224.38508073132
+    2: 3059.5154068677957
+    3: 2575.6743675951266
+    4: 2143.5266360659766
