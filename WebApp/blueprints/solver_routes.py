@@ -1,3 +1,4 @@
+import sys
 from flask import Blueprint, current_app
 from blueprints.extensions import socketio  # Import socketio from extensions
 import time
@@ -221,7 +222,16 @@ def solve():
     solution_json = best_solution.solution_df.to_json(orient='records', double_precision=3)
     socketio.emit('solver_info', {'status': 'Solution', 'progress': 100, 'text': "Final Solution:", 'time_elapsed': round(time.time()-start_time, 2), 'solution': solution_json})
     
-    dataset_path = str(globals.dataset_path).split("/")[-1]
+    def get_dir_name(path:str):
+        if sys.platform in ('linux', 'darwin'):
+            path = path.split("datasets")[1]
+            path = "/".join(path)
+            return safe_text(path)
+        else:
+            path = path.split("/")[-1]
+            return safe_text(path)
+    
+    dataset_path = get_dir_name(str(globals.dataset_path))
     print(dataset_path)
     datetime_now = time.strftime("%y%m%d_%H%M%S")
     solution_filename  = f"sol_{datetime_now}.yml"

@@ -25,7 +25,6 @@ def find_dataset():
 @dataset_bp.route('/load_dataset', methods=['POST'])
 def load_dataset():
     dataset = request.get_json().get('dataset')
-    print(dataset)
     globals.data = yaml.load(open(dataset), Loader=yaml.FullLoader)
     
     globals.depot = Customer(0, tuple(globals.data["Depot_coordinates"]), [0]*globals.data["Planning_Horizon"], 0, globals.data["Planning_Horizon"])

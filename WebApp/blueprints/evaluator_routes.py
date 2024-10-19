@@ -12,7 +12,10 @@ evaluator_bp = Blueprint('evaluator_bp', __name__)
 @evaluator_bp.route('/evaluate', methods=['GET'])
 def evaluate():
     solutions_base_path = current_app.config['SOLUTION_PATH']
-    solutions = get_directory_structure(solutions_base_path)    
+    solutions = get_directory_structure(solutions_base_path) 
+    solutions.pop('.DS_Store', None)
+    # sort both keys and values
+    solutions = dict(sorted(solutions.items()))
     return render_template('evaluate.html', solutions=solutions)
 
 @evaluator_bp.route('/get_solution_file', methods=['POST'])
