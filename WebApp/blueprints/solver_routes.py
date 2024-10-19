@@ -222,6 +222,7 @@ def solve():
     socketio.emit('solver_info', {'status': 'Solution', 'progress': 100, 'text': "Final Solution:", 'time_elapsed': round(time.time()-start_time, 2), 'solution': solution_json})
     
     dataset_path = str(globals.dataset_path).split("/")[-1]
+    print(dataset_path)
     datetime_now = time.strftime("%y%m%d_%H%M%S")
     solution_filename  = f"sol_{datetime_now}.yml"
     
