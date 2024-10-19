@@ -1,0 +1,251 @@
+metadata:
+  datetime: '2024-10-16 16:11:45'
+  solution_for_file: b1.yml
+  instance_name: HCon11
+  description: Solution for Heterogeneous Consistent Vehicle Routing Problem (HConVRP)
+  computation_time_seconds: 0.33
+  vnd_iterations: 1
+  steps: '[{"Step":"Initial","Period 0":331.123,"Period 1":443.738,"Period 2":427.352,"Total
+    Cost":1202.213},{"Step":"2-opt","Period 0":331.123,"Period 1":441.865,"Period
+    2":427.029,"Total Cost":1200.017}]'
+solution:
+  planning_horizon: 3
+  max_route_duration: 35
+  depot: !!python/object:solver_modules.models.Customer
+    id: 0
+    coordinates: !!python/tuple
+    - 0.0
+    - 0.0
+    demands:
+    - 0
+    - 0
+    - 0
+    planning_horizon: 3
+    service_time: 0
+    is_serviced:
+      0: false
+      1: false
+      2: false
+  nodes:
+  - !!python/object:solver_modules.models.Customer
+    id: 1
+    coordinates: !!python/tuple
+    - 8.18
+    - 9.781
+    demands:
+    - 3
+    - 3
+    - 3
+    planning_horizon: 3
+    service_time: 1
+    is_serviced:
+      0: false
+      1: false
+      2: false
+  - !!python/object:solver_modules.models.Customer
+    id: 2
+    coordinates: !!python/tuple
+    - 0.864
+    - 3.187
+    demands:
+    - 0
+    - 1
+    - 0
+    planning_horizon: 3
+    service_time: 1
+    is_serviced:
+      0: false
+      1: false
+      2: false
+  - !!python/object:solver_modules.models.Customer
+    id: 3
+    coordinates: !!python/tuple
+    - 3.66
+    - 2.82
+    demands:
+    - 2
+    - 0
+    - 2
+    planning_horizon: 3
+    service_time: 1
+    is_serviced:
+      0: false
+      1: false
+      2: false
+  - !!python/object:solver_modules.models.Customer
+    id: 4
+    coordinates: !!python/tuple
+    - 0.866
+    - 2.47
+    demands:
+    - 2
+    - 2
+    - 0
+    planning_horizon: 3
+    service_time: 1
+    is_serviced:
+      0: false
+      1: false
+      2: false
+  - !!python/object:solver_modules.models.Customer
+    id: 5
+    coordinates: !!python/tuple
+    - 3.045
+    - 8.571
+    demands:
+    - 3
+    - 3
+    - 0
+    planning_horizon: 3
+    service_time: 1
+    is_serviced:
+      0: false
+      1: false
+      2: false
+  - !!python/object:solver_modules.models.Customer
+    id: 6
+    coordinates: !!python/tuple
+    - 8.371
+    - 8.022
+    demands:
+    - 0
+    - 1
+    - 1
+    planning_horizon: 3
+    service_time: 1
+    is_serviced:
+      0: false
+      1: false
+      2: false
+  - !!python/object:solver_modules.models.Customer
+    id: 7
+    coordinates: !!python/tuple
+    - 2.04
+    - 2.697
+    demands:
+    - 0
+    - 3
+    - 0
+    planning_horizon: 3
+    service_time: 1
+    is_serviced:
+      0: false
+      1: false
+      2: false
+  - !!python/object:solver_modules.models.Customer
+    id: 8
+    coordinates: !!python/tuple
+    - 1.409
+    - 5.733
+    demands:
+    - 3
+    - 3
+    - 3
+    planning_horizon: 3
+    service_time: 1
+    is_serviced:
+      0: false
+      1: false
+      2: false
+  - !!python/object:solver_modules.models.Customer
+    id: 9
+    coordinates: !!python/tuple
+    - 9.236
+    - 1.998
+    demands:
+    - 0
+    - 1
+    - 1
+    planning_horizon: 3
+    service_time: 1
+    is_serviced:
+      0: false
+      1: false
+      2: false
+  - !!python/object:solver_modules.models.Customer
+    id: 10
+    coordinates: !!python/tuple
+    - 1.755
+    - 2.412
+    demands:
+    - 1
+    - 0
+    - 1
+    planning_horizon: 3
+    service_time: 1
+    is_serviced:
+      0: false
+      1: false
+      2: false
+  vehicle_types:
+  - &id001 !!python/object:solver_modules.models.VehicleType
+    vehicle_type_name: TYPE1
+    available_vehicles: 1
+    capacity: 18.0
+    fixed_cost: 130.0
+    variable_cost: 5.0
+    speed: 1.0
+  - &id002 !!python/object:solver_modules.models.VehicleType
+    vehicle_type_name: TYPE2
+    available_vehicles: 1
+    capacity: 15.0
+    fixed_cost: 100.0
+    variable_cost: 3.0
+    speed: 1.0
+  vehicles:
+  - id: 1
+    type: *id001
+  - id: 2
+    type: *id002
+  routes:
+    0:
+    - vehicle_id: 1
+      route:
+      - 0
+      - 0
+    - vehicle_id: 2
+      route:
+      - 0
+      - 10
+      - 3
+      - 1
+      - 5
+      - 8
+      - 4
+      - 0
+    1:
+    - vehicle_id: 1
+      route:
+      - 0
+      - 9
+      - 7
+      - 0
+    - vehicle_id: 2
+      route:
+      - 0
+      - 4
+      - 2
+      - 8
+      - 5
+      - 1
+      - 6
+      - 0
+    2:
+    - vehicle_id: 1
+      route:
+      - 0
+      - 9
+      - 0
+    - vehicle_id: 2
+      route:
+      - 0
+      - 8
+      - 1
+      - 6
+      - 3
+      - 10
+      - 0
+  total_cost:
+    0: 331.1227116871139
+    1: 441.8649262333585
+    2: 427.02933058373134
