@@ -1,3 +1,4 @@
+import copy
 import yaml
 import os
 import numpy as np
@@ -53,7 +54,6 @@ class Vehicle:
         self.cost = {i: self.fixed_cost for i in range(planning_horizon)}
         self.route_duration = {i: 0.0 for i in range(planning_horizon)}
         self.routes = {i: [self.current_location, self.current_location] for i in range(planning_horizon)}
-        self.sliding_variable_cost = {i: [] for i in range(planning_horizon)}
 
     def __str__(self):
         return (f"Vehicle {self.id} of type {self.vehicle_type.vehicle_type_name}.\n"
@@ -67,6 +67,13 @@ class Vehicle:
     def __repr__(self):
         return f"Vehicle_{self.id} - {self.vehicle_type.vehicle_type_name}"
     
+    def shallow_copy(self):
+        new_vehicle = copy.copy(self)
+        new_vehicle.routes = copy.deepcopy(self.routes)
+        new_vehicle.load = copy.deepcopy(self.load)
+        new_vehicle.cost = copy.deepcopy(self.cost)
+        new_vehicle.route_duration = copy.deepcopy(self.route_duration)
+        return new_vehicle
     
     def _added_duration(self, period, customer, position):
         previous_node = self.routes[period][position - 1]

@@ -232,7 +232,6 @@ def solve():
             return safe_text(path)
     
     dataset_path = get_dir_name(str(globals.dataset_path))
-    print(dataset_path)
     datetime_now = time.strftime("%y%m%d_%H%M%S")
     solution_filename  = f"sol_{datetime_now}.yml"
     
