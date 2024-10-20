@@ -11,7 +11,6 @@ class Customer:
         self.demands = demands
         self.planning_horizon = planning_horizon
         self.service_time = service_time
-        self.is_serviced = {i: False for i in range(self.planning_horizon)}
     
     def __str__(self):
         return f"Customer {self.id} with demands {self.demands}"
