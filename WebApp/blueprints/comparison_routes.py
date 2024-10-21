@@ -12,7 +12,8 @@ comparison_bp = Blueprint('comparison_bp', __name__)
 @comparison_bp.route('/compare', methods=['GET'])
 def comparison_index():
     solutions_base_path = current_app.config['SOLUTION_PATH']
-    solutions = get_directory_structure(solutions_base_path)    
+    solutions = get_directory_structure(solutions_base_path)
+    solutions.pop('.DS_Store', None)    
     return render_template('compare.html', solutions=solutions)
 
 

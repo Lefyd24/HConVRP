@@ -56,7 +56,7 @@ def solve():
         print(f"k: {k}")
         improved = False  # Assume no improvement initially
 
-        if k == 0:
+        if k == 2:
             pre_ChangeVehicleChain_cost = best_cost
             pre_ChangeVehicleChain_solver = copy.deepcopy(best_solution)  # Deep copy of the solver before ChangeVehicleChain optimization
             best_solution.change_vehicle_chain_optimization(start_time, socketio)
@@ -114,7 +114,7 @@ def solve():
                 })
                 best_solution = copy.deepcopy(pre_swap_solver)  # Deep copy the previous best solution
                 continue
-        elif k == 2:
+        elif k == 0:
             # Perform relocation optimization
             pre_relocate_cost = best_cost
             pre_relocate_solver = copy.deepcopy(best_solution)  # Deep copy of the solution before relocation

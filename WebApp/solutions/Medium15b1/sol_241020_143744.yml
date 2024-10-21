@@ -1,31 +1,24 @@
 metadata:
-  datetime: '2024-10-20 13:42:45'
+  datetime: '2024-10-20 14:37:44'
   solution_for_file: Medium15b1
   instance_name: HCon51
   description: Solution for Heterogeneous Consistent Vehicle Routing Problem (HConVRP)
-  computation_time_seconds: 38.51
-  vnd_iterations: 11
-  steps: '[{"Step":"Initial","Period 0":3044.087,"Period 1":2863.759,"Period 2":4419.002,"Period
-    3":3760.172,"Period 4":3489.176,"Total Cost":17576.195},{"Step":"ChangeVehicleChain","Period
-    0":2916.429,"Period 1":2893.901,"Period 2":3910.654,"Period 3":3465.793,"Period
-    4":2926.486,"Total Cost":16113.264},{"Step":"ChangeVehicleChain","Period 0":2822.021,"Period
-    1":2484.643,"Period 2":3381.48,"Period 3":3183.028,"Period 4":2843.929,"Total
-    Cost":14715.1},{"Step":"ChangeVehicleChain","Period 0":2685.129,"Period 1":2489.179,"Period
-    2":3295.507,"Period 3":3137.656,"Period 4":2890.163,"Total Cost":14497.634},{"Step":"ChangeVehicleChain","Period
-    0":2598.428,"Period 1":2489.179,"Period 2":3198.707,"Period 3":3137.656,"Period
-    4":2860.607,"Total Cost":14284.576},{"Step":"Swap","Period 0":2669.949,"Period
-    1":2352.705,"Period 2":3083.104,"Period 3":3131.596,"Period 4":2757.493,"Total
-    Cost":13994.848},{"Step":"ChangeVehicleChain","Period 0":2584.713,"Period 1":2406.913,"Period
-    2":3082.569,"Period 3":3107.833,"Period 4":2703.23,"Total Cost":13885.259},{"Step":"Swap","Period
-    0":2604.949,"Period 1":2295.61,"Period 2":3106.555,"Period 3":2919.215,"Period
-    4":2602.197,"Total Cost":13528.525},{"Step":"ChangeVehicleChain","Period 0":2515.475,"Period
-    1":2276.181,"Period 2":3081.183,"Period 3":2792.914,"Period 4":2599.867,"Total
-    Cost":13265.62},{"Step":"Swap","Period 0":2488.083,"Period 1":2259.788,"Period
-    2":3082.416,"Period 3":2617.17,"Period 4":2494.244,"Total Cost":12941.7},{"Step":"Relocation","Period
-    0":2385.731,"Period 1":2170.243,"Period 2":3002.014,"Period 3":2643.48,"Period
-    4":2529.732,"Total Cost":12731.199},{"Step":"ChangeVehicleChain","Period 0":2342.248,"Period
-    1":2144.375,"Period 2":2930.093,"Period 3":2605.097,"Period 4":2387.385,"Total
-    Cost":12409.198}]'
+  computation_time_seconds: 97.27
+  vnd_iterations: 7
+  steps: '[{"Step":"Initial","Period 0":3209.212,"Period 1":3078.876,"Period 2":4185.851,"Period
+    3":3905.041,"Period 4":3732.74,"Total Cost":18111.72},{"Step":"ChangeVehicleChain","Period
+    0":2955.948,"Period 1":2507.611,"Period 2":3476.426,"Period 3":3018.795,"Period
+    4":3030.153,"Total Cost":14988.932},{"Step":"ChangeVehicleChain","Period 0":2853.192,"Period
+    1":2333.019,"Period 2":3346.79,"Period 3":2918.702,"Period 4":2804.651,"Total
+    Cost":14256.355},{"Step":"Swap","Period 0":2764.043,"Period 1":2279.274,"Period
+    2":3346.79,"Period 3":2916.149,"Period 4":2644.116,"Total Cost":13950.372},{"Step":"Relocation","Period
+    0":2629.631,"Period 1":2279.274,"Period 2":3309.075,"Period 3":2686.245,"Period
+    4":2631.926,"Total Cost":13536.151},{"Step":"2-opt","Period 0":2530.967,"Period
+    1":2279.274,"Period 2":3306.63,"Period 3":2686.245,"Period 4":2446.601,"Total
+    Cost":13249.717},{"Step":"Swap","Period 0":2486.166,"Period 1":2279.274,"Period
+    2":3292.189,"Period 3":2686.245,"Period 4":2445.089,"Total Cost":13188.962},{"Step":"Or-opt","Period
+    0":2486.166,"Period 1":2274.911,"Period 2":3269.962,"Period 3":2686.245,"Period
+    4":2444.748,"Total Cost":13162.032}]'
 solution:
   planning_horizon: 5
   max_route_duration: 240
@@ -729,240 +722,240 @@ solution:
     - vehicle_id: 1
       route:
       - 0
-      - 11
+      - 6
       - 0
     - vehicle_id: 2
       route:
       - 0
-      - 6
-      - 8
-      - 26
-      - 43
-      - 24
-      - 25
-      - 41
-      - 12
-      - 0
-    - vehicle_id: 3
-      route:
-      - 0
-      - 1
-      - 22
-      - 35
-      - 20
-      - 2
-      - 21
-      - 50
-      - 38
-      - 18
-      - 0
-    - vehicle_id: 4
-      route:
-      - 0
-      - 4
-      - 32
-      - 9
       - 10
       - 33
       - 15
       - 44
-      - 42
+      - 4
+      - 18
+      - 24
+      - 43
+      - 26
+      - 8
+      - 32
+      - 0
+    - vehicle_id: 3
+      route:
+      - 0
+      - 12
+      - 11
+      - 38
+      - 9
+      - 50
+      - 21
+      - 35
+      - 2
+      - 22
+      - 1
+      - 0
+    - vehicle_id: 4
+      route:
+      - 0
+      - 25
+      - 41
       - 19
+      - 42
       - 17
       - 37
+      - 20
       - 0
     1:
     - vehicle_id: 1
       route:
       - 0
-      - 46
+      - 6
       - 0
     - vehicle_id: 2
       route:
       - 0
-      - 6
+      - 32
       - 8
       - 7
       - 24
       - 14
-      - 25
-      - 13
-      - 41
+      - 18
+      - 4
+      - 10
+      - 39
+      - 30
       - 0
     - vehicle_id: 3
       route:
       - 0
-      - 18
-      - 27
-      - 1
-      - 22
-      - 3
-      - 36
-      - 2
       - 38
+      - 2
+      - 36
+      - 3
+      - 22
+      - 1
+      - 27
       - 0
     - vehicle_id: 4
       route:
       - 0
-      - 32
-      - 30
-      - 39
-      - 10
-      - 45
-      - 42
+      - 25
+      - 13
+      - 41
       - 19
-      - 4
+      - 42
+      - 45
       - 17
+      - 46
       - 0
     2:
     - vehicle_id: 1
       route:
       - 0
-      - 46
+      - 23
+      - 6
+      - 47
       - 5
       - 34
-      - 16
-      - 11
-      - 28
-      - 31
       - 0
     - vehicle_id: 2
       route:
       - 0
-      - 6
-      - 8
-      - 26
-      - 7
-      - 23
       - 24
-      - 25
-      - 13
-      - 47
+      - 7
+      - 26
+      - 8
+      - 32
+      - 16
+      - 30
+      - 39
+      - 15
+      - 4
+      - 18
       - 0
     - vehicle_id: 3
       route:
       - 0
-      - 18
-      - 27
-      - 1
-      - 22
-      - 3
-      - 36
-      - 35
-      - 20
-      - 21
+      - 11
+      - 9
       - 50
+      - 21
       - 2
+      - 35
+      - 36
+      - 3
+      - 28
+      - 31
+      - 22
+      - 1
+      - 27
       - 0
     - vehicle_id: 4
       route:
       - 0
-      - 32
-      - 9
-      - 30
-      - 39
-      - 15
-      - 37
-      - 42
+      - 25
+      - 13
       - 40
-      - 4
+      - 42
       - 17
+      - 37
+      - 20
+      - 46
       - 0
     3:
     - vehicle_id: 1
       route:
       - 0
-      - 46
-      - 11
-      - 16
-      - 28
-      - 31
+      - 47
       - 0
     - vehicle_id: 2
       route:
       - 0
-      - 47
-      - 13
       - 24
       - 43
       - 7
       - 26
       - 48
+      - 32
+      - 16
+      - 30
+      - 39
+      - 33
+      - 10
       - 0
     - vehicle_id: 3
       route:
       - 0
-      - 27
-      - 22
-      - 3
-      - 36
-      - 35
-      - 20
-      - 2
-      - 29
-      - 21
-      - 50
-      - 49
+      - 11
       - 38
+      - 9
+      - 50
+      - 21
+      - 2
+      - 35
+      - 36
+      - 3
+      - 28
+      - 31
+      - 22
+      - 27
       - 0
     - vehicle_id: 4
       route:
       - 0
       - 17
+      - 13
       - 19
       - 42
       - 45
-      - 33
-      - 39
-      - 10
-      - 30
-      - 9
-      - 32
+      - 49
+      - 29
+      - 20
+      - 46
       - 0
     4:
     - vehicle_id: 1
       route:
       - 0
-      - 16
-      - 28
-      - 31
+      - 6
       - 0
     - vehicle_id: 2
       route:
       - 0
-      - 6
-      - 26
-      - 7
+      - 32
+      - 16
+      - 39
+      - 33
+      - 15
+      - 4
       - 24
-      - 25
-      - 12
+      - 7
+      - 26
       - 0
     - vehicle_id: 3
       route:
       - 0
+      - 12
+      - 9
       - 50
       - 21
       - 35
       - 3
+      - 28
+      - 31
       - 1
       - 0
     - vehicle_id: 4
       route:
       - 0
-      - 32
-      - 37
-      - 9
-      - 39
-      - 33
-      - 45
-      - 15
+      - 25
       - 40
       - 19
-      - 4
+      - 45
+      - 37
       - 0
   total_cost:
-    0: 2342.247576555499
-    1: 2144.3749899495847
-    2: 2930.0925130389214
-    3: 2605.097486949682
-    4: 2387.3850578168103
+    0: 2486.165647632203
+    1: 2274.910850713971
+    2: 3269.961972042464
+    3: 2686.2448579755883
+    4: 2444.748282525126
