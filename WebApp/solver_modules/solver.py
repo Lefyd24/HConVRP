@@ -272,8 +272,6 @@ class HConVRP:
         """
         Initial Assignment steps, with tracking of objective function improvements.
         """
-        pre_vehicles = deepcopy(self.vehicles)
-        pre_customers = deepcopy(self.customers)
         # Frequent Customers
         random.shuffle(self.frequent_customers)
         for customer in self.frequent_customers:
@@ -349,9 +347,7 @@ class HConVRP:
                     else:
                         print(f"Warning: No feasible position found for customer {customer.id} in period {period}")
                         print(f"Restarting the assignment process...")
-                        self.vehicles = pre_vehicles
-                        self.customers = pre_customers
-                        return self.initial_assignment(start_time, socketio)
+                        raise Exception("Assignment Failure")
 
                     # Break since the customer requires service in only one period
                     break

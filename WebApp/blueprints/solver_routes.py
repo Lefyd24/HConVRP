@@ -29,7 +29,15 @@ def solve():
     
     # Initial Solution
     #try:
-    solution = Solver.initial_assignment(start_time, socketio)
+    while True:
+        deepcopy_solver = copy.deepcopy(Solver)
+        try:
+            Solver.initial_assignment(start_time, socketio)
+            break
+        except Exception as e:
+            print(f"Error in initial assignment. Error: {e}")
+            Solver = deepcopy_solver
+            continue
     #except TypeError as e:
     #    socketio.emit('solver_info', {'status': 'Error', 'progress': 100, 'text': f"Error in initial assignment. Please try again. Error: {e} in line {e.__traceback__.tb_lineno}", 'time_elapsed': round(time.time()-start_time, 2)})
     #    return '', 400
@@ -56,7 +64,7 @@ def solve():
         print(f"k: {k}")
         improved = False  # Assume no improvement initially
 
-        if k == 2:
+        if k == 0:
             pre_ChangeVehicleChain_cost = best_cost
             pre_ChangeVehicleChain_solver = copy.deepcopy(best_solution)  # Deep copy of the solver before ChangeVehicleChain optimization
             best_solution.change_vehicle_chain_optimization(start_time, socketio)
@@ -114,7 +122,7 @@ def solve():
                 })
                 best_solution = copy.deepcopy(pre_swap_solver)  # Deep copy the previous best solution
                 continue
-        elif k == 0:
+        elif k == 2:
             # Perform relocation optimization
             pre_relocate_cost = best_cost
             pre_relocate_solver = copy.deepcopy(best_solution)  # Deep copy of the solution before relocation
