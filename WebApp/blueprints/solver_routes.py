@@ -29,7 +29,15 @@ def solve():
     
     # Initial Solution
     #try:
-    solution = Solver.initial_assignment(start_time, socketio)
+    while True:
+        deepcopy_solver = copy.deepcopy(Solver)
+        try:
+            Solver.initial_assignment(start_time, socketio)
+            break
+        except Exception as e:
+            print(f"Error in initial assignment. Error: {e}")
+            Solver = deepcopy_solver
+            continue
     #except TypeError as e:
     #    socketio.emit('solver_info', {'status': 'Error', 'progress': 100, 'text': f"Error in initial assignment. Please try again. Error: {e} in line {e.__traceback__.tb_lineno}", 'time_elapsed': round(time.time()-start_time, 2)})
     #    return '', 400

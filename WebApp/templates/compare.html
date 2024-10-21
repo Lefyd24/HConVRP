@@ -50,10 +50,10 @@
         <!-- Left Column: Folder Structure -->
         <div class="col-md-3" style="height: 100%; ">
             <div id="dataset-tree" class="card h-100 shadow" >
-                <div class="card-header bg-aueb-secondary">
+                <div class="card-header bg-secondary">
                     <div class='row d-flex justify-content-between align-items-center'>
                         <div class='col-6'>
-                            <h5 class="text-white align-items-center pt-1">Folder Structure</h5>
+                            <span class="text-white align-items-center pt-1 h5">Folder Structure</span>
                         </div>
                         <div class='col-6 text-end'>
                             <button id="comparisonBtn" class="btn btn-aueb-info disabled">Compare <i class="fas fa-arrow-alt-circle-right"></i></button>
@@ -63,7 +63,7 @@
                 <div class="card-body" style='overflow-y: auto; overflow-x: auto;'>
                     {% macro render_tree(structure, parent_path="") %}
                         <ul class="folder">
-                        {% for key, value in structure.items() %}
+                        {% for key, value in structure|dictsort(reverse=True)%}
                             <li>
                                 {% if value is mapping %}
                                     <span class="folder-toggle " data-folder="{{ parent_path }}/{{ key }}">
@@ -88,8 +88,8 @@
         </div>
         <div class="col-md-9" style="height: 100%; overflow-y: auto;">
             <div id="evaluation-results" class="card">
-                <div class="card-header bg-aueb-secondary">
-                    <h5 class="text-white align-items-center pt-1">Comparison Results</h5>
+                <div class="card-header bg-secondary">
+                    <span class="text-white align-items-center pt-1 h5">Comparison Results</span>
                 </div>
                 <div class="card-body">
                     <div id="comparison-results-content" class="text-muted">
@@ -121,8 +121,25 @@
 
     document.addEventListener('DOMContentLoaded', function() {
         // Initially hide all nested folders (folders should be initially closed)
-        document.querySelectorAll('.folder > ul').forEach(function(ul) {
-            ul.style.display = 'none'; // All folders start closed
+        document.querySelectorAll('.folder-toggle').forEach(function(folderToggle) {
+            var sublist = folderToggle.nextElementSibling;
+            
+            // Hide the sublist (folder content) initially
+            if (sublist) {
+                sublist.style.display = 'none'; // All folders start closed
+            }
+            
+            // Ensure the arrow starts in the 'right' position
+            let arrowIcon = folderToggle.querySelector('.fa-chevron-down');
+            if (arrowIcon) {
+                arrowIcon.classList.replace('fa-chevron-down', 'fa-chevron-right'); // Ensure it's set to right arrow
+            }
+    
+            // Ensure the folder starts in the closed position
+            let folderIcon = folderToggle.querySelector('.fa-folder-open');
+            if (folderIcon) {
+                folderIcon.classList.replace('fa-folder-open', 'fa-folder'); // Ensure it's set to closed folder
+            }
         });
     
         // Add click event listener to toggle folders with a single click
@@ -270,6 +287,29 @@
                                 `;
                                 tbody.appendChild(row);
                             }
+                            // Add an average row
+                            var averageRow = document.createElement('tr');
+                            averageRow.classList.add('text-center', 'bg-aueb-primary', 'text-white');
+                            var medianRow = document.createElement('tr');
+                            medianRow.classList.add('text-center', 'bg-aueb-primary', 'text-white');
+                            // Calculate the average cost
+                            var totalCosts = Object.values(data).map(function(solution) {
+                                return solution['Total Cost'];
+                            });
+                            var averageCost = totalCosts.reduce(function(a, b) { return a + b; }, 0) / totalCosts.length;
+                            var medianCost = totalCosts.sort()[Math.floor(totalCosts.length / 2)];
+                            averageRow.innerHTML = `
+                                <td>Average</td>
+                                <td>${averageCost.toFixed(2)}</td>
+                                <td></td>
+                            `;
+                            medianRow.innerHTML = `
+                                <td>Median</td>
+                                <td>${medianCost.toFixed(2)}</td>
+                                <td></td>
+                            `;
+                            tbody.appendChild(averageRow);
+                            tbody.appendChild(medianRow);
                             table.appendChild(tbody);
 
                             // Append the table to the parent element
@@ -306,6 +346,30 @@
                                 `;
                                 tbody.appendChild(row);
                             }
+                            // Add an average row
+                            var averageRow = document.createElement('tr');
+                            averageRow.classList.add('text-center', 'bg-aueb-primary', 'text-white');
+                            var medianRow = document.createElement('tr');
+                            medianRow.classList.add('text-center', 'bg-aueb-primary', 'text-white');
+
+                            // Calculate the average time
+                            var times = Object.values(data).map(function(solution) {
+                                return solution['Time (s)'];
+                            });
+                            var averageTime = times.reduce(function(a, b) { return a + b; }, 0) / times.length;
+                            var medianTime = times.sort()[Math.floor(times.length / 2)];
+                            averageRow.innerHTML = `
+                                <td>Average</td>
+                                <td>${averageTime.toFixed(2)}</td>
+                                <td></td>
+                            `;
+                            medianRow.innerHTML = `
+                                <td>Median</td>
+                                <td>${medianTime.toFixed(2)}</td>
+                                <td></td>
+                            `;
+                            tbody.appendChild(averageRow);
+                            tbody.appendChild(medianRow);
                             table.appendChild(tbody);
 
                             // Append the table to the parent element

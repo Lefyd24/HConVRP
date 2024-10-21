@@ -24,27 +24,29 @@
 <div class="container-fluid mt-4 mb-4" style="height: calc(100vh - 100px);">
     <div class="row" style="height: 100%;">
         <!-- Left Column: Folder Structure -->
-        <div class="col-md-3" style="height: 100%; overflow-y: auto;">
-            <div id="dataset-tree" class="card h-100">
+        <div class="col-md-3" style='height: 100%; overflow-y: auto;'>
+            <div id="dataset-tree" class="card shadow">
+                <div class="card-header bg-secondary">
+                    <span class="text-white h5 p-1">Solutions</span>
+                </div>
                 <div class="card-body">
-                    <h5 class="card-title">Solution Tree</h5>
                     {% macro render_tree(structure, parent_path="") %}
                         <ul class="folder">
-                        {% for key, value in structure.items() %}
-                            <li>
-                                {% if value is mapping %}
-                                    <span class="folder-toggle " data-folder="{{ parent_path }}/{{ key }}">
-                                        <i class="fas fa-chevron-down"></i> <!-- Start with right arrow -->
-                                        <i class="fas fa-folder"></i> <span class="folder-text">{{ key }}</span>
-                                    </span>
-                                    {{ render_tree(value, parent_path ~ "/" ~ key) }}
-                                {% else %}
-                                    <span class="file solution-link" data-file="{{ parent_path }}/{{ key }}">
-                                        <i class="fas fa-file"></i> <span class="file-text">{{ key }}</span>
-                                    </span>
-                                {% endif %}
-                            </li>
-                        {% endfor %}
+                            {% for key, value in structure|dictsort(reverse=True) %}
+                                <li>
+                                    {% if value is mapping %}
+                                        <span class="folder-toggle" data-folder="{{ parent_path }}/{{ key }}">
+                                            <i class="fas fa-chevron-right"></i> <!-- Right arrow for closed state -->
+                                            <i class="fas fa-folder"></i> <span class="folder-text">{{ key }}</span>
+                                        </span>
+                                        {{ render_tree(value, parent_path ~ "/" ~ key) }}
+                                    {% else %}
+                                        <span class="file solution-link" data-file="{{ parent_path }}/{{ key }}">
+                                            <i class="fas fa-file"></i> <span class="file-text">{{ key }}</span>
+                                        </span>
+                                    {% endif %}
+                                </li>
+                            {% endfor %}
                         </ul>
                     {% endmacro %}
                     {{ render_tree(solutions) }}
@@ -52,25 +54,30 @@
             </div>
         </div>
         <div class="col-md-4" style="height: 100%; overflow-y: auto;">
-            <div id="file-content" class="card h-100">
-                <div class="card-body">
-                    <div class="card-title d-flex justify-content-between align-items-center">
-                        <h5>File Content</h5>
-                        <a id='evaluationBtn' href="#" class="btn btn-primary disabled" data-file="">Evaluate <i class="fas fa-arrow-right"></i></a>
-                    </div>
+            <div id="file-content" class="card shadow">
+                <div class="card-header bg-secondary d-flex justify-content-between align-items-center">
+                    <span class="text-white align-items-center pt-1 h5">File Content</span>
+                    <a id='evaluationBtn' href="#" class="btn btn-aueb-primary disabled" data-file="">Evaluate <i class="fas fa-arrow-right"></i></a>
+                </div>
+                <div class="card-body p-0 m-0">
                     <div id="file-display" class="text-muted" style="height: calc(100vh - 200px);"></div>
                 </div>
             </div>
         </div>
         <div class="col-md-5" style='height: 100%; overflow-y: auto;'>
-            <div id="evaluation-results" class="card">
+            <div id="evaluation-results" class="card shadow">
+                <div class="card-header bg-secondary">
+                    <span class="text-white h5 p-1">Evaluation Results</span>
+                </div>
                 <div class="card-body">
-                    <div class="card-title">
-                        <h5>Evaluation Results</h5>
-                    </div>
-                    <div id="evaluation-results-content" class="text-muted"></div>
-                    <br>
-                    <h5 class="card-title mt-2" id='solution-df-title' hidden>Solution Dataframe</h5>
+                    <div id="evaluation-results-content" class="text-muted">Once you click "Evaluate" on a solution, 
+                        the evaluation results will be displayed here.
+                    </div>                    
+                </div>
+                <div class="card-header bg-secondary" id='solution-df-title'  hidden>
+                    <span class="text-white h5 p-1 mt-2" >Solution Dataframe</span>
+                </div>
+                <div class="card-body">
                     <div id="solution-df-content" class="text-muted"></div>
                 </div>
             </div>
@@ -100,8 +107,25 @@
         var editor = new JSONEditor(container, options);
 
         // Initially hide all nested folders (folders should be initially closed)
-        document.querySelectorAll('.folder > ul').forEach(function(ul) {
-            ul.style.display = 'none'; // All folders start closed
+        document.querySelectorAll('.folder-toggle').forEach(function(folderToggle) {
+            var sublist = folderToggle.nextElementSibling;
+            
+            // Hide the sublist (folder content) initially
+            if (sublist) {
+                sublist.style.display = 'none'; // All folders start closed
+            }
+            
+            // Ensure the arrow starts in the 'right' position
+            let arrowIcon = folderToggle.querySelector('.fa-chevron-down');
+            if (arrowIcon) {
+                arrowIcon.classList.replace('fa-chevron-down', 'fa-chevron-right'); // Ensure it's set to right arrow
+            }
+    
+            // Ensure the folder starts in the closed position
+            let folderIcon = folderToggle.querySelector('.fa-folder-open');
+            if (folderIcon) {
+                folderIcon.classList.replace('fa-folder-open', 'fa-folder'); // Ensure it's set to closed folder
+            }
         });
 
         // Add click event listener to toggle folders with single click

@@ -207,9 +207,10 @@ html, body {
 
 /* JsonEditor styling */
 /* Remove list item bullets and padding */
-.folder > ul {
+.folder, .folder ul {
     margin-left: 20px;
-    list-style-type: none; /* Hide list dots */
+    list-style: none; /* Hide list dots */
+    list-style-type: none;
     padding-left: 0;
 }
 
@@ -232,7 +233,8 @@ html, body {
 }
 
 .file {
-    list-style-type: none; /* Hide list dots */
+    list-style: none; /* Hide list dots */
+    list-style-type: none;
     padding-left: 20px; /* Align files to the folder level */
 }
 
