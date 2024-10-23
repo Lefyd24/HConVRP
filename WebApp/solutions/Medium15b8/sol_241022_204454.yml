@@ -1,0 +1,1896 @@
+metadata:
+  datetime: '2024-10-22 20:44:54'
+  solution_for_file: Medium15b8
+  instance_name: HCon101
+  description: Solution for Heterogeneous Consistent Vehicle Routing Problem (HConVRP)
+  computation_time_seconds: 2186.54
+  vnd_iterations: 35
+  steps: '[{"Step":"Initial","Period 0":4891.878,"Period 1":4279.026,"Period 2":4566.472,"Period
+    3":4474.858,"Period 4":4212.322,"Total Cost":22424.556},{"Step":"ChangeVehicleChain","Period
+    0":4670.851,"Period 1":4174.509,"Period 2":4338.954,"Period 3":4318.789,"Period
+    4":4192.447,"Total Cost":21695.55},{"Step":"ChangeVehicleChain","Period 0":4526.587,"Period
+    1":4055.264,"Period 2":4088.669,"Period 3":4097.5,"Period 4":3999.251,"Total Cost":20767.271},{"Step":"ChangeVehicleChain","Period
+    0":4401.022,"Period 1":4006.087,"Period 2":3940.231,"Period 3":4032.493,"Period
+    4":3972.95,"Total Cost":20352.783},{"Step":"ChangeVehicleChain","Period 0":4392.819,"Period
+    1":3981.965,"Period 2":3941.445,"Period 3":4028.3,"Period 4":3923.303,"Total Cost":20267.833},{"Step":"ChangeVehicleChain","Period
+    0":4383.051,"Period 1":3981.965,"Period 2":3941.445,"Period 3":4056.048,"Period
+    4":3905.118,"Total Cost":20267.627},{"Step":"ChangeVehicleChain","Period 0":4392.669,"Period
+    1":3981.965,"Period 2":3942.32,"Period 3":4041.895,"Period 4":3905.118,"Total
+    Cost":20263.967},{"Step":"ChangeVehicleChain","Period 0":4388.959,"Period 1":3981.705,"Period
+    2":3942.635,"Period 3":4030.229,"Period 4":3915.726,"Total Cost":20259.253},{"Step":"ChangeVehicleChain","Period
+    0":4407.596,"Period 1":3941.482,"Period 2":3954.636,"Period 3":4030.057,"Period
+    4":3897.683,"Total Cost":20231.455},{"Step":"ChangeVehicleChain","Period 0":4399.599,"Period
+    1":3927.699,"Period 2":3954.636,"Period 3":4050.028,"Period 4":3897.683,"Total
+    Cost":20229.647},{"Step":"ChangeVehicleChain","Period 0":4387.311,"Period 1":3910.543,"Period
+    2":3948.692,"Period 3":4047.415,"Period 4":3894.57,"Total Cost":20188.531},{"Step":"ChangeVehicleChain","Period
+    0":4341.592,"Period 1":3906.282,"Period 2":3997.756,"Period 3":4047.415,"Period
+    4":3894.57,"Total Cost":20187.615},{"Step":"ChangeVehicleChain","Period 0":4346.854,"Period
+    1":3927.019,"Period 2":3930.486,"Period 3":4047.415,"Period 4":3906.551,"Total
+    Cost":20158.325},{"Step":"ChangeVehicleChain","Period 0":4345.114,"Period 1":3909.997,"Period
+    2":3940.8,"Period 3":4047.415,"Period 4":3903.113,"Total Cost":20146.439},{"Step":"ChangeVehicleChain","Period
+    0":4319.277,"Period 1":3909.997,"Period 2":3936.304,"Period 3":4013.701,"Period
+    4":3904.281,"Total Cost":20083.56},{"Step":"ChangeVehicleChain","Period 0":4294.128,"Period
+    1":3889.526,"Period 2":3930.228,"Period 3":4032.786,"Period 4":3908.434,"Total
+    Cost":20055.102},{"Step":"ChangeVehicleChain","Period 0":4294.546,"Period 1":3886.735,"Period
+    2":3929.378,"Period 3":4027.648,"Period 4":3916.462,"Total Cost":20054.769},{"Step":"Swap","Period
+    0":4280.814,"Period 1":3888.781,"Period 2":3868.16,"Period 3":3998.159,"Period
+    4":3668.527,"Total Cost":19704.442},{"Step":"ChangeVehicleChain","Period 0":4280.814,"Period
+    1":3889.915,"Period 2":3873.928,"Period 3":3990.778,"Period 4":3668.299,"Total
+    Cost":19703.735},{"Step":"ChangeVehicleChain","Period 0":4255.165,"Period 1":3883.725,"Period
+    2":3844.465,"Period 3":3990.778,"Period 4":3668.299,"Total Cost":19642.432},{"Step":"Swap","Period
+    0":4225.986,"Period 1":3847.862,"Period 2":3843.901,"Period 3":4010.55,"Period
+    4":3668.299,"Total Cost":19596.598},{"Step":"ChangeVehicleChain","Period 0":4218.591,"Period
+    1":3855.727,"Period 2":3833.14,"Period 3":4017.947,"Period 4":3658.056,"Total
+    Cost":19583.461},{"Step":"ChangeVehicleChain","Period 0":4218.591,"Period 1":3830.603,"Period
+    2":3831.644,"Period 3":4015.773,"Period 4":3658.285,"Total Cost":19554.896},{"Step":"Swap","Period
+    0":4218.557,"Period 1":3811.746,"Period 2":3831.644,"Period 3":4015.773,"Period
+    4":3655.246,"Total Cost":19532.966},{"Step":"Relocation","Period 0":4027.744,"Period
+    1":3776.89,"Period 2":3789.676,"Period 3":4095.004,"Period 4":3634.483,"Total
+    Cost":19323.797},{"Step":"ChangeVehicleChain","Period 0":4071.171,"Period 1":3791.127,"Period
+    2":3836.387,"Period 3":3958.651,"Period 4":3602.989,"Total Cost":19260.325},{"Step":"ChangeVehicleChain","Period
+    0":4042.973,"Period 1":3779.649,"Period 2":3807.13,"Period 3":3910.314,"Period
+    4":3615.445,"Total Cost":19155.511},{"Step":"ChangeVehicleChain","Period 0":4011.402,"Period
+    1":3754.678,"Period 2":3783.373,"Period 3":3910.314,"Period 4":3597.459,"Total
+    Cost":19057.226},{"Step":"ChangeVehicleChain","Period 0":4011.285,"Period 1":3746.167,"Period
+    2":3781.729,"Period 3":3884.128,"Period 4":3573.647,"Total Cost":18996.955},{"Step":"Swap","Period
+    0":3966.582,"Period 1":3704.699,"Period 2":3757.494,"Period 3":3825.359,"Period
+    4":3534.664,"Total Cost":18788.798},{"Step":"ChangeVehicleChain","Period 0":3966.088,"Period
+    1":3694.073,"Period 2":3757.905,"Period 3":3827.957,"Period 4":3534.664,"Total
+    Cost":18780.688},{"Step":"Swap","Period 0":3963.609,"Period 1":3659.925,"Period
+    2":3734.541,"Period 3":3825.367,"Period 4":3534.664,"Total Cost":18718.106},{"Step":"Relocation","Period
+    0":3951.926,"Period 1":3648.892,"Period 2":3707.546,"Period 3":3808.691,"Period
+    4":3537.312,"Total Cost":18654.366},{"Step":"Swap","Period 0":3951.926,"Period
+    1":3638.918,"Period 2":3686.353,"Period 3":3808.691,"Period 4":3534.776,"Total
+    Cost":18620.664},{"Step":"2-opt","Period 0":3918.028,"Period 1":3638.918,"Period
+    2":3663.455,"Period 3":3760.318,"Period 4":3534.776,"Total Cost":18515.495},{"Step":"Or-opt","Period
+    0":3917.046,"Period 1":3638.918,"Period 2":3663.455,"Period 3":3760.318,"Period
+    4":3534.776,"Total Cost":18514.513}]'
+solution:
+  planning_horizon: 5
+  max_route_duration: 360
+  depot: !!python/object:solver_modules.models.Customer
+    id: 0
+    coordinates: !!python/tuple
+    - 0.0
+    - 0.0
+    demands:
+    - 0
+    - 0
+    - 0
+    - 0
+    - 0
+    planning_horizon: 5
+    service_time: 0
+  nodes:
+  - !!python/object:solver_modules.models.Customer
+    id: 1
+    coordinates: !!python/tuple
+    - 6.0
+    - 14.0
+    demands:
+    - 10
+    - 10
+    - 0
+    - 10
+    - 0
+    planning_horizon: 5
+    service_time: 10
+  - !!python/object:solver_modules.models.Customer
+    id: 2
+    coordinates: !!python/tuple
+    - 0.0
+    - -18.0
+    demands:
+    - 0
+    - 0
+    - 0
+    - 0
+    - 7
+    planning_horizon: 5
+    service_time: 10
+  - !!python/object:solver_modules.models.Customer
+    id: 3
+    coordinates: !!python/tuple
+    - 20.0
+    - 10.0
+    demands:
+    - 13
+    - 13
+    - 13
+    - 13
+    - 13
+    planning_horizon: 5
+    service_time: 10
+  - !!python/object:solver_modules.models.Customer
+    id: 4
+    coordinates: !!python/tuple
+    - 20.0
+    - -15.0
+    demands:
+    - 0
+    - 19
+    - 19
+    - 19
+    - 19
+    planning_horizon: 5
+    service_time: 10
+  - !!python/object:solver_modules.models.Customer
+    id: 5
+    coordinates: !!python/tuple
+    - -20.0
+    - -5.0
+    demands:
+    - 0
+    - 0
+    - 0
+    - 26
+    - 0
+    planning_horizon: 5
+    service_time: 10
+  - !!python/object:solver_modules.models.Customer
+    id: 6
+    coordinates: !!python/tuple
+    - -10.0
+    - -5.0
+    demands:
+    - 0
+    - 0
+    - 0
+    - 0
+    - 3
+    planning_horizon: 5
+    service_time: 10
+  - !!python/object:solver_modules.models.Customer
+    id: 7
+    coordinates: !!python/tuple
+    - -15.0
+    - 15.0
+    demands:
+    - 5
+    - 0
+    - 5
+    - 5
+    - 5
+    planning_horizon: 5
+    service_time: 10
+  - !!python/object:solver_modules.models.Customer
+    id: 8
+    coordinates: !!python/tuple
+    - -25.0
+    - 8.0
+    demands:
+    - 0
+    - 9
+    - 0
+    - 0
+    - 9
+    planning_horizon: 5
+    service_time: 10
+  - !!python/object:solver_modules.models.Customer
+    id: 9
+    coordinates: !!python/tuple
+    - 20.0
+    - 25.0
+    demands:
+    - 16
+    - 0
+    - 16
+    - 0
+    - 0
+    planning_horizon: 5
+    service_time: 10
+  - !!python/object:solver_modules.models.Customer
+    id: 10
+    coordinates: !!python/tuple
+    - -5.0
+    - 25.0
+    demands:
+    - 16
+    - 16
+    - 0
+    - 16
+    - 0
+    planning_horizon: 5
+    service_time: 10
+  - !!python/object:solver_modules.models.Customer
+    id: 11
+    coordinates: !!python/tuple
+    - -15.0
+    - 30.0
+    demands:
+    - 0
+    - 12
+    - 12
+    - 12
+    - 12
+    planning_horizon: 5
+    service_time: 10
+  - !!python/object:solver_modules.models.Customer
+    id: 12
+    coordinates: !!python/tuple
+    - 15.0
+    - 0.0
+    demands:
+    - 0
+    - 0
+    - 0
+    - 0
+    - 19
+    planning_horizon: 5
+    service_time: 10
+  - !!python/object:solver_modules.models.Customer
+    id: 13
+    coordinates: !!python/tuple
+    - -5.0
+    - -10.0
+    demands:
+    - 23
+    - 23
+    - 23
+    - 0
+    - 0
+    planning_horizon: 5
+    service_time: 10
+  - !!python/object:solver_modules.models.Customer
+    id: 14
+    coordinates: !!python/tuple
+    - -20.0
+    - -25.0
+    demands:
+    - 20
+    - 20
+    - 0
+    - 20
+    - 20
+    planning_horizon: 5
+    service_time: 10
+  - !!python/object:solver_modules.models.Customer
+    id: 15
+    coordinates: !!python/tuple
+    - -5.0
+    - -30.0
+    demands:
+    - 8
+    - 8
+    - 8
+    - 8
+    - 0
+    planning_horizon: 5
+    service_time: 10
+  - !!python/object:solver_modules.models.Customer
+    id: 16
+    coordinates: !!python/tuple
+    - -25.0
+    - -15.0
+    demands:
+    - 19
+    - 19
+    - 19
+    - 0
+    - 0
+    planning_horizon: 5
+    service_time: 10
+  - !!python/object:solver_modules.models.Customer
+    id: 17
+    coordinates: !!python/tuple
+    - -30.0
+    - -5.0
+    demands:
+    - 2
+    - 2
+    - 2
+    - 2
+    - 0
+    planning_horizon: 5
+    service_time: 10
+  - !!python/object:solver_modules.models.Customer
+    id: 18
+    coordinates: !!python/tuple
+    - -15.0
+    - 5.0
+    demands:
+    - 12
+    - 12
+    - 12
+    - 0
+    - 0
+    planning_horizon: 5
+    service_time: 10
+  - !!python/object:solver_modules.models.Customer
+    id: 19
+    coordinates: !!python/tuple
+    - -20.0
+    - 25.0
+    demands:
+    - 17
+    - 0
+    - 17
+    - 17
+    - 17
+    planning_horizon: 5
+    service_time: 10
+  - !!python/object:solver_modules.models.Customer
+    id: 20
+    coordinates: !!python/tuple
+    - 10.0
+    - 30.0
+    demands:
+    - 0
+    - 0
+    - 9
+    - 0
+    - 0
+    planning_horizon: 5
+    service_time: 10
+  - !!python/object:solver_modules.models.Customer
+    id: 21
+    coordinates: !!python/tuple
+    - 10.0
+    - -15.0
+    demands:
+    - 0
+    - 11
+    - 11
+    - 11
+    - 11
+    planning_horizon: 5
+    service_time: 10
+  - !!python/object:solver_modules.models.Customer
+    id: 22
+    coordinates: !!python/tuple
+    - 10.0
+    - -25.0
+    demands:
+    - 18
+    - 18
+    - 18
+    - 0
+    - 18
+    planning_horizon: 5
+    service_time: 10
+  - !!python/object:solver_modules.models.Customer
+    id: 23
+    coordinates: !!python/tuple
+    - 20.0
+    - -30.0
+    demands:
+    - 29
+    - 0
+    - 0
+    - 29
+    - 29
+    planning_horizon: 5
+    service_time: 10
+  - !!python/object:solver_modules.models.Customer
+    id: 24
+    coordinates: !!python/tuple
+    - 30.0
+    - 0.0
+    demands:
+    - 3
+    - 3
+    - 0
+    - 3
+    - 3
+    planning_horizon: 5
+    service_time: 10
+  - !!python/object:solver_modules.models.Customer
+    id: 25
+    coordinates: !!python/tuple
+    - 30.0
+    - -15.0
+    demands:
+    - 0
+    - 6
+    - 6
+    - 0
+    - 6
+    planning_horizon: 5
+    service_time: 10
+  - !!python/object:solver_modules.models.Customer
+    id: 26
+    coordinates: !!python/tuple
+    - 10.0
+    - -5.0
+    demands:
+    - 17
+    - 17
+    - 17
+    - 17
+    - 0
+    planning_horizon: 5
+    service_time: 10
+  - !!python/object:solver_modules.models.Customer
+    id: 27
+    coordinates: !!python/tuple
+    - 0.0
+    - 5.0
+    demands:
+    - 0
+    - 0
+    - 16
+    - 16
+    - 16
+    planning_horizon: 5
+    service_time: 10
+  - !!python/object:solver_modules.models.Customer
+    id: 28
+    coordinates: !!python/tuple
+    - 6.0
+    - 2.0
+    demands:
+    - 16
+    - 16
+    - 16
+    - 16
+    - 16
+    planning_horizon: 5
+    service_time: 10
+  - !!python/object:solver_modules.models.Customer
+    id: 29
+    coordinates: !!python/tuple
+    - 29.0
+    - 7.0
+    demands:
+    - 9
+    - 9
+    - 9
+    - 9
+    - 0
+    planning_horizon: 5
+    service_time: 10
+  - !!python/object:solver_modules.models.Customer
+    id: 30
+    coordinates: !!python/tuple
+    - 5.0
+    - 25.0
+    demands:
+    - 21
+    - 21
+    - 21
+    - 21
+    - 21
+    planning_horizon: 5
+    service_time: 10
+  - !!python/object:solver_modules.models.Customer
+    id: 31
+    coordinates: !!python/tuple
+    - -4.0
+    - 17.0
+    demands:
+    - 27
+    - 27
+    - 27
+    - 0
+    - 0
+    planning_horizon: 5
+    service_time: 10
+  - !!python/object:solver_modules.models.Customer
+    id: 32
+    coordinates: !!python/tuple
+    - 0.0
+    - 34.0
+    demands:
+    - 23
+    - 23
+    - 0
+    - 23
+    - 23
+    planning_horizon: 5
+    service_time: 10
+  - !!python/object:solver_modules.models.Customer
+    id: 33
+    coordinates: !!python/tuple
+    - 18.0
+    - 17.0
+    demands:
+    - 11
+    - 11
+    - 11
+    - 0
+    - 11
+    planning_horizon: 5
+    service_time: 10
+  - !!python/object:solver_modules.models.Customer
+    id: 34
+    coordinates: !!python/tuple
+    - 30.0
+    - 20.0
+    demands:
+    - 14
+    - 0
+    - 14
+    - 14
+    - 14
+    planning_horizon: 5
+    service_time: 10
+  - !!python/object:solver_modules.models.Customer
+    id: 35
+    coordinates: !!python/tuple
+    - 28.0
+    - 30.0
+    demands:
+    - 8
+    - 0
+    - 0
+    - 8
+    - 8
+    planning_horizon: 5
+    service_time: 10
+  - !!python/object:solver_modules.models.Customer
+    id: 36
+    coordinates: !!python/tuple
+    - -33.0
+    - 25.0
+    demands:
+    - 5
+    - 5
+    - 5
+    - 5
+    - 5
+    planning_horizon: 5
+    service_time: 10
+  - !!python/object:solver_modules.models.Customer
+    id: 37
+    coordinates: !!python/tuple
+    - -15.0
+    - -15.0
+    demands:
+    - 8
+    - 8
+    - 8
+    - 8
+    - 0
+    planning_horizon: 5
+    service_time: 10
+  - !!python/object:solver_modules.models.Customer
+    id: 38
+    coordinates: !!python/tuple
+    - -30.0
+    - -30.0
+    demands:
+    - 0
+    - 16
+    - 16
+    - 16
+    - 0
+    planning_horizon: 5
+    service_time: 10
+  - !!python/object:solver_modules.models.Customer
+    id: 39
+    coordinates: !!python/tuple
+    - 25.0
+    - -23.0
+    demands:
+    - 31
+    - 31
+    - 31
+    - 31
+    - 0
+    planning_horizon: 5
+    service_time: 10
+  - !!python/object:solver_modules.models.Customer
+    id: 40
+    coordinates: !!python/tuple
+    - 5.0
+    - -10.0
+    demands:
+    - 9
+    - 9
+    - 9
+    - 0
+    - 9
+    planning_horizon: 5
+    service_time: 10
+  - !!python/object:solver_modules.models.Customer
+    id: 41
+    coordinates: !!python/tuple
+    - 7.0
+    - -28.0
+    demands:
+    - 5
+    - 5
+    - 0
+    - 5
+    - 5
+    planning_horizon: 5
+    service_time: 10
+  - !!python/object:solver_modules.models.Customer
+    id: 42
+    coordinates: !!python/tuple
+    - -11.0
+    - -23.0
+    demands:
+    - 5
+    - 0
+    - 0
+    - 0
+    - 0
+    planning_horizon: 5
+    service_time: 10
+  - !!python/object:solver_modules.models.Customer
+    id: 43
+    coordinates: !!python/tuple
+    - -12.0
+    - -32.0
+    demands:
+    - 7
+    - 0
+    - 0
+    - 7
+    - 0
+    planning_horizon: 5
+    service_time: 10
+  - !!python/object:solver_modules.models.Customer
+    id: 44
+    coordinates: !!python/tuple
+    - -24.0
+    - -21.0
+    demands:
+    - 18
+    - 18
+    - 18
+    - 18
+    - 18
+    planning_horizon: 5
+    service_time: 10
+  - !!python/object:solver_modules.models.Customer
+    id: 45
+    coordinates: !!python/tuple
+    - -29.0
+    - 3.0
+    demands:
+    - 0
+    - 0
+    - 16
+    - 16
+    - 16
+    planning_horizon: 5
+    service_time: 10
+  - !!python/object:solver_modules.models.Customer
+    id: 46
+    coordinates: !!python/tuple
+    - -33.0
+    - 13.0
+    demands:
+    - 1
+    - 1
+    - 1
+    - 0
+    - 1
+    planning_horizon: 5
+    service_time: 10
+  - !!python/object:solver_modules.models.Customer
+    id: 47
+    coordinates: !!python/tuple
+    - -27.0
+    - 21.0
+    demands:
+    - 0
+    - 27
+    - 0
+    - 0
+    - 0
+    planning_horizon: 5
+    service_time: 10
+  - !!python/object:solver_modules.models.Customer
+    id: 48
+    coordinates: !!python/tuple
+    - -22.0
+    - 17.0
+    demands:
+    - 0
+    - 0
+    - 36
+    - 0
+    - 36
+    planning_horizon: 5
+    service_time: 10
+  - !!python/object:solver_modules.models.Customer
+    id: 49
+    coordinates: !!python/tuple
+    - -29.0
+    - 33.0
+    demands:
+    - 0
+    - 0
+    - 30
+    - 30
+    - 30
+    planning_horizon: 5
+    service_time: 10
+  - !!python/object:solver_modules.models.Customer
+    id: 50
+    coordinates: !!python/tuple
+    - 12.0
+    - 12.0
+    demands:
+    - 0
+    - 0
+    - 13
+    - 13
+    - 13
+    planning_horizon: 5
+    service_time: 10
+  - !!python/object:solver_modules.models.Customer
+    id: 51
+    coordinates: !!python/tuple
+    - 14.0
+    - 23.0
+    demands:
+    - 10
+    - 10
+    - 0
+    - 10
+    - 0
+    planning_horizon: 5
+    service_time: 10
+  - !!python/object:solver_modules.models.Customer
+    id: 52
+    coordinates: !!python/tuple
+    - -8.0
+    - 8.0
+    demands:
+    - 0
+    - 9
+    - 9
+    - 0
+    - 9
+    planning_horizon: 5
+    service_time: 10
+  - !!python/object:solver_modules.models.Customer
+    id: 53
+    coordinates: !!python/tuple
+    - 2.0
+    - -4.0
+    demands:
+    - 14
+    - 14
+    - 0
+    - 0
+    - 0
+    planning_horizon: 5
+    service_time: 10
+  - !!python/object:solver_modules.models.Customer
+    id: 54
+    coordinates: !!python/tuple
+    - 22.0
+    - -6.0
+    demands:
+    - 0
+    - 0
+    - 0
+    - 0
+    - 18
+    planning_horizon: 5
+    service_time: 10
+  - !!python/object:solver_modules.models.Customer
+    id: 55
+    coordinates: !!python/tuple
+    - 28.0
+    - -12.0
+    demands:
+    - 2
+    - 2
+    - 2
+    - 2
+    - 2
+    planning_horizon: 5
+    service_time: 10
+  - !!python/object:solver_modules.models.Customer
+    id: 56
+    coordinates: !!python/tuple
+    - 18.0
+    - -23.0
+    demands:
+    - 6
+    - 0
+    - 6
+    - 0
+    - 6
+    planning_horizon: 5
+    service_time: 10
+  - !!python/object:solver_modules.models.Customer
+    id: 57
+    coordinates: !!python/tuple
+    - -3.0
+    - -23.0
+    demands:
+    - 0
+    - 7
+    - 0
+    - 0
+    - 7
+    planning_horizon: 5
+    service_time: 10
+  - !!python/object:solver_modules.models.Customer
+    id: 58
+    coordinates: !!python/tuple
+    - 1.0
+    - -9.0
+    demands:
+    - 18
+    - 18
+    - 18
+    - 18
+    - 18
+    planning_horizon: 5
+    service_time: 10
+  - !!python/object:solver_modules.models.Customer
+    id: 59
+    coordinates: !!python/tuple
+    - -14.0
+    - -11.0
+    demands:
+    - 28
+    - 28
+    - 0
+    - 28
+    - 28
+    planning_horizon: 5
+    service_time: 10
+  - !!python/object:solver_modules.models.Customer
+    id: 60
+    coordinates: !!python/tuple
+    - -18.0
+    - -1.0
+    demands:
+    - 0
+    - 0
+    - 0
+    - 3
+    - 3
+    planning_horizon: 5
+    service_time: 10
+  - !!python/object:solver_modules.models.Customer
+    id: 61
+    coordinates: !!python/tuple
+    - -23.0
+    - -11.0
+    demands:
+    - 13
+    - 0
+    - 13
+    - 0
+    - 13
+    planning_horizon: 5
+    service_time: 10
+  - !!python/object:solver_modules.models.Customer
+    id: 62
+    coordinates: !!python/tuple
+    - -11.0
+    - 23.0
+    demands:
+    - 19
+    - 19
+    - 0
+    - 19
+    - 19
+    planning_horizon: 5
+    service_time: 10
+  - !!python/object:solver_modules.models.Customer
+    id: 63
+    coordinates: !!python/tuple
+    - -8.0
+    - 34.0
+    demands:
+    - 0
+    - 0
+    - 0
+    - 10
+    - 0
+    planning_horizon: 5
+    service_time: 10
+  - !!python/object:solver_modules.models.Customer
+    id: 64
+    coordinates: !!python/tuple
+    - -20.0
+    - 42.0
+    demands:
+    - 9
+    - 9
+    - 9
+    - 9
+    - 0
+    planning_horizon: 5
+    service_time: 10
+  - !!python/object:solver_modules.models.Customer
+    id: 65
+    coordinates: !!python/tuple
+    - 27.0
+    - 42.0
+    demands:
+    - 20
+    - 20
+    - 20
+    - 0
+    - 20
+    planning_horizon: 5
+    service_time: 10
+  - !!python/object:solver_modules.models.Customer
+    id: 66
+    coordinates: !!python/tuple
+    - 14.0
+    - 38.0
+    demands:
+    - 0
+    - 0
+    - 25
+    - 25
+    - 0
+    planning_horizon: 5
+    service_time: 10
+  - !!python/object:solver_modules.models.Customer
+    id: 67
+    coordinates: !!python/tuple
+    - 32.0
+    - -30.0
+    demands:
+    - 25
+    - 25
+    - 25
+    - 25
+    - 25
+    planning_horizon: 5
+    service_time: 10
+  - !!python/object:solver_modules.models.Customer
+    id: 68
+    coordinates: !!python/tuple
+    - 21.0
+    - 4.0
+    demands:
+    - 36
+    - 36
+    - 0
+    - 36
+    - 36
+    planning_horizon: 5
+    service_time: 10
+  - !!python/object:solver_modules.models.Customer
+    id: 69
+    coordinates: !!python/tuple
+    - 2.0
+    - 12.0
+    demands:
+    - 6
+    - 6
+    - 6
+    - 6
+    - 6
+    planning_horizon: 5
+    service_time: 10
+  - !!python/object:solver_modules.models.Customer
+    id: 70
+    coordinates: !!python/tuple
+    - 2.0
+    - 21.0
+    demands:
+    - 5
+    - 5
+    - 5
+    - 0
+    - 5
+    planning_horizon: 5
+    service_time: 10
+  - !!python/object:solver_modules.models.Customer
+    id: 71
+    coordinates: !!python/tuple
+    - 22.0
+    - 33.0
+    demands:
+    - 15
+    - 0
+    - 15
+    - 15
+    - 0
+    planning_horizon: 5
+    service_time: 10
+  - !!python/object:solver_modules.models.Customer
+    id: 72
+    coordinates: !!python/tuple
+    - 12.0
+    - -19.0
+    demands:
+    - 25
+    - 25
+    - 25
+    - 0
+    - 0
+    planning_horizon: 5
+    service_time: 10
+  - !!python/object:solver_modules.models.Customer
+    id: 73
+    coordinates: !!python/tuple
+    - 9.0
+    - -18.0
+    demands:
+    - 9
+    - 9
+    - 9
+    - 0
+    - 0
+    planning_horizon: 5
+    service_time: 10
+  - !!python/object:solver_modules.models.Customer
+    id: 74
+    coordinates: !!python/tuple
+    - 11.0
+    - -22.0
+    demands:
+    - 8
+    - 8
+    - 0
+    - 8
+    - 8
+    planning_horizon: 5
+    service_time: 10
+  - !!python/object:solver_modules.models.Customer
+    id: 75
+    coordinates: !!python/tuple
+    - 14.0
+    - -24.0
+    demands:
+    - 18
+    - 18
+    - 18
+    - 18
+    - 18
+    planning_horizon: 5
+    service_time: 10
+  - !!python/object:solver_modules.models.Customer
+    id: 76
+    coordinates: !!python/tuple
+    - 14.0
+    - 7.0
+    demands:
+    - 13
+    - 13
+    - 0
+    - 13
+    - 0
+    planning_horizon: 5
+    service_time: 10
+  - !!python/object:solver_modules.models.Customer
+    id: 77
+    coordinates: !!python/tuple
+    - 18.0
+    - 8.0
+    demands:
+    - 0
+    - 0
+    - 0
+    - 0
+    - 14
+    planning_horizon: 5
+    service_time: 10
+  - !!python/object:solver_modules.models.Customer
+    id: 78
+    coordinates: !!python/tuple
+    - 26.0
+    - 17.0
+    demands:
+    - 0
+    - 0
+    - 0
+    - 3
+    - 0
+    planning_horizon: 5
+    service_time: 10
+  - !!python/object:solver_modules.models.Customer
+    id: 79
+    coordinates: !!python/tuple
+    - 22.0
+    - 13.0
+    demands:
+    - 23
+    - 0
+    - 0
+    - 23
+    - 23
+    planning_horizon: 5
+    service_time: 10
+  - !!python/object:solver_modules.models.Customer
+    id: 80
+    coordinates: !!python/tuple
+    - 21.0
+    - 2.0
+    demands:
+    - 6
+    - 6
+    - 0
+    - 6
+    - 0
+    planning_horizon: 5
+    service_time: 10
+  - !!python/object:solver_modules.models.Customer
+    id: 81
+    coordinates: !!python/tuple
+    - 20.0
+    - 19.0
+    demands:
+    - 26
+    - 26
+    - 0
+    - 26
+    - 0
+    planning_horizon: 5
+    service_time: 10
+  - !!python/object:solver_modules.models.Customer
+    id: 82
+    coordinates: !!python/tuple
+    - -20.0
+    - 12.0
+    demands:
+    - 16
+    - 16
+    - 16
+    - 16
+    - 0
+    planning_horizon: 5
+    service_time: 10
+  - !!python/object:solver_modules.models.Customer
+    id: 83
+    coordinates: !!python/tuple
+    - -21.0
+    - 2.0
+    demands:
+    - 11
+    - 0
+    - 11
+    - 0
+    - 0
+    planning_horizon: 5
+    service_time: 10
+  - !!python/object:solver_modules.models.Customer
+    id: 84
+    coordinates: !!python/tuple
+    - -24.0
+    - -4.0
+    demands:
+    - 7
+    - 0
+    - 0
+    - 0
+    - 0
+    planning_horizon: 5
+    service_time: 10
+  - !!python/object:solver_modules.models.Customer
+    id: 85
+    coordinates: !!python/tuple
+    - -19.0
+    - -13.0
+    demands:
+    - 41
+    - 41
+    - 41
+    - 41
+    - 41
+    planning_horizon: 5
+    service_time: 10
+  - !!python/object:solver_modules.models.Customer
+    id: 86
+    coordinates: !!python/tuple
+    - -31.0
+    - -17.0
+    demands:
+    - 35
+    - 35
+    - 35
+    - 35
+    - 35
+    planning_horizon: 5
+    service_time: 10
+  - !!python/object:solver_modules.models.Customer
+    id: 87
+    coordinates: !!python/tuple
+    - -7.0
+    - -17.0
+    demands:
+    - 26
+    - 0
+    - 26
+    - 0
+    - 0
+    planning_horizon: 5
+    service_time: 10
+  - !!python/object:solver_modules.models.Customer
+    id: 88
+    coordinates: !!python/tuple
+    - -9.0
+    - 17.0
+    demands:
+    - 9
+    - 0
+    - 0
+    - 0
+    - 0
+    planning_horizon: 5
+    service_time: 10
+  - !!python/object:solver_modules.models.Customer
+    id: 89
+    coordinates: !!python/tuple
+    - -9.0
+    - 0.0
+    demands:
+    - 0
+    - 15
+    - 0
+    - 0
+    - 0
+    planning_horizon: 5
+    service_time: 10
+  - !!python/object:solver_modules.models.Customer
+    id: 90
+    coordinates: !!python/tuple
+    - -4.0
+    - 32.0
+    demands:
+    - 3
+    - 0
+    - 3
+    - 3
+    - 3
+    planning_horizon: 5
+    service_time: 10
+  - !!python/object:solver_modules.models.Customer
+    id: 91
+    coordinates: !!python/tuple
+    - -20.0
+    - -16.0
+    demands:
+    - 1
+    - 1
+    - 0
+    - 1
+    - 1
+    planning_horizon: 5
+    service_time: 10
+  - !!python/object:solver_modules.models.Customer
+    id: 92
+    coordinates: !!python/tuple
+    - -13.0
+    - -13.0
+    demands:
+    - 2
+    - 0
+    - 2
+    - 2
+    - 0
+    planning_horizon: 5
+    service_time: 10
+  - !!python/object:solver_modules.models.Customer
+    id: 93
+    coordinates: !!python/tuple
+    - -17.0
+    - -11.0
+    demands:
+    - 22
+    - 22
+    - 22
+    - 0
+    - 22
+    planning_horizon: 5
+    service_time: 10
+  - !!python/object:solver_modules.models.Customer
+    id: 94
+    coordinates: !!python/tuple
+    - -9.0
+    - -8.0
+    demands:
+    - 27
+    - 27
+    - 0
+    - 27
+    - 0
+    planning_horizon: 5
+    service_time: 10
+  - !!python/object:solver_modules.models.Customer
+    id: 95
+    coordinates: !!python/tuple
+    - -10.0
+    - -11.0
+    demands:
+    - 20
+    - 0
+    - 20
+    - 20
+    - 20
+    planning_horizon: 5
+    service_time: 10
+  - !!python/object:solver_modules.models.Customer
+    id: 96
+    coordinates: !!python/tuple
+    - -13.0
+    - -8.0
+    demands:
+    - 0
+    - 0
+    - 11
+    - 11
+    - 11
+    planning_horizon: 5
+    service_time: 10
+  - !!python/object:solver_modules.models.Customer
+    id: 97
+    coordinates: !!python/tuple
+    - -10.0
+    - -14.0
+    demands:
+    - 12
+    - 0
+    - 12
+    - 0
+    - 12
+    planning_horizon: 5
+    service_time: 10
+  - !!python/object:solver_modules.models.Customer
+    id: 98
+    coordinates: !!python/tuple
+    - -16.0
+    - -14.0
+    demands:
+    - 0
+    - 10
+    - 10
+    - 10
+    - 0
+    planning_horizon: 5
+    service_time: 10
+  - !!python/object:solver_modules.models.Customer
+    id: 99
+    coordinates: !!python/tuple
+    - -15.0
+    - -9.0
+    demands:
+    - 9
+    - 0
+    - 9
+    - 9
+    - 0
+    planning_horizon: 5
+    service_time: 10
+  - !!python/object:solver_modules.models.Customer
+    id: 100
+    coordinates: !!python/tuple
+    - -17.0
+    - -17.0
+    demands:
+    - 0
+    - 0
+    - 0
+    - 17
+    - 0
+    planning_horizon: 5
+    service_time: 10
+  vehicle_types:
+  - &id001 !!python/object:solver_modules.models.VehicleType
+    vehicle_type_name: TYPE1
+    available_vehicles: 2
+    capacity: 250.0
+    fixed_cost: 250.0
+    variable_cost: 1.8
+    speed: 1.0
+  - &id002 !!python/object:solver_modules.models.VehicleType
+    vehicle_type_name: TYPE2
+    available_vehicles: 2
+    capacity: 200.0
+    fixed_cost: 200.0
+    variable_cost: 1.7
+    speed: 1.0
+  - &id003 !!python/object:solver_modules.models.VehicleType
+    vehicle_type_name: TYPE3
+    available_vehicles: 2
+    capacity: 180.0
+    fixed_cost: 180.0
+    variable_cost: 1.4
+    speed: 1.0
+  - &id004 !!python/object:solver_modules.models.VehicleType
+    vehicle_type_name: TYPE4
+    available_vehicles: 1
+    capacity: 120.0
+    fixed_cost: 120.0
+    variable_cost: 1.6
+    speed: 1.0
+  vehicles:
+  - id: 1
+    type: *id001
+  - id: 2
+    type: *id001
+  - id: 3
+    type: *id002
+  - id: 4
+    type: *id002
+  - id: 5
+    type: *id003
+  - id: 6
+    type: *id003
+  - id: 7
+    type: *id004
+  routes:
+    0:
+    - vehicle_id: 1
+      route:
+      - 0
+      - 18
+      - 82
+      - 19
+      - 36
+      - 46
+      - 83
+      - 85
+      - 93
+      - 59
+      - 95
+      - 94
+      - 0
+    - vehicle_id: 2
+      route:
+      - 0
+      - 0
+    - vehicle_id: 3
+      route:
+      - 0
+      - 31
+      - 88
+      - 62
+      - 64
+      - 32
+      - 90
+      - 10
+      - 30
+      - 70
+      - 69
+      - 28
+      - 53
+      - 0
+    - vehicle_id: 4
+      route:
+      - 0
+      - 9
+      - 79
+      - 3
+      - 76
+      - 13
+      - 42
+      - 14
+      - 44
+      - 86
+      - 16
+      - 91
+      - 37
+      - 92
+      - 0
+    - vehicle_id: 5
+      route:
+      - 0
+      - 99
+      - 61
+      - 17
+      - 84
+      - 7
+      - 1
+      - 51
+      - 81
+      - 26
+      - 23
+      - 72
+      - 40
+      - 58
+      - 0
+    - vehicle_id: 6
+      route:
+      - 0
+      - 73
+      - 74
+      - 22
+      - 75
+      - 55
+      - 24
+      - 29
+      - 34
+      - 35
+      - 65
+      - 71
+      - 33
+      - 68
+      - 80
+      - 0
+    - vehicle_id: 7
+      route:
+      - 0
+      - 56
+      - 39
+      - 67
+      - 41
+      - 15
+      - 43
+      - 87
+      - 97
+      - 0
+    1:
+    - vehicle_id: 1
+      route:
+      - 0
+      - 18
+      - 82
+      - 47
+      - 36
+      - 46
+      - 85
+      - 93
+      - 59
+      - 94
+      - 0
+    - vehicle_id: 2
+      route:
+      - 0
+      - 0
+    - vehicle_id: 3
+      route:
+      - 0
+      - 31
+      - 10
+      - 62
+      - 11
+      - 64
+      - 32
+      - 30
+      - 70
+      - 69
+      - 28
+      - 53
+      - 0
+    - vehicle_id: 4
+      route:
+      - 0
+      - 76
+      - 3
+      - 13
+      - 37
+      - 14
+      - 44
+      - 38
+      - 86
+      - 16
+      - 91
+      - 98
+      - 0
+    - vehicle_id: 5
+      route:
+      - 0
+      - 89
+      - 17
+      - 8
+      - 52
+      - 1
+      - 51
+      - 81
+      - 26
+      - 72
+      - 21
+      - 40
+      - 58
+      - 0
+    - vehicle_id: 6
+      route:
+      - 0
+      - 33
+      - 65
+      - 29
+      - 68
+      - 80
+      - 24
+      - 55
+      - 25
+      - 4
+      - 75
+      - 22
+      - 74
+      - 73
+      - 0
+    - vehicle_id: 7
+      route:
+      - 0
+      - 39
+      - 67
+      - 41
+      - 15
+      - 57
+      - 0
+    2:
+    - vehicle_id: 1
+      route:
+      - 0
+      - 95
+      - 93
+      - 85
+      - 83
+      - 46
+      - 36
+      - 49
+      - 19
+      - 82
+      - 18
+      - 0
+    - vehicle_id: 2
+      route:
+      - 0
+      - 0
+    - vehicle_id: 3
+      route:
+      - 0
+      - 28
+      - 69
+      - 70
+      - 30
+      - 90
+      - 64
+      - 11
+      - 31
+      - 27
+      - 0
+    - vehicle_id: 4
+      route:
+      - 0
+      - 96
+      - 16
+      - 86
+      - 38
+      - 44
+      - 98
+      - 37
+      - 92
+      - 13
+      - 3
+      - 9
+      - 50
+      - 0
+    - vehicle_id: 5
+      route:
+      - 0
+      - 52
+      - 7
+      - 48
+      - 45
+      - 17
+      - 61
+      - 99
+      - 58
+      - 40
+      - 21
+      - 72
+      - 26
+      - 0
+    - vehicle_id: 6
+      route:
+      - 0
+      - 33
+      - 20
+      - 66
+      - 65
+      - 71
+      - 34
+      - 29
+      - 55
+      - 25
+      - 4
+      - 75
+      - 22
+      - 73
+      - 0
+    - vehicle_id: 7
+      route:
+      - 0
+      - 56
+      - 39
+      - 67
+      - 15
+      - 87
+      - 97
+      - 0
+    3:
+    - vehicle_id: 1
+      route:
+      - 0
+      - 19
+      - 49
+      - 36
+      - 82
+      - 60
+      - 85
+      - 59
+      - 95
+      - 94
+      - 0
+    - vehicle_id: 2
+      route:
+      - 0
+      - 0
+    - vehicle_id: 3
+      route:
+      - 0
+      - 27
+      - 10
+      - 62
+      - 11
+      - 64
+      - 63
+      - 90
+      - 32
+      - 30
+      - 69
+      - 28
+      - 0
+    - vehicle_id: 4
+      route:
+      - 0
+      - 50
+      - 79
+      - 3
+      - 76
+      - 92
+      - 37
+      - 100
+      - 14
+      - 38
+      - 86
+      - 44
+      - 91
+      - 98
+      - 96
+      - 0
+    - vehicle_id: 5
+      route:
+      - 0
+      - 99
+      - 5
+      - 17
+      - 45
+      - 7
+      - 1
+      - 51
+      - 81
+      - 26
+      - 23
+      - 21
+      - 58
+      - 0
+    - vehicle_id: 6
+      route:
+      - 0
+      - 66
+      - 71
+      - 35
+      - 34
+      - 78
+      - 29
+      - 68
+      - 80
+      - 24
+      - 55
+      - 4
+      - 75
+      - 74
+      - 0
+    - vehicle_id: 7
+      route:
+      - 0
+      - 43
+      - 15
+      - 41
+      - 67
+      - 39
+      - 0
+    4:
+    - vehicle_id: 1
+      route:
+      - 0
+      - 95
+      - 59
+      - 93
+      - 85
+      - 60
+      - 46
+      - 36
+      - 49
+      - 19
+      - 0
+    - vehicle_id: 2
+      route:
+      - 0
+      - 0
+    - vehicle_id: 3
+      route:
+      - 0
+      - 27
+      - 62
+      - 11
+      - 90
+      - 32
+      - 30
+      - 70
+      - 69
+      - 28
+      - 0
+    - vehicle_id: 4
+      route:
+      - 0
+      - 77
+      - 3
+      - 79
+      - 50
+      - 6
+      - 96
+      - 91
+      - 86
+      - 44
+      - 14
+      - 0
+    - vehicle_id: 5
+      route:
+      - 0
+      - 52
+      - 7
+      - 48
+      - 8
+      - 45
+      - 61
+      - 2
+      - 23
+      - 21
+      - 40
+      - 58
+      - 0
+    - vehicle_id: 6
+      route:
+      - 0
+      - 33
+      - 65
+      - 35
+      - 34
+      - 68
+      - 24
+      - 55
+      - 25
+      - 4
+      - 75
+      - 22
+      - 74
+      - 0
+    - vehicle_id: 7
+      route:
+      - 0
+      - 12
+      - 54
+      - 67
+      - 56
+      - 41
+      - 57
+      - 97
+      - 0
+  total_cost:
+    0: 3917.0460273949902
+    1: 3638.9182119648704
+    2: 3663.455190697434
+    3: 3760.318004439145
+    4: 3534.775541035151
