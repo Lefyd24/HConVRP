@@ -141,7 +141,6 @@ def create_interactive_graph(graph, edges, solution, filename='solution_with_sli
 def get_directory_structure(rootdir):
     dir_structure = {}
     for dirpath, dirnames, filenames in os.walk(rootdir):
-        print(dirpath, dirnames, filenames)
         folder = os.path.relpath(dirpath, rootdir)
         subdir = dir_structure
         if folder != '.':
