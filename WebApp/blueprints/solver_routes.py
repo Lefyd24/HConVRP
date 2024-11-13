@@ -213,7 +213,6 @@ def solve():
                 continue 
             
         
-        # If either swap or relocation improved the solution, increment the iteration counter
         VND_iterator += 1
         solution_json = best_solution.solution_df.to_json(orient='records', double_precision=3)
         socketio.emit('solver_info', {

@@ -66,8 +66,9 @@
         </div>
         <div class="col-md-5" style='height: 100%; overflow-y: auto;'>
             <div id="evaluation-results" class="card shadow">
-                <div class="card-header bg-secondary">
-                    <span class="text-white h5 p-1">Evaluation Results</span>
+                <div class="card-header bg-secondary d-flex justify-content-between align-items-center">
+                    <span class="text-white align-items-center pt-1 h5">Evaluation Results</span>
+                    <a id='visualizationBtn' href="#" class="btn btn-aueb-primary disabled" data-file="">Visualize <i class="fas fa-arrow-right"></i></a>
                 </div>
                 <div class="card-body">
                     <div id="evaluation-results-content" class="text-muted">Once you click "Evaluate" on a solution, 
@@ -185,7 +186,10 @@
 // Attach click event to the evaluate button
 document.getElementById('evaluationBtn').addEventListener('click', function(event) {
     event.preventDefault(); // Prevent the default link click behavior
-
+    // CLEAR any visualization event listeners and remove cached graph content
+    document.getElementById('visualizationBtn').classList.add('disabled');
+    document.getElementById('visualizationBtn').removeEventListener('click', null);
+    
     var filePath = document.querySelector('.file.selected').dataset.file.trim();
     console.log("Evaluating file:", filePath);
 
@@ -195,8 +199,10 @@ document.getElementById('evaluationBtn').addEventListener('click', function(even
         contentType: 'application/json',
         data: JSON.stringify({ file_path: filePath }),
         success: function(response) {
+            $('#visualizationBtn').removeClass('disabled');
             var evaluation_results = response.evaluation_results;
             var solution_df = response.solution_df;
+            var graph_html_content = response.graph_content;
 
             var resultsContent = document.getElementById('evaluation-results-content');
             var solutionDfContent = document.getElementById('solution-df-content');
@@ -304,6 +310,14 @@ document.getElementById('evaluationBtn').addEventListener('click', function(even
                 // If no solution dataframe is provided, clear the content
                 solutionDfContent.innerHTML = '';
             }
+
+            // Add an event listener to the visualize button
+            document.getElementById('visualizationBtn').addEventListener('click', function(event) {
+                event.preventDefault(); // Prevent the default link click behavior
+                // Open a new tab with the graph content
+                var newTab = window.open();
+                newTab.document.write(graph_html_content);
+            });
 
         },
         error: function(xhr, status, error) {

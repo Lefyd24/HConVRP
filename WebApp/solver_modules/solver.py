@@ -319,8 +319,8 @@ class HConVRP:
                         if vehicle._validate_customer_insertion(period, customer, position)[0]:
                             move_cost = vehicle.calculate_insertion_cost(period, customer, position)
                             # Introduce some randomness in the move cost to avoid deterministic assignments
-                            randomized_cost = move_cost * (1 + random.uniform(-0.2, 0.2))  # Perturb the cost by +/- 20%
-                            insertion_options.append((randomized_cost, vehicle, position))
+                            #randomized_cost = move_cost * (1 + random.uniform(-0.2, 0.2))  # Perturb the cost by +/- 20%
+                            insertion_options.append((move_cost, vehicle, position))
             
             if insertion_options:
                 # Sort by randomized cost

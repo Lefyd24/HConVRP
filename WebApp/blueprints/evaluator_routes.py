@@ -3,7 +3,7 @@ from flask import Blueprint, jsonify, render_template, request, current_app
 import os
 import yaml
 from solver_modules.models import *
-from solver_modules.helpers import create_node_matrix, get_directory_structure
+from solver_modules.helpers import create_node_matrix, get_directory_structure, create_interactive_graph
 from solver_modules.solution_handling import SolutionLoader, SolutionChecker
 import networkx as nx
 
@@ -89,6 +89,9 @@ def get_dataset_file():
             return jsonify({'error': str(e)}), 500
     else:
         solution = loader.load_solution(full_path)
+        graph, edges = loader.create_graph(solution)
+        graph_content = create_interactive_graph(graph, edges, solution)
+
         checker = SolutionChecker(solution)
         # Check constraints
         vehicle_capacity = checker.check_vehicle_capacity()
@@ -114,4 +117,4 @@ def get_dataset_file():
         
         solution_df = solution['metadata'].get('steps', None)
 
-        return jsonify({'evaluation_results': evaluation_results, 'solution_df': solution_df})
+        return jsonify({'evaluation_results': evaluation_results, 'solution_df': solution_df, 'graph_content': graph_content})
