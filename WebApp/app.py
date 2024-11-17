@@ -23,4 +23,4 @@ app.register_blueprint(evaluator_bp)
 app.register_blueprint(comparison_bp)
 
 if __name__ == '__main__':
-    socketio.run(app, debug=True, port=5050)
+    socketio.run(app, debug=True, port=5050, host="0.0.0.0")
