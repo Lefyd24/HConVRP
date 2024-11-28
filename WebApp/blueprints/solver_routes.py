@@ -20,7 +20,7 @@ def safe_text(text:str):
     return text
 
 @solver_bp.route('/solve', methods=['GET'])
-def solve():
+def solve(): 
     start_time = time.time()
     SolutionObj = Solution(depot=globals.depot)
     Solver = HConVRP(globals.depot, globals.customers, globals.vehicles, globals.vehicle_types, globals.planning_horizon, globals.route_duration, globals.distance_matrix, SolutionObj)
@@ -48,7 +48,7 @@ def solve():
 
     socketio.emit('solver_info', {
         'status': 'Initiation', 
-        'progress': 10, 
+        'progress': 0, 
         'text': "Initial Solution constructed", 
         'time_elapsed': round(time.time()-start_time, 2), 
         'solution': solution_json,
@@ -75,7 +75,7 @@ def solve():
                 improved = True
                 socketio.emit('solver_info', {
                     'status': 'Info', 
-                    'progress': 30 + VND_iterator * 10,  # Dynamic progress
+                    'progress': VND_iterator+1,  # Dynamic progress
                     'text': f"ChangeVehicleChain optimization improved the solution by <span style='color:green'>{round(pre_ChangeVehicleChain_cost - post_ChangeVehicleChain_cost, 2)}</span>.",
                     'time_elapsed': round(time.time()-start_time, 2),
                     'min_total_cost': best_cost
@@ -105,7 +105,7 @@ def solve():
                 improved = True
                 socketio.emit('solver_info', {
                     'status': 'Info', 
-                    'progress': 30 + VND_iterator * 10,  # Dynamic progress
+                    'progress': VND_iterator + 1,  # Dynamic progress
                     'text': f"Swap optimization improved the solution by <span style='color:green'>{round(pre_swap_cost - post_swap_cost, 2)}</span>.",
                     'time_elapsed': round(time.time()-start_time, 2),
                     'min_total_cost': best_cost
@@ -115,7 +115,7 @@ def solve():
                 k += 1 # Send it to the next neighborhood (Relocation)
                 socketio.emit('solver_info', {
                     'status': 'Info', 
-                    'progress': 30 + VND_iterator * 10, 
+                    'progress': VND_iterator + 1, 
                     'text': f"Swap optimization did not improve the solution (<span style='color:red'>Obj. Change {round(pre_swap_cost - post_swap_cost, 2)}</span> - New Total Cost {post_swap_cost}).",
                     'time_elapsed': round(time.time()-start_time, 2),
                     'min_total_cost': best_cost
@@ -135,7 +135,7 @@ def solve():
                 improved = True
                 socketio.emit('solver_info', {
                     'status': 'Info', 
-                    'progress': 30 + VND_iterator * 10, 
+                    'progress': VND_iterator + 1,  # Dynamic progress
                     'text': f"Relocation optimization improved the solution by <span style='color:green'>{round(pre_relocate_cost - post_relocate_cost, 2)}</span>.",
                     'time_elapsed': round(time.time()-start_time, 2),
                     'min_total_cost': best_cost
@@ -146,7 +146,7 @@ def solve():
                 k += 1
                 socketio.emit('solver_info', {
                     'status': 'Info', 
-                    'progress': 30 + VND_iterator * 10, 
+                    'progress': VND_iterator + 1, 
                     'text': f"Relocation optimization did not improve the solution (<span style='color:red'>Obj. Change {round(pre_relocate_cost - post_relocate_cost, 2)}</span> - New Total Cost {post_relocate_cost}).",
                     'time_elapsed': round(time.time()-start_time, 2),
                     'min_total_cost': best_cost
@@ -166,7 +166,7 @@ def solve():
                 improved = True
                 socketio.emit('solver_info', {
                     'status': 'Info', 
-                    'progress': 30 + VND_iterator * 10, 
+                    'progress': VND_iterator + 1, 
                     'text': f"2-opt optimization improved the solution by <span style='color:green'>{round(pre_two_opt_cost - post_two_opt_cost, 2)}</span>.",
                     'time_elapsed': round(time.time()-start_time, 2),
                     'min_total_cost': best_cost
@@ -176,7 +176,7 @@ def solve():
                 k += 1
                 socketio.emit('solver_info', {
                     'status': 'Info', 
-                    'progress': 30 + VND_iterator * 10, 
+                    'progress': VND_iterator + 1, 
                     'text': f"2-opt optimization did not improve the solution (<span style='color:red'>Obj. Change {round(pre_two_opt_cost - post_two_opt_cost, 2)}</span> - New Total Cost {post_two_opt_cost}).",
                     'time_elapsed': round(time.time()-start_time, 2),
                     'min_total_cost': best_cost
@@ -194,7 +194,7 @@ def solve():
                 improved = True
                 socketio.emit('solver_info', {
                     'status': 'Info', 
-                    'progress': 30 + VND_iterator * 10, 
+                    'progress': VND_iterator + 1, 
                     'text': f"Or-opt optimization improved the solution by <span style='color:green'>{round(pre_or_opt_cost - post_or_opt_cost, 2)}</span>.",
                     'time_elapsed': round(time.time()-start_time, 2),
                     'min_total_cost': best_cost
@@ -204,7 +204,7 @@ def solve():
                 k += 1
                 socketio.emit('solver_info', {
                     'status': 'Info', 
-                    'progress': 30 + VND_iterator * 10, 
+                    'progress': VND_iterator + 1, 
                     'text': f"Or-opt optimization did not improve the solution (<span style='color:red'>Obj. Change {round(pre_or_opt_cost - post_or_opt_cost, 2)}</span> - New Total Cost {post_or_opt_cost}).",
                     'time_elapsed': round(time.time()-start_time, 2),
                     'min_total_cost': best_cost
@@ -217,7 +217,7 @@ def solve():
         solution_json = best_solution.solution_df.to_json(orient='records', double_precision=3)
         socketio.emit('solver_info', {
             'status': 'Info', 
-            'progress': min(90, 30 + VND_iterator * 10),  # Dynamic progress
+            'progress': VND_iterator,  # Dynamic progress
             'text': f"VND Optimization - Iteration {VND_iterator}",
             'time_elapsed': round(time.time()-start_time, 2), 
             'solution': solution_json,
@@ -225,9 +225,9 @@ def solve():
         })
 
     end_time = time.time()
-    socketio.emit('solver_info', {'status': 'Completed', 'progress': 100, 'text': f'Solver has completed in {round(end_time-start_time, 2)}"', 'time_elapsed': round(time.time()-start_time, 2)})
+    socketio.emit('solver_info', {'status': 'Completed', 'progress': VND_iterator, 'text': f'Solver has completed in {round(end_time-start_time, 2)}"', 'time_elapsed': round(time.time()-start_time, 2)})
     solution_json = best_solution.solution_df.to_json(orient='records', double_precision=3)
-    socketio.emit('solver_info', {'status': 'Solution', 'progress': 100, 'text': "Final Solution:", 'time_elapsed': round(time.time()-start_time, 2), 'solution': solution_json})
+    socketio.emit('solver_info', {'status': 'Solution', 'progress': VND_iterator, 'text': "Final Solution:", 'time_elapsed': round(time.time()-start_time, 2), 'solution': solution_json})
     
     def get_dir_name(path:str):
         if sys.platform in ('linux', 'darwin'):

@@ -366,7 +366,7 @@ class HConVRP:
         """
         socketio.emit('solver_info', {
             'status': 'Info',
-            'progress': 20,
+            'progress': "-",
             'text': f"Performing Relocation Optimization on solution with cost: <u>{round(self.solution_df['Total Cost'].iloc[-1], 2)}</u>",
             'time_elapsed': round(time.time()-start_time, 2),
         })
@@ -392,7 +392,7 @@ class HConVRP:
                         
         socketio.emit('solver_info', {
             'status': 'Info', 
-            'progress': 20, 
+            'progress': "-", 
             'text': f"Total intra relocations: {total_intra_relocations} | Total inter relocations: {total_inter_relocations} | Total inter frequent relocations: {total_inter_frequent_relocations}", 
             'time_elapsed': round(time.time()-start_time, 2), 
         })
@@ -409,7 +409,7 @@ class HConVRP:
         """
         socketio.emit('solver_info', {
             'status': 'Info', 
-            'progress': 20, 
+            'progress': "-", 
             'text': f"Performing Swap Optimization with Tabu List on solution with cost: <u>{round(self.solution_df['Total Cost'].iloc[-1], 2)}</u>", 
             'time_elapsed': round(time.time()-start_time, 2), 
         })
@@ -462,7 +462,7 @@ class HConVRP:
         
         socketio.emit('solver_info', {
             'status': 'Info',
-            'progress': 20,
+            'progress': "-",
             'text': f"Total intra-swaps: {total_intra_swaps} | Total inter-swaps: {total_inter_swaps} | Total frequent swaps: {total_frequent_swaps}",
             'time_elapsed': round(time.time()-start_time, 2),
         })
@@ -480,7 +480,7 @@ class HConVRP:
         """
         socketio.emit('solver_info', {
             'status': 'Info', 
-            'progress': 20, 
+            'progress': "-", 
             'text': f"Performing ChangeVehicleChain Optimization on solution with cost: <u>{round(self.solution_df['Total Cost'].iloc[-1], 2)}</u> - (Number of vehicle combinations: {len(self.vehicles) ** 3 * self.planning_horizon})",
             'time_elapsed': round(time.time()-start_time, 2), 
         })
@@ -542,7 +542,7 @@ class HConVRP:
 
         socketio.emit('solver_info', {
             'status': 'Info', 
-            'progress': 20, 
+            'progress': "-", 
             'text': f"Total chain relocations: {total_chain_relocations}", 
             'time_elapsed': round(time.time()-start_time, 2), 
         })
@@ -623,7 +623,7 @@ class HConVRP:
         """
         socketio.emit('solver_info', {
             'status': 'Info',
-            'progress': 20,
+            'progress': "-",
             'text': f"Performing 2-opt Optimization on solution with cost: <u>{round(self.solution_df['Total Cost'].iloc[-1], 2)}</u>",
             'time_elapsed': round(time.time()-start_time, 2),
         })
@@ -655,7 +655,7 @@ class HConVRP:
         # Emit progress update
         socketio.emit('solver_info', {
             'status': 'Info',
-            'progress': 20,
+            'progress': "-",
             'text': f"2-opt Iteration concluded within {iteration} iterations - Improvements: {total_2_opt_improvements}",
             'time_elapsed': round(time.time()-start_time, 2),
         })
@@ -732,7 +732,7 @@ class HConVRP:
         """
         socketio.emit('solver_info', {
             'status': 'Info',
-            'progress': 20,
+            'progress': "-",
             'text': f"Performing Or-opt Optimization on solution with cost: <u>{round(self.solution_df['Total Cost'].iloc[-1], 2)}</u>",
             'time_elapsed': round(time.time()-start_time, 2),
         })
@@ -764,7 +764,7 @@ class HConVRP:
         # Emit progress update
         socketio.emit('solver_info', {
             'status': 'Info',
-            'progress': 20,
+            'progress': "-",
             'text': f"Or-opt concluded within {iteration} iterations - Improvements: {total_or_opt_improvements}",
             'time_elapsed': round(time.time()-start_time, 2),
         })

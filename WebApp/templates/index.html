@@ -86,7 +86,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="card-body">
+                <div class="card-body" style="max-height: 700px;overflow-y:scroll;" id="scrollCard">
                     <p class="card-text" id="solverInfo">
                         <p id="introText">Select a dataset and initiate the solver to see info here.</p>
                         <ul class="list-group mt-2" id="solverUpdates"></ul>
@@ -107,7 +107,7 @@
     $("#evaluationNav").removeClass("active");
 
     function printCardContent() {
-        var printContents = document.getElementById('printCard').innerHTML;
+        var printContents = document.getElementById('scrollCard').innerHTML;
         var originalContents = document.body.innerHTML;
 
         document.body.innerHTML = printContents;
@@ -266,6 +266,8 @@
 
     let logIndex = 1;
 
+var vnd_iteration = "0";
+
 socket.on('solver_info', function(msg) {
     // Remove the intro text if it's the first update
     if (document.getElementById('introText')) {
@@ -291,6 +293,11 @@ socket.on('solver_info', function(msg) {
     }
 
     // Create a new list item for the update
+    if (msg.progress === "-") {
+        msg.progress = vnd_iteration;
+    } else {
+        vnd_iteration = msg.progress;
+    }
     var newListItem = `
     <li class="log-item">
         <div class="log-details">
@@ -301,7 +308,7 @@ socket.on('solver_info', function(msg) {
             <div class="log-vertical-divider"></div>
             <span class="log-text">${msg.text}</span>
             <span class="log-time">Time: ${msg.time_elapsed}"</span>
-            <span class="log-progress">Progress: ${msg.progress}%</span>
+            <span class="log-progress">VND Iteration: ${msg.progress}</span>
         </div>
     `;
 
@@ -377,8 +384,15 @@ socket.on('solver_info', function(msg) {
         $('#solverLoader').attr('hidden', true);
     }
 
-    // Scroll to the bottom of the page
-    window.scrollTo(0, document.body.scrollHeight);
+    // Scroll to the bottom of the card
+    var scrollCard = document.getElementById('scrollCard');
+    // scroll smoothly
+    scrollCard.scrollTo({
+        top: scrollCard.scrollHeight,
+        behavior: 'smooth'
+    });
+
+    
 
 
 });
