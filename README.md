@@ -37,3 +37,22 @@ You may find detailed dataset information inside the directory [HConVRPDatasets_
 * > Frequent Customers
     * **Driver Consistency**: Imposes that each frequent customer needs to be visited by the same vehicle $m \in M$ in all periods.
     * **Arrival Time Consistency**: Imposes that the difference between the earliest and latest arrival times at a frequent customer does not exceed a specified limit $L$.
+
+### Web Application
+The web application is developed using Flask web framework. To run the application, you need to install the required packages using the following command:
+
+- Linux
+```bash
+pip install -r requirements_linux.txt
+```
+
+- Windows
+```bash
+pip install -r requirements_win.txt
+```
+
+After installing the required packages, you can run the application using the following command:
+```bash
+cd WebApp
+python app.py
+```
