@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block title %}Graph Visualization{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid mt-4 mb-4">
+    <div id="graph-container">
+        {{ graph_html|safe }}
+    </div>
+</div>
+{% endblock %}

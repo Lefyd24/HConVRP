@@ -1,5 +1,5 @@
 import time
-from flask import Blueprint, jsonify, render_template, request, current_app
+from flask import Blueprint, jsonify, render_template, request, current_app, session
 import os
 import yaml
 from solver_modules.models import *
@@ -89,8 +89,6 @@ def get_dataset_file():
             return jsonify({'error': str(e)}), 500
     else:
         solution = loader.load_solution(full_path)
-        graph, edges = loader.create_graph(solution)
-        graph_content = create_interactive_graph(graph, edges, solution)
 
         checker = SolutionChecker(solution)
         # Check constraints
@@ -117,4 +115,18 @@ def get_dataset_file():
         
         solution_df = solution['metadata'].get('steps', None)
 
-        return jsonify({'evaluation_results': evaluation_results, 'solution_df': solution_df, 'graph_content': graph_content})
+        return jsonify({'evaluation_results': evaluation_results, 'solution_df': solution_df})
+
+@evaluator_bp.route('/visualize_graph', methods=['POST'])
+def visualize_graph():
+    file_path = request.get_json().get('file_path')
+    file_path = file_path.lstrip("/\\")
+    solution_root = current_app.config['SOLUTION_PATH']
+    full_path = os.path.normpath(os.path.join(solution_root, file_path))
+
+    loader = SolutionLoader()
+    solution = loader.load_solution(full_path)
+    graph, edges = loader.create_graph(solution)
+    graph_content = create_interactive_graph(graph, edges, solution)
+
+    return render_template('graph.html', graph_html=graph_content)

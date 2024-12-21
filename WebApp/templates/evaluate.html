@@ -202,7 +202,6 @@ document.getElementById('evaluationBtn').addEventListener('click', function(even
             $('#visualizationBtn').removeClass('disabled');
             var evaluation_results = response.evaluation_results;
             var solution_df = response.solution_df;
-            var graph_html_content = response.graph_content;
 
             var resultsContent = document.getElementById('evaluation-results-content');
             var solutionDfContent = document.getElementById('solution-df-content');
@@ -311,13 +310,32 @@ document.getElementById('evaluationBtn').addEventListener('click', function(even
                 solutionDfContent.innerHTML = '';
             }
 
-            // Add an event listener to the visualize button
             document.getElementById('visualizationBtn').addEventListener('click', function(event) {
                 event.preventDefault(); // Prevent the default link click behavior
-                // Open a new tab with the graph content
-                var newTab = window.open();
-                newTab.document.write(graph_html_content);
+                // Add a unique timestamp to prevent caching
+                var timestamp = new Date().getTime();
+
+                var filePath = document.querySelector('.file.selected').dataset.file.trim();
+                console.log("Sending file for visualization:", filePath);
+
+                $.ajax({
+                    url: '/visualize_graph?' + timestamp, // Append timestamp as query parameter
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ file_path: filePath }),
+                    success: function (graphHtml) {
+                        // Open the graph visualization in a new tab
+                        var newTab = window.open();
+                        newTab.document.write(graphHtml);
+                    },
+                    error: function (xhr, status, error) {
+                        console.error('Error rendering graph:', xhr);
+                    }
+                });
+
             });
+
+            
 
         },
         error: function(xhr, status, error) {

@@ -59,12 +59,12 @@ def create_interactive_graph(graph, edges, solution, write_to_file=False, filena
     # Create node mapping and add nodes with labels, positioned based on actual coordinates
     depot = solution['depot']
     node_mapping = {0: depot}
-    G.add_node(0, label="Depot", title="Depot", color='#FFD700', size=5, pos=(depot.coordinates[0], depot.coordinates[1]))
+    G.add_node(0, label="Depot", title="Depot", color='#FFD700', size=20, pos=(depot.coordinates[0], depot.coordinates[1]))
 
     # Add customer nodes with actual coordinates
     for customer in solution['customers']:
         G.add_node(customer.id, label=f"Customer {customer.id}", title=str(customer),
-                   color='#00FA9A', size=15, pos=(customer.coordinates[0], customer.coordinates[1]))
+                   color='#00FA9A', size=11, pos=(customer.coordinates[0], customer.coordinates[1]))
 
     # Prepare edges for each period
     period_edges = {}
@@ -81,10 +81,10 @@ def create_interactive_graph(graph, edges, solution, write_to_file=False, filena
 
     # Generate the initial graph with the first period's edges
     for edge in period_edges[0]:
-        G.add_edge(edge["from"], edge["to"], color=edge["color"], title=edge["title"])
+        G.add_edge(edge["from"], edge["to"], color=edge["color"], title=edge["title"], width=2)
     
     # Create the PyVis network from NetworkX graph
-    net = Network(height='750px', width='100%', directed=True, bgcolor='#1e1e1e', font_color='white', select_menu=True, filter_menu=True)
+    net = Network(height='750px', width='100%', directed=True, bgcolor='white', font_color='black', select_menu=True, filter_menu=True)
     net.from_nx(G)
     net.toggle_physics(False)  # Disable physics simulation for better layout
 
@@ -92,18 +92,19 @@ def create_interactive_graph(graph, edges, solution, write_to_file=False, filena
     for node in net.nodes:
         if "pos" in G.nodes[node['id']]:
             pos = G.nodes[node['id']]['pos']
-            node['x'] = pos[0] * 20
-            node['y'] = pos[1] * 20
+            node['x'] = pos[0] * 30
+            node['y'] = pos[1] * 30
 
     # Custom JavaScript for slider functionality
     custom_script = f"""
     <script type="text/javascript">
         document.addEventListener("DOMContentLoaded", function() {{
             var periodEdges = {json.dumps(period_edges)};
+
             function updateGraph(period) {{
-                var selectedEdges = periodEdges[period];
-                var allEdges = network.body.data.edges.get();
+                var selectedEdges = periodEdges[period] || [];
                 network.body.data.edges.clear();
+
                 selectedEdges.forEach(function(edge) {{
                     network.body.data.edges.add({{
                         from: edge.from,
@@ -113,28 +114,36 @@ def create_interactive_graph(graph, edges, solution, write_to_file=False, filena
                         title: edge.title
                     }});
                 }});
-                document.getElementById("periodValue").innerHTML = period;
             }}
-            document.getElementById("periodSlider").addEventListener("input", function() {{
-                updateGraph(this.value);
+
+            // Handle dropdown change
+            var dropdown = document.getElementById("periodDropdown");
+            dropdown.addEventListener("change", function() {{
+                console.log("Selected period:", this.value);
+                var selectedPeriod = parseInt(this.value, 10);
+                updateGraph(selectedPeriod);
             }});
-            updateGraph(0); // Initialize graph with period 0
+
+            // Initialize the graph with the first period
+            updateGraph(0);
         }});
     </script>
     """
 
-    # Slider and title HTML
-    slider_html = f"""
-    <div style="text-align: center; color: white;">
-        <input type="range" min="0" max="{max_period}" value="0" class="slider" id="periodSlider" style="width: 100%;">
-        <p style='color:#FFF'>Period: <span id="periodValue">0</span></p>
+    # Dropdown HTML for selecting periods
+    dropdown_html = """
+    <div style="text-align: center; margin-top: 20px;">
+        <label for="periodDropdown" style="color: white; font-size: 16px; margin-right: 10px;">Select Period:</label>
+        <select id="periodDropdown" style="padding: 5px; font-size: 16px;">
+    """ + "".join([f'<option value="{period}">Period {period}</option>' for period in range(max_period + 1)]) + """
+        </select>
     </div>
     """
 
     # Insert the custom JavaScript and slider into the HTML content
     html_content = net.generate_html()
     html_content = html_content.replace('lib/', '/static/lib/')
-    html_content = html_content.replace('</body>', custom_script + slider_html + '</body>')
+    html_content = html_content.replace('</body>', custom_script + dropdown_html + '</body>')
     
     # Write the final HTML to a file
     if write_to_file:
