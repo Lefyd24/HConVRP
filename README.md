@@ -16,7 +16,7 @@ This repository provides tools and resources for solving the Consistent Vehicle 
 # Requirements
 Clone the repository and install the required packages using the following command:
 
-- Linux
+- Linux/MacOS
 ```bash
 pip install -r requirements_linux.txt
 ```
