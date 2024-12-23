@@ -55,7 +55,7 @@ def solve():
         'min_total_cost': best_cost  # Send the initial total cost to the front-end
     })
     
-    # VND Loop: Swap and Relocation Optimization with neighborhood switching
+    # VND Loop
     VND_iterator = 0
     k = 0  # Number of neighborhoods
     improved = True
