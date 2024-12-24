@@ -100,3 +100,11 @@ After installing the required packages, you can run the application using the fo
 cd WebApp
 python app.py
 ```
+
+---
+
+**Author**: Fthenos Eleftherios
+
+**Supervisor Professor**: Zachariadis Emmanouil
+
+**2024 - 2025**
