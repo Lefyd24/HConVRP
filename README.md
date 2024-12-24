@@ -39,7 +39,7 @@ You may find detailed dataset information inside the directory [HConVRPDatasets_
 ├── HConVRPDatasets_YML
 │   ├── Medium           # Medium-sized datasets in .yaml format
 │   └── Small            # Small-sized datasets in .yaml format
-├── Report               # Placeholder for reports or documentation
+├── Report               # Directory for reports
 ├── Solver               # Python solver application  
 ├── WebApp
 │   ├── blueprints       # Modular Flask application structure
