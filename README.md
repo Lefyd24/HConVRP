@@ -9,8 +9,8 @@ Customer relationship management is of high importance as it strengthens custome
 # Overview
 This repository provides tools and resources for solving the Consistent Vehicle Routing Problem (HConVRP), a complex combinatorial optimization problem that balances operational costs with customer service consistency using a heterogeneous fleet of vehicles. The solution includes:
 
-- **Plain Python Solver**: A command-line application for running optimization algorithms on dataset instances.
-- **Web Application**: A Flask-based interactive interface for managing datasets, running the solver, and visualizing results.
+- **Plain Python Solver**: A command-line application for running the proposed optimization algorithm on the dataset instances.
+- **Web Application**: A Flask-based interactive interface for managing the problem's datasets, running the solver, and visualizing its results.
 - **Dataset Resources**: Predefined datasets in both `.txt` (original) and `.yaml` (used for this project) formats.
 
 # Requirements
