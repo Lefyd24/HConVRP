@@ -26,6 +26,7 @@ pip install -r requirements_linux.txt
 pip install -r requirements_win.txt
 ```
 
+### **Note**: The project is developed using Python 3.11. In order to avoid any compatibility issues, it is recommended a version $>=$ 3.11.
 
 # Dataset Information
 You may find detailed dataset information inside the directory [HConVRPDatasets_YML](HConVRPDatasets_YML/).
