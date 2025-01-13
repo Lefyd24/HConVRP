@@ -5,3 +5,4 @@ __pycache__
 .venv
 .vscode
 Solver/Solutions
+times.ipynb
