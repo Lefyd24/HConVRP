@@ -117,3 +117,6 @@ python app.py
 **Supervisor Professor**: Zachariadis Emmanouil
 
 **2024 - 2025**
+
+---
+**License**: [Attribution 4.0 International](https://creativecommons.org/licenses/by/4.0/legalcode.en)
